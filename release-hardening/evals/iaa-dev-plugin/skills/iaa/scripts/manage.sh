@@ -189,14 +189,24 @@ orchestration_remove_legacy_shim() {
 }
 
 orchestration_remove_legacy_links() {
-  # LEGACY: unlink pre-rename skill-link names when they point at this source, so
-  # only one active copy can trigger.
+  # LEGACY: unlink pre-rename skill-link names when they point at this source (by
+  # resolution OR by literal legacy target — the target dangles once the source has
+  # moved to its renamed location), so only one active copy can trigger.
   for orchestration_destination in \
     "$ORCHESTRATION_USER_HOME/.agents/skills/$LEGACY_SKILL_NAME" \
     "$ORCHESTRATION_USER_HOME/.claude/skills/$LEGACY_SKILL_NAME" \
     "$ORCHESTRATION_USER_HOME/.zcode/skills/$LEGACY_SKILL_NAME"
   do
-    orchestration_remove_link "$orchestration_destination"
+    [ -L "$orchestration_destination" ] || continue
+    orchestration_literal_target=$(readlink -- "$orchestration_destination")
+    orchestration_resolved=$(readlink -f -- "$orchestration_destination" 2>/dev/null || true)
+    if [ "$orchestration_resolved" = "$ORCHESTRATION_ROOT" ] || \
+       [ "${orchestration_literal_target#*ai-agent-orchestration/}" != "$orchestration_literal_target" ]; then
+      unlink -- "$orchestration_destination"
+      printf 'unlinked legacy skill link (pre-rename): %s\n' "$orchestration_destination"
+    else
+      printf 'preserved unrelated symlink: %s\n' "$orchestration_destination"
+    fi
   done
 }
 
