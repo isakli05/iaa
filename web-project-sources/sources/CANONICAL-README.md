@@ -1,20 +1,24 @@
-# Persistent cross-tool multi-agent orchestration
+# İAA — persistent cross-tool orchestration
+
+**İAA — İştirak-i A‘mâl-i Ajanîye** (technical identifier `iaa`). Renamed 2026-09-23;
+known as MAO / Multi-Agent Orchestration at install time and in all pre-rename historical
+evidence. No orchestration semantics changed in the rename.
 
 Installed 2026-08-26 for the local Codex CLI, Claude Code, and ZCode environments. This is a user-level workflow preference; no application repository was modified.
 
 ## Architecture
 
 ```text
-~/.local/share/ai-agent-orchestration/
-└── multi-agent-orchestration/       canonical source of truth
+~/.local/share/iaa/
+└── iaa/       canonical source of truth
     ├── SKILL.md                     decision policy
     ├── references/                  delegation + platform adapters
     ├── scripts/manage.sh            install / verify / uninstall
     └── tests/scenarios.md           behavior contract
              │
-             ├── ~/.agents/skills/multi-agent-orchestration   (Codex)
-             ├── ~/.claude/skills/multi-agent-orchestration   (Claude)
-             └── ~/.zcode/skills/multi-agent-orchestration    (ZCode)
+             ├── ~/.agents/skills/iaa   (Codex)
+             ├── ~/.claude/skills/iaa   (Claude)
+             └── ~/.zcode/skills/iaa    (ZCode)
 ```
 
 All three discovery entries are relative directory symlinks to the same canonical skill. Each product also has a short managed global-instruction section that tells the primary agent to load the skill when delegation is requested or materially useful. Detailed procedure is loaded only when relevant.
@@ -55,7 +59,7 @@ The primary agent always owns decomposition, shared contracts, disjoint write ow
 
 ### Codex
 
-Codex reads the global shim from `~/.codex/AGENTS.md` and discovers the canonical skill through `~/.agents/skills/multi-agent-orchestration`. The pre-existing `[agents]` configuration remains enabled with a four-child concurrent ceiling. No Codex model name was added or changed.
+Codex reads the global shim from `~/.codex/AGENTS.md` and discovers the canonical skill through `~/.agents/skills/iaa`. The pre-existing `[agents]` configuration remains enabled with a four-child concurrent ceiling. No Codex model name was added or changed.
 
 Codex can use targeted history-free/bounded forks for isolation and full-history forks only when the child genuinely needs surrounding decisions. The pre-existing `~/.codex/agents/reviewer.toml` remains available; this installation did not create or modify it.
 
@@ -75,21 +79,21 @@ Built-in Explore is read-only and does not inject AGENTS.md. General-purpose and
 
 Existing Graphify sections in all three global instruction files were preserved. Codex's older, duplicated native-orchestration prose was replaced by the managed shim because the canonical skill now holds that method.
 
-The enabled Superpowers plugin in Claude and ZCode contributes `subagent-driven-development` (SDD), a complete alternative orchestration engine: fresh implementer per task, mandatory task review and final whole-branch review, no parallel implementers. MAO and SDD are never composed on one task — see "Superpowers execution modes" below. Compatible Superpowers component skills remain usable individually. No plugin cache file was edited and the plugin stays enabled.
+The enabled Superpowers plugin in Claude and ZCode contributes `subagent-driven-development` (SDD), a complete alternative orchestration engine: fresh implementer per task, mandatory task review and final whole-branch review, no parallel implementers. İAA and SDD are never composed on one task — see "Superpowers execution modes" below. Compatible Superpowers component skills remain usable individually. No plugin cache file was edited and the plugin stays enabled.
 
 ## Superpowers execution modes
 
 Exactly one orchestration authority governs a task.
 
-**Mode 1 — Adaptive MAO (default).** Any request to use subagents, delegate, divide, or parallelize — including "use subagents where appropriate" — selects MAO. The full SDD umbrella skill is not loaded as a competing authority; its per-task reviewer cadence, fresh-implementer rule, and sequential-implementer rule do not enter execution. MAO alone decides topology, concurrency, ownership, and review materiality, and owns integration and final validation.
+**Mode 1 — Adaptive İAA (default).** Any request to use subagents, delegate, divide, or parallelize — including "use subagents where appropriate" — selects İAA. The full SDD umbrella skill is not loaded as a competing authority; its per-task reviewer cadence, fresh-implementer rule, and sequential-implementer rule do not enter execution. İAA alone decides topology, concurrency, ownership, and review materiality, and owns integration and final validation.
 
-**Mode 2 — Native Superpowers SDD (explicit opt-in).** Only an explicit request naming the workflow ("use native superpowers:subagent-driven-development", "execute this with Superpowers SDD") selects it. SDD then governs its own execution; MAO does not constrain it. The modes are mutually exclusive per task.
+**Mode 2 — Native Superpowers SDD (explicit opt-in).** Only an explicit request naming the workflow ("use native superpowers:subagent-driven-development", "execute this with Superpowers SDD") selects it. SDD then governs its own execution; İAA does not constrain it. The modes are mutually exclusive per task.
 
-**Component skills MAO mode may still use individually:** `test-driven-development`, `using-git-worktrees`, `verification-before-completion`, `receiving-code-review`, `finishing-a-development-branch`, `systematic-debugging`, `writing-plans`, and `executing-plans` for plan-execution discipline. Two component skills prescribe agent seats — `requesting-code-review` and `dispatching-parallel-agents` — and are applied only to execute a lane MAO has already authorized. SDD-internal mechanisms (ledger workspace, task-brief/review-package scripts, prompt templates) are not required in MAO mode; the delegation contract covers briefs and handoffs.
+**Component skills İAA mode may still use individually:** `test-driven-development`, `using-git-worktrees`, `verification-before-completion`, `receiving-code-review`, `finishing-a-development-branch`, `systematic-debugging`, `writing-plans`, and `executing-plans` for plan-execution discipline. Two component skills prescribe agent seats — `requesting-code-review` and `dispatching-parallel-agents` — and are applied only to execute a lane İAA has already authorized. SDD-internal mechanisms (ledger workspace, task-brief/review-package scripts, prompt templates) are not required in İAA mode; the delegation contract covers briefs and handoffs.
 
-**Review authorization stays adaptive.** MAO authorizes an independent reviewer when risk warrants it (auth, security, destructive migrations, concurrency, shared contracts, public APIs, ambiguous correctness); low-risk mechanical work is verified by the primary. Authorizing a review never preauthorizes a fixer or re-reviewer.
+**Review authorization stays adaptive.** İAA authorizes an independent reviewer when risk warrants it (auth, security, destructive migrations, concurrency, shared contracts, public APIs, ambiguous correctness); low-risk mechanical work is verified by the primary. Authorizing a review never preauthorizes a fixer or re-reviewer.
 
-**Why not prose precedence:** behavioral evidence (2026-08-27, `~/collision-smoke-test-evidence/post-fix-20260827/`) showed the same precedence policy honored in one model sample and ignored in another once SDD's full imperative body was loaded. The fix moves control to skill selection: SDD is simply not loaded in MAO mode, so there is no second topology authority to fight.
+**Why not prose precedence:** behavioral evidence (2026-08-27, `~/collision-smoke-test-evidence/post-fix-20260827/`) showed the same precedence policy honored in one model sample and ignored in another once SDD's full imperative body was loaded. The fix moves control to skill selection: SDD is simply not loaded in İAA mode, so there is no second topology authority to fight.
 
 **Testing the routing:** `tests/scenarios.md` J (default delegation request must not load SDD) and K (explicit native request must let SDD govern). Post-separation behavioral evidence lives in `~/mao-sdd-archfix-20260827/`.
 
@@ -99,19 +103,19 @@ Exactly one orchestration authority governs a task.
 
 Created files:
 
-- `/home/isa/.local/share/ai-agent-orchestration/README.md`
-- `/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/SKILL.md`
-- `/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/references/delegation-contract.md`
-- `/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/references/platform-adapters.md`
-- `/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh`
-- `/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/tests/scenarios.md`
-- `/home/isa/.config/ai-agent-orchestration/claude-depth.state`
+- `/home/isa/.local/share/iaa/README.md`
+- `/home/isa/.local/share/iaa/iaa/SKILL.md`
+- `/home/isa/.local/share/iaa/iaa/references/delegation-contract.md`
+- `/home/isa/.local/share/iaa/iaa/references/platform-adapters.md`
+- `/home/isa/.local/share/iaa/iaa/scripts/manage.sh`
+- `/home/isa/.local/share/iaa/iaa/tests/scenarios.md`
+- `/home/isa/.config/iaa/claude-depth.state`
 
 Created symlinks:
 
-- `/home/isa/.agents/skills/multi-agent-orchestration -> ../../.local/share/ai-agent-orchestration/multi-agent-orchestration`
-- `/home/isa/.claude/skills/multi-agent-orchestration -> ../../.local/share/ai-agent-orchestration/multi-agent-orchestration`
-- `/home/isa/.zcode/skills/multi-agent-orchestration -> ../../.local/share/ai-agent-orchestration/multi-agent-orchestration`
+- `/home/isa/.agents/skills/iaa -> ../../.local/share/iaa/iaa`
+- `/home/isa/.claude/skills/iaa -> ../../.local/share/iaa/iaa`
+- `/home/isa/.zcode/skills/iaa -> ../../.local/share/iaa/iaa`
 
 Modified files:
 
@@ -122,13 +126,13 @@ Modified files:
 
 Backups created:
 
-- `/home/isa/.codex/AGENTS.md.multi-agent-orchestration-backup-20260826T173941+0300`
-- `/home/isa/.codex/AGENTS.md.multi-agent-orchestration-backup-20260826T174355+0300`
-- `/home/isa/.claude/CLAUDE.md.multi-agent-orchestration-backup-20260826T173941+0300`
-- `/home/isa/.claude/CLAUDE.md.multi-agent-orchestration-backup-20260826T174355+0300`
-- `/home/isa/.claude/settings.json.multi-agent-orchestration-backup-20260826T173941+0300`
-- `/home/isa/.zcode/AGENTS.md.multi-agent-orchestration-backup-20260826T173941+0300`
-- `/home/isa/.zcode/AGENTS.md.multi-agent-orchestration-backup-20260826T174355+0300`
+- `/home/isa/.codex/AGENTS.md.iaa-backup-20260826T173941+0300`
+- `/home/isa/.codex/AGENTS.md.iaa-backup-20260826T174355+0300`
+- `/home/isa/.claude/CLAUDE.md.iaa-backup-20260826T173941+0300`
+- `/home/isa/.claude/CLAUDE.md.iaa-backup-20260826T174355+0300`
+- `/home/isa/.claude/settings.json.iaa-backup-20260826T173941+0300`
+- `/home/isa/.zcode/AGENTS.md.iaa-backup-20260826T173941+0300`
+- `/home/isa/.zcode/AGENTS.md.iaa-backup-20260826T174355+0300`
 
 The second AGENTS/CLAUDE backups were produced by the first installer normalization pass; subsequent installer runs were byte-identical and produced no additional backups.
 
@@ -162,7 +166,7 @@ The first A run exposed over-triggering through a manufactured reviewer task. Th
 Edit the canonical files only:
 
 ```sh
-${EDITOR:-vi} /home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/SKILL.md
+${EDITOR:-vi} /home/isa/.local/share/iaa/iaa/SKILL.md
 ```
 
 Changes flow through all three symlinks immediately. Codex normally detects skill edits automatically; restart if a selector is stale. In Claude run `/reload-skills` or start a new session. In ZCode open Settings → Skills, click Refresh, and start a new task if an existing task still has old metadata.
@@ -174,16 +178,16 @@ Keep the description concise and trigger-specific; ZCode injects only about the 
 Run the static checks:
 
 ```sh
-/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh verify
+/home/isa/.local/share/iaa/iaa/scripts/manage.sh verify
 python3 /home/isa/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  /home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration
+  /home/isa/.local/share/iaa/iaa
 ```
 
 Product-native checks:
 
-- Codex: `codex -a never exec --ephemeral -s read-only --skip-git-repo-check 'Invoke $multi-agent-orchestration and summarize its delegation decision rule.'`
-- Claude: after login, use `/memory`, `/skills`, and `/reload-skills`; invoke `/multi-agent-orchestration` or a matching natural-language prompt.
-- ZCode: Settings → Skills → Refresh; confirm `multi-agent-orchestration` is enabled, then invoke `$multi-agent-orchestration`. Settings → Subagents should show the built-in general-purpose and Explore roles.
+- Codex: `codex -a never exec --ephemeral -s read-only --skip-git-repo-check 'Invoke $iaa and summarize its delegation decision rule.'`
+- Claude: after login, use `/memory`, `/skills`, and `/reload-skills`; invoke `/iaa` or a matching natural-language prompt.
+- ZCode: Settings → Skills → Refresh; confirm `iaa` is enabled, then invoke `$iaa`. Settings → Subagents should show the built-in general-purpose and Explore roles.
 
 ## Disable, reinstall, or uninstall
 
@@ -192,7 +196,7 @@ For one task, say: `Do not delegate or spawn subagents for this task.`
 For a full reversible uninstall:
 
 ```sh
-/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh uninstall
+/home/isa/.local/share/iaa/iaa/scripts/manage.sh uninstall
 ```
 
 This removes only the three marked shims and three symlinks, and removes the Claude depth setting only if it still has the managed value `1`. It preserves unrelated configuration, backups, and the canonical source. Restart active sessions after uninstalling.
@@ -200,10 +204,10 @@ This removes only the three marked shims and three symlinks, and removes the Cla
 Reinstall with:
 
 ```sh
-/home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh install
+/home/isa/.local/share/iaa/iaa/scripts/manage.sh install
 ```
 
-To remove the retained source too, first run `uninstall`, then move `/home/isa/.local/share/ai-agent-orchestration` to a recoverable archive location. Remove `/home/isa/.config/ai-agent-orchestration` only after confirming it contains no state you want to keep.
+To remove the retained source too, first run `uninstall`, then move `/home/isa/.local/share/iaa` to a recoverable archive location. Remove `/home/isa/.config/iaa` only after confirming it contains no state you want to keep.
 
 ## Limitations
 

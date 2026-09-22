@@ -6,13 +6,13 @@ Genuine, evidence-backed limitations only. No invented improvement work.
 
 1. **Instruction-following, not harness enforcement.** Mode routing and the artifact
    provenance rule are natural-language policy. Claude Code's official doctrine: prose is
-   "a request, not a guarantee." A future model sample could load SDD in MAO mode — the fix
+   "a request, not a guarantee." A future model sample could load SDD in İAA mode — the fix
    made that a *single visible routing violation* (detectable by scenario J / analyze_run.py)
    instead of silent cadence leakage, but it did not make it impossible. Evidence: 3-sample
    variance that defeated the prose fix (ADR-0001) never re-occurred post-fix (6+ samples),
    yet samples ≠ proof.
-2. **One-directional boundary.** MAO knows about Superpowers; Superpowers knows nothing about
-   MAO. Any upstream change (new redirect, new bootstrap aggressiveness, renamed skills)
+2. **One-directional boundary.** İAA knows about Superpowers; Superpowers knows nothing about
+   İAA. Any upstream change (new redirect, new bootstrap aggressiveness, renamed skills)
    re-opens the contest until the documented upgrade-check runs.
 3. **Codex nesting is policy-only.** `max_depth=1` in Codex config is a V1 fallback that
    MultiAgentV2 ignores; on Codex, the no-nested-agents rule rests on briefs + policy. Claude

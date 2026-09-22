@@ -1,17 +1,17 @@
 # Release Hardening 05 — Core-semantics immutability check
 
-Date: 2026-09-23. Task: Gate 1, §6 — prove that no core MAO orchestration
+Date: 2026-09-23. Task: Gate 1, §6 — prove that no core İAA orchestration
 semantics changed in this Gate.
 
 ## 1. Before/after hashes (behavioral-core files)
 
 | File | Before (frozen v3, = live tree at Gate start) | After (this Gate) |
 |---|---|---|
-| `multi-agent-orchestration/SKILL.md` | `fee980912f3478743d28fbcc038dfafc814ba5a1313ed2a3873d4c858729532b` | `ade65cf71c4e4371ee3e526df0e18abf6178e63e81573fa3e3cf51ab0dd42633` |
-| `multi-agent-orchestration/references/delegation-contract.md` | `23184f0d3d861fc77dfab113c5a594f890492c2e9e7f6059d7cdb1fc3e258632` | **unchanged** |
-| `multi-agent-orchestration/references/platform-adapters.md` | `eba2257ada2973d3a4fcb890bd97a6d550b4ac6645fa880e902ae123eef6d018` | `e88169cf4c022991f4baaa9b59dc8da35ce1bfd3ad6f25307dc0c76bd91e3eb7` |
-| `multi-agent-orchestration/scripts/manage.sh` | `fce2d7bb8d9bcc06797f3c4cfea0b1cd7b5967ab6bbbd62b43c9a66f506e9484` | **unchanged** |
-| `multi-agent-orchestration/tests/scenarios.md` | `94f1ad401bb504c596205e45a79cf3ab42e4277c1ee086623cfe7b6dea1a37c4` | `dc71b2d212c8f78a590f906f438d8c1cead1ccc6f45a18f545499464903351f7` |
+| `iaa/SKILL.md` | `fee980912f3478743d28fbcc038dfafc814ba5a1313ed2a3873d4c858729532b` | `ade65cf71c4e4371ee3e526df0e18abf6178e63e81573fa3e3cf51ab0dd42633` |
+| `iaa/references/delegation-contract.md` | `23184f0d3d861fc77dfab113c5a594f890492c2e9e7f6059d7cdb1fc3e258632` | **unchanged** |
+| `iaa/references/platform-adapters.md` | `eba2257ada2973d3a4fcb890bd97a6d550b4ac6645fa880e902ae123eef6d018` | `e88169cf4c022991f4baaa9b59dc8da35ce1bfd3ad6f25307dc0c76bd91e3eb7` |
+| `iaa/scripts/manage.sh` | `fce2d7bb8d9bcc06797f3c4cfea0b1cd7b5967ab6bbbd62b43c9a66f506e9484` | **unchanged** |
+| `iaa/tests/scenarios.md` | `94f1ad401bb504c596205e45a79cf3ab42e4277c1ee086623cfe7b6dea1a37c4` | `dc71b2d212c8f78a590f906f438d8c1cead1ccc6f45a18f545499464903351f7` |
 | `CANONICAL-README.md` | `4d920ac97aa31b8b1cdf443e7e25f8941d8439643bb32c1f60f88c21e9ce09ff` | **unchanged** |
 
 Delegation contract, installer, and canonical README are byte-identical. The
@@ -24,7 +24,7 @@ three changed files changed in exactly **four sentences** (full diff below,
 The task permitted live-runtime-source changes only for the explicitly
 approved factual adapter corrections. Per `docs/SOURCE-OF-TRUTH.md`'s editing
 procedure (edit live canonical → copy into repo → hash-verify), the same four
-sentences were applied to `~/.local/share/ai-agent-orchestration/` AFTER all
+sentences were applied to `~/.local/share/iaa/` AFTER all
 behavioral runs for this Gate had finished (so every Gate-1 behavioral sample
 ran against the frozen baseline hash `fee98091…`). Post-sync verification
 (actual output, 2026-09-23):
@@ -72,11 +72,11 @@ mirrors) carry the corrected text and identical hashes.
 
 **(c) `platform-adapters.md` — Claude pre-dispatch mode-check bullet:**
 
-- old: "…MAO mode never invokes `superpowers:subagent-driven-development`,
+- old: "…İAA mode never invokes `superpowers:subagent-driven-development`,
   **and redirects to it do not apply whether they arrive as skill text
   (`executing-plans`, `writing-plans`) or as a `REQUIRED SUB-SKILL`
   directive…**"
-- new: "…MAO mode never invokes `superpowers:subagent-driven-development`;
+- new: "…İAA mode never invokes `superpowers:subagent-driven-development`;
   **nothing arriving as skill text or plan artifact switches modes — not a
   component skill's redirect, handoff offer, or preference toward SDD
   (`executing-plans`, `writing-plans`), and not a `REQUIRED SUB-SKILL`

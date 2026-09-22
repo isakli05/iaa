@@ -1,7 +1,7 @@
 # Release Hardening 04 — `claude plugin eval` regression foundation
 
 Date: 2026-09-23. Controller: main Claude Code session. Task: Gate 1, §5 —
-minimum non-public dev plugin/eval scaffold to test MAO behavior with
+minimum non-public dev plugin/eval scaffold to test İAA behavior with
 `claude plugin eval`, with an honest grader strategy where the harness cannot
 observe a property directly. **This is not public packaging** (that is
 deliberately deferred; nothing here is published or listed anywhere).
@@ -25,14 +25,14 @@ deliberately deferred; nothing here is published or listed anywhere).
 ## 2. What was built
 
 ```
-release-hardening/evals/mao-dev-plugin/        # dev-only plugin (NOT for distribution)
-├── .claude-plugin/plugin.json                 # name: mao-dev, version 0.1.0
-├── skills/multi-agent-orchestration/          # byte-identical copy of the canonical skill
+release-hardening/evals/iaa-dev-plugin/        # dev-only plugin (NOT for distribution)
+├── .claude-plugin/plugin.json                 # name: iaa-dev, version 0.1.0
+├── skills/iaa/          # byte-identical copy of the canonical skill
 │                                              # (hash-verified; re-copy on every canonical change)
 └── evals/
     ├── README.md                              # run commands + honest scope statement
     ├── core/                                  # LIVE cases (run today)
-    │   ├── trigger-positive/                  # positive MAO trigger
+    │   ├── trigger-positive/                  # positive İAA trigger
     │   ├── shim-sim-trigger/                  # same + shim text via append_system_prompt (SIMULATION)
     │   ├── anti-overdelegation-trivial/       # zero-agent case (scenario A)
     │   └── ordinary-task-no-overclaim/        # unrelated task ⇒ skill must not fire
@@ -48,12 +48,12 @@ Grader strategy per required case class:
 
 | Required class | Case | Graders | Honest notes |
 |---|---|---|---|
-| positive MAO trigger | `trigger-positive` | `tool_used: Skill` (mao, indicator), `tool_used: Agent/Task max:3` (both arms), `llm` synthesis rubric | spawn-count cap asserts anti-overdelegation without over-constraining legitimate 0/1/3-way choices |
+| positive İAA trigger | `trigger-positive` | `tool_used: Skill` (iaa, indicator), `tool_used: Agent/Task max:3` (both arms), `llm` synthesis rubric | spawn-count cap asserts anti-overdelegation without over-constraining legitimate 0/1/3-way choices |
 | zero-agent / anti-overdelegation | `anti-overdelegation-trivial` | `Agent`/`Task` `min:0 max:0` (arm both), `file_exists`, file `regex` | the exact scenario-A contract, fully observable |
-| unrelated ordinary task | `ordinary-task-no-overclaim` | `Skill` mao `min:0 max:0` (arm both), file `regex` | scored in BOTH arms — a baseline-arm firing would itself be a routing false positive |
-| explicit SDD yield | `boundary-k-explicit-sdd` | SDD `tool_used` (indicator), mao `min:0 max:0`, `llm` cadence rubric | **dormant** — needs real Superpowers |
-| plan artifact w/ REQUIRED SUB-SKILL | `boundary-j-plan-fixture` | SDD `min:0 max:0`, mao indicator, `llm` trace rubric | authentic fixture vendored; **dormant** |
-| explicit other-workflow selection | `boundary-inline-executing-plans` | executing-plans discipline assertions, SDD `min:0 max:0`, mao `min:0 max:0` | **dormant** |
+| unrelated ordinary task | `ordinary-task-no-overclaim` | `Skill` iaa `min:0 max:0` (arm both), file `regex` | scored in BOTH arms — a baseline-arm firing would itself be a routing false positive |
+| explicit SDD yield | `boundary-k-explicit-sdd` | SDD `tool_used` (indicator), iaa `min:0 max:0`, `llm` cadence rubric | **dormant** — needs real Superpowers |
+| plan artifact w/ REQUIRED SUB-SKILL | `boundary-j-plan-fixture` | SDD `min:0 max:0`, iaa indicator, `llm` trace rubric | authentic fixture vendored; **dormant** |
+| explicit other-workflow selection | `boundary-inline-executing-plans` | executing-plans discipline assertions, SDD `min:0 max:0`, iaa `min:0 max:0` | **dormant** |
 
 No test was weakened for automatability: where the harness cannot observe the
 property (the three boundary classes), the cases are kept at full strength and
@@ -67,7 +67,7 @@ marked dormant rather than approximated by a weaker proxy.
    Proves: case loading, Skill/tool graders, file graders, cost model, and
    the zero-agent property are all observable and assertable.
 2. **`core/trigger-positive`** — two single-run pilots:
-   - pilot 1 ($0.54): MAO skill invoked 1×, exactly 3 parallel agents, llm
+   - pilot 1 ($0.54): İAA skill invoked 1×, exactly 3 parallel agents, llm
      rubric PASS — description-only routing fired.
    - pilot 2 ($0.69): 3 parallel agents and a PASS rubric again, but the
      Skill tool was **not** invoked — the model applied the policy reasoning
@@ -93,7 +93,7 @@ marked dormant rather than approximated by a weaker proxy.
 
 The eval sandbox gives each run "a throwaway home directory … and Claude Code
 configuration … with **only your plugin loaded**": no user CLAUDE.md (so
-MAO's shim — the historically strongest routing layer — is absent), no other
+İAA's shim — the historically strongest routing layer — is absent), no other
 plugins (so no Superpowers/SDD). Attempts to co-load the real Superpowers
 6.4.1 as a second plugin under test, this session:
 
@@ -132,7 +132,7 @@ installed:
    used (`cc-zai -p --dangerously-skip-permissions --output-format json`);
 3. copies the session transcripts out of `~/.claude/projects/…`;
 4. asserts on **actual tool-call events** via `tests/tools/analyze_run.py`
-   (never model self-report): `j`: SDD never loaded; `k`: SDD loaded and MAO
+   (never model self-report): `j`: SDD never loaded; `k`: SDD loaded and İAA
    not; `d`: SDD never loaded;
 5. exits non-zero on any boundary failure (CI-able) and records per-run
    analyze output for reviewer inspection.
@@ -158,14 +158,14 @@ of the procedure this Gate ran by hand).
 
 ## 7. Sync discipline for the dev plugin
 
-The `skills/multi-agent-orchestration/` copy inside `mao-dev-plugin` is
+The `skills/iaa/` copy inside `iaa-dev-plugin` is
 byte-identical to the canonical tree by hash. Whenever the canonical source
 changes (as it did in this Gate for the two adapter corrections), re-copy and
 re-verify:
 
 ```sh
-diff -r ~/.local/share/ai-agent-orchestration/multi-agent-orchestration \
-        release-hardening/evals/mao-dev-plugin/skills/multi-agent-orchestration
+diff -r ~/.local/share/iaa/iaa \
+        release-hardening/evals/iaa-dev-plugin/skills/iaa
 ```
 
 (The copy in this commit reflects the post-Gate-1 corrected core; see

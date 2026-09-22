@@ -3,9 +3,9 @@
 ## Live vs maintained
 
 - **Live runtime source (consumed by all three runtimes, unchanged since 2026-08-27):**
-  `/home/isa/.local/share/ai-agent-orchestration/` — hash-pinned (SKILL.md v3 =
+  `/home/isa/.local/share/iaa/` — hash-pinned (SKILL.md v3 =
   sha256 `fee98091…`, 7,913 B). NOT version-controlled in place.
-- **Maintained/versioned copy:** the `multi-agent-orchestration/` GitHub baseline repo
+- **Maintained/versioned copy:** the `iaa/` GitHub baseline repo
   (private, isakli05) holds a byte-identical copy + this documentation. Sync rule: edit
   live → copy → hash-verify → commit.
 

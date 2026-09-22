@@ -20,9 +20,9 @@
 ## How to re-run key checks (safe, current machine)
 
 ```sh
-~/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh verify
+~/.local/share/iaa/iaa/scripts/manage.sh verify
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  ~/.local/share/ai-agent-orchestration/multi-agent-orchestration
+  ~/.local/share/iaa/iaa
 # transcript analysis of any preserved campaign run:
 python3 tests/tools/analyze_run.py <path-to-primary-transcript.jsonl>
 ```
@@ -37,7 +37,7 @@ Re-run after every Superpowers update (upgrade-check procedure in CANONICAL-READ
 
 | Scenario | Ever executed? | Where |
 |---|---|---|
-| A–E (trivial/exploration/overlapping-write/explicit/implicit) | YES — install-time Codex smoke (A needed one policy tightening, then passed) | README validation log; session `-tmp-multi-agent-orchestration-smoke-*` |
+| A–E (trivial/exploration/overlapping-write/explicit/implicit) | YES — install-time Codex smoke (A needed one policy tightening, then passed) | README validation log; session `-tmp-iaa-smoke-*` |
 | F nested-delegation boundary | NO (rejection side incidentally proven everywhere; authorized-nesting path never exercised) | — |
 | G conflicting fan-out skill | SUPERSEDED by the real instance: campaigns 1–3 tested the actual SDD collision far harder | campaign trees |
 | H failed/interrupted child | NO | — |

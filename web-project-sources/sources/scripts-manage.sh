@@ -5,19 +5,19 @@ ORCHESTRATION_ACTION=${1:-install}
 ORCHESTRATION_SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 ORCHESTRATION_ROOT=$(CDPATH= cd -- "$ORCHESTRATION_SCRIPT_DIR/.." && pwd -P)
 ORCHESTRATION_USER_HOME=${ORCHESTRATION_HOME:-${HOME:?HOME is not set}}
-ORCHESTRATION_STATE_DIR="$ORCHESTRATION_USER_HOME/.config/ai-agent-orchestration"
+ORCHESTRATION_STATE_DIR="$ORCHESTRATION_USER_HOME/.config/iaa"
 ORCHESTRATION_DEPTH_STATE="$ORCHESTRATION_STATE_DIR/claude-depth.state"
 
-MANAGED_BEGIN='<!-- BEGIN managed: multi-agent-orchestration -->'
-MANAGED_END='<!-- END managed: multi-agent-orchestration -->'
+MANAGED_BEGIN='<!-- BEGIN managed: iaa -->'
+MANAGED_END='<!-- END managed: iaa -->'
 
 orchestration_backup_name() {
   orchestration_source=$1
   orchestration_stamp=$(date +%Y%m%dT%H%M%S%z)
-  orchestration_candidate="$orchestration_source.multi-agent-orchestration-backup-$orchestration_stamp"
+  orchestration_candidate="$orchestration_source.iaa-backup-$orchestration_stamp"
   orchestration_index=1
   while [ -e "$orchestration_candidate" ] || [ -L "$orchestration_candidate" ]; do
-    orchestration_candidate="$orchestration_source.multi-agent-orchestration-backup-$orchestration_stamp-$orchestration_index"
+    orchestration_candidate="$orchestration_source.iaa-backup-$orchestration_stamp-$orchestration_index"
     orchestration_index=$((orchestration_index + 1))
   done
   printf '%s\n' "$orchestration_candidate"
@@ -83,9 +83,9 @@ orchestration_write_shim() {
   fi
   printf '%s\n' \
     "$MANAGED_BEGIN" \
-    '## Multi-agent orchestration' \
+    '## İAA orchestration' \
     '' \
-    'For non-trivial tasks, evaluate whether delegation offers concrete parallelism, bounded-context isolation, specialization, context offloading, or independent verification. When the user requests subagents, delegation, or parallel agents—or delegation is materially useful—load and follow the installed `multi-agent-orchestration` skill before spawning.' \
+    'For non-trivial tasks, evaluate whether delegation offers concrete parallelism, bounded-context isolation, specialization, context offloading, or independent verification. When the user requests subagents, delegation, or parallel agents—or delegation is materially useful—load and follow the installed `iaa` skill before spawning.' \
     '' \
     'Interpret "use subagents" as permission for only beneficial, bounded delegation, not a requirement to maximize agent count. The primary agent owns decomposition, disjoint write ownership, shared contracts, integration, and final validation. This skill is the sole orchestration authority in its mode: do not combine it with other orchestration workflow skills such as superpowers:subagent-driven-development; a native workflow like that one applies only when the user explicitly requests it by name.' \
     "$MANAGED_END" >> "$orchestration_temp"
@@ -219,9 +219,9 @@ orchestration_verify() {
     orchestration_fail=1
   fi
   for orchestration_destination in \
-    "$ORCHESTRATION_USER_HOME/.agents/skills/multi-agent-orchestration" \
-    "$ORCHESTRATION_USER_HOME/.claude/skills/multi-agent-orchestration" \
-    "$ORCHESTRATION_USER_HOME/.zcode/skills/multi-agent-orchestration"
+    "$ORCHESTRATION_USER_HOME/.agents/skills/iaa" \
+    "$ORCHESTRATION_USER_HOME/.claude/skills/iaa" \
+    "$ORCHESTRATION_USER_HOME/.zcode/skills/iaa"
   do
     orchestration_resolved=$(readlink -f -- "$orchestration_destination" 2>/dev/null || true)
     if [ "$orchestration_resolved" = "$ORCHESTRATION_ROOT" ]; then
@@ -268,9 +268,9 @@ orchestration_verify() {
 }
 
 orchestration_install() {
-  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.agents/skills/multi-agent-orchestration"
-  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.claude/skills/multi-agent-orchestration"
-  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.zcode/skills/multi-agent-orchestration"
+  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.agents/skills/iaa"
+  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.claude/skills/iaa"
+  orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.zcode/skills/iaa"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
@@ -297,9 +297,9 @@ orchestration_uninstall() {
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
-  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.agents/skills/multi-agent-orchestration"
-  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.claude/skills/multi-agent-orchestration"
-  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.zcode/skills/multi-agent-orchestration"
+  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.agents/skills/iaa"
+  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.claude/skills/iaa"
+  orchestration_remove_link "$ORCHESTRATION_USER_HOME/.zcode/skills/iaa"
   printf 'source retained: %s\n' "$ORCHESTRATION_ROOT"
 }
 

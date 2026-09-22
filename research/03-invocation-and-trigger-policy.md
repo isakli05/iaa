@@ -1,15 +1,15 @@
 # Research 03 — Invocation and Trigger Policy (research only; no semantics changed)
 
-## MAO's current invocation semantics (verified)
+## İAA's current invocation semantics (verified)
 
 - **Claude Code:** model-invocable skill (description-matched, progressive disclosure) +
-  user-invocable `/multi-agent-orchestration` + proactive load instruction in the global
+  user-invocable `/iaa` + proactive load instruction in the global
   CLAUDE.md managed shim ("when … requested or materially useful"). No hook, no bootstrap.
-- **Codex:** implicit invocation enabled (default `allow_implicit_invocation: true` — MAO
-  ships no `agents/openai.yaml`, so it accepts the default) + `$multi-agent-orchestration`
+- **Codex:** implicit invocation enabled (default `allow_implicit_invocation: true` — İAA
+  ships no `agents/openai.yaml`, so it accepts the default) + `$iaa`
   + AGENTS.md shim.
-- **ZCode:** enabled-skill description injected each turn (≤250 chars) + `$multi-agent-
-  orchestration` + AGENTS.md shim.
+- **ZCode:** enabled-skill description injected each turn (≤250 chars) + `$iaa`
+  + AGENTS.md shim.
 - Runtime-specific difference: only the injection channel differs (description listing vs
   per-turn injection vs global instructions); the trigger *meaning* is identical by design.
 - Classification: **hybrid** — explicit and model-invocable and proactively-triggered, with
@@ -17,35 +17,35 @@
 
 ## The three public models, evaluated against coexistence
 
-### A. Explicit-only MAO (`disable-model-invocation: true`-equivalent everywhere)
+### A. Explicit-only İAA (`disable-model-invocation: true`-equivalent everywhere)
 
 - Claude: supported natively; Codex: supported (`allow_implicit_invocation: false`); ZCode:
   no documented implicit-disable flag (would need description-based discouragement only) —
   asymmetry across runtimes.
-- Coexistence wins: Class-3 (trigger) collisions vanish — MAO can never be dragged into a
-  contested selection by description match; SDD/GSD/bootstraps compete without MAO in the
+- Coexistence wins: Class-3 (trigger) collisions vanish — İAA can never be dragged into a
+  contested selection by description match; SDD/GSD/bootstraps compete without İAA in the
   listing.
-- Costs: defeats MAO's core design goal — "proactively when a complex task concretely
+- Costs: defeats İAA's core design goal — "proactively when a complex task concretely
   benefits" is half the policy's value (install-time smoke scenario E proved implicit
   benefit real); users must remember the name; the shim's "materially useful" instruction
   would contradict the frontmatter (shim would need rewording — a semantics change, out of
-  scope). Also note: audit-council shows this model works well for *bounded tools*; MAO is
+  scope). Also note: audit-council shows this model works well for *bounded tools*; İAA is
   not a bounded tool.
 - Net: safest for coexistence, contradicting to purpose.
 
-### B. Automatically model-invocable MAO (status quo, public)
+### B. Automatically model-invocable İAA (status quo, public)
 
 - The description is the entire collision surface. Current description is deliberately
   narrow ("requests to use subagents, delegate, divide, or parallelize… when a complex task
   concretely benefits… Not for small or tightly coupled work").
 - Coexistence exposure: any other broad proactive skill (a future GSD plugin, BMAD-style
   agents, a renamed SDD) matching the same request forces a selection contest every time.
-  Evidence that MAO wins such contests when it matters: the shim rides the instruction
+  Evidence that İAA wins such contests when it matters: the shim rides the instruction
   channel (6+ samples); evidence it can't be *guaranteed*: official doctrine + ADR-0001's
   variance history.
-- Public-specific risk: on other users' machines, MAO's shim text lands in *their* global
+- Public-specific risk: on other users' machines, İAA's shim text lands in *their* global
   instruction files — a strong-voiced instruction from a newly installed package. Polite
-  but assertive; must stay honest and narrow, or MAO becomes the aggressive neighbor it
+  but assertive; must stay honest and narrow, or İAA becomes the aggressive neighbor it
   defends against.
 - Net: matches purpose; requires the narrow trigger discipline + scenario-J tripwire
   documented in the upgrade-check.
@@ -69,7 +69,7 @@ redirect. For public release the description must simultaneously: (1) match dele
 requests, (2) declare sole authority, (3) anti-trigger small/coupled work, (4) fit ZCode's
 250-char injection, (5) stay under Claude's 1,536 listing budget, (6) respect the spec's
 1,024. Current description satisfies all (247–249 chars) — this constraint set should be
-recorded as a packaging invariant (`mao doctor` check; design doc).
+recorded as a packaging invariant (`iaa doctor` check; design doc).
 
 ## Recommendation shape (for the later decision, not decided here)
 

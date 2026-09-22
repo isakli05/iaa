@@ -6,12 +6,12 @@
 |---|---|
 | 08-26 early | Live audit of Codex native multi-agent (MultiAgentV2 tools, fork semantics, roles) — design research before installing anything |
 | 08-26 17:39–17:54 | **v0 install** for 3 runtimes (manage.sh; backups; symlinks; shims; depth key). Codex smoke A–E passes (after tightening: no manufactured reviewer on trivial tasks) |
-| 08-27 00:55–06:28 | **Campaign 1 — collision smoke test**: MAO vs co-loaded SDD, 6-task seed repo, glm-5.3. MAO keeps topology authority; SDD's review cadence + no-parallel rule leak; ~2.5× cost. PARTIAL PASS |
+| 08-27 00:55–06:28 | **Campaign 1 — collision smoke test**: İAA vs co-loaded SDD, 6-task seed repo, glm-5.3. İAA keeps topology authority; SDD's review cadence + no-parallel rule leak; ~2.5× cost. PARTIAL PASS |
 | 08-27 07:39–08:47 | **Campaign 1b — prose post-fix (v1)**: 4 attempts; identical wording, opposite outcomes across samples ⇒ prose precedence unreliable. PARTIAL PASS; stop the arms race |
-| 08-27 10:24–15:22 | **Campaign 2 — structural archfix (v2)**: two-mode separation at skill-selection; shim routing sentence; scenarios J/K. Tests: SDD never loads in MAO mode (3/3); native opt-in intact (15 agents). PASS |
+| 08-27 10:24–15:22 | **Campaign 2 — structural archfix (v2)**: two-mode separation at skill-selection; shim routing sentence; scenarios J/K. Tests: SDD never loads in İAA mode (3/3); native opt-in intact (15 agents). PASS |
 | 08-27 16:22–21:20 | **Campaign 3 — artifact boundary (v3)**: provenance rule. Authentic adversarial plan fixture; incl. strengthened "MUST use SDD" variant. PASS |
 | 08-27 21:20 → | source frozen (v3 unchanged since) |
-| 09-06 | **Production use**: LCO fifth-audit program under MAO adaptive mode (3 parallel read-only investigators → primary plan → primary sequential TDD), documented in isakli05/llm_council_orchestrator |
+| 09-06 | **Production use**: LCO fifth-audit program under İAA adaptive mode (3 parallel read-only investigators → primary plan → primary sequential TDD), documented in isakli05/llm_council_orchestrator |
 | 09-22 | This baseline audit + private GitHub baseline |
 
 ## The two 2026-08-27 evidence trees (what the task brief asked about) — and a third
@@ -33,7 +33,7 @@
 data not for publication). Into the maintained repo went only: condensed ADRs, the lineage
 diffs + v0/v1 snapshots, the sanitized plan fixture, and the transcript analyzer tool.
 They are *not* runtime content and never were: canonical runtime source is and always was
-`~/.local/share/ai-agent-orchestration/` alone.
+`~/.local/share/iaa/` alone.
 
 ## Evidence quality notes
 

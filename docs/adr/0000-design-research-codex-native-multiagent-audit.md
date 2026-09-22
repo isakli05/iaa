@@ -13,7 +13,7 @@ behavior (verified overlapping child intervals, root work concurrent with childr
 
 ## Decision
 
-MAO's platform adapters were written from these verified primitives (explorer/worker/default
+İAA's platform adapters were written from these verified primitives (explorer/worker/default
 preferences, fresh-context-first fork policy, direct-children-only nesting, runtime steering)
 rather than from documented assumptions. Claude Code and ZCode adapters were written against
 their documented built-ins (Explore/Plan/general-purpose; ZCode's no-nesting platform rule).
@@ -22,5 +22,5 @@ their documented built-ins (Explore/Plan/general-purpose; ZCode's no-nesting pla
 
 - Adapter advice is grounded in observed runtime behavior for Codex; Claude/ZCode adapter
   claims are documentation-based and were behaviorally exercised only on Claude (campaigns).
-- The audit also established the "policy rides the mechanism" split that MAO still uses:
-  MAO never re-implements spawning; it decides when/what to spawn.
+- The audit also established the "policy rides the mechanism" split that İAA still uses:
+  İAA never re-implements spawning; it decides when/what to spawn.

@@ -1,0 +1,6 @@
+{
+  "name": "iaa-dev",
+  "description": "Development-only plugin wrapper for İAA regression evals. Non-public: exists so `claude plugin eval` can load the iaa skill in an isolated sandbox. Not for distribution.",
+  "version": "0.1.0",
+  "keywords": ["testing", "regression"]
+}

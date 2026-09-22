@@ -10,7 +10,7 @@ are recorded here as errata only.
 
 | System | Local (this machine, verified 2026-09-22) | Upstream current (verified from primary source 2026-09-22) | Evidence quality |
 |---|---|---|---|
-| MAO | v3, canonical `~/.local/share/ai-agent-orchestration/`, SKILL.md sha256 `fee98091…87329532b` (re-verified this session; repo copy byte-identical) | n/a (frozen since 2026-08-27) | PROVEN (hash) |
+| İAA | v3, canonical `~/.local/share/iaa/`, SKILL.md sha256 `fee98091…87329532b` (re-verified this session; repo copy byte-identical) | n/a (frozen since 2026-08-27) | PROVEN (hash) |
 | Claude Code | **2.1.274** (`claude --version`, this session) | see §4 | PROVEN (local); upstream per §4 |
 | Codex CLI | **0.154.0** (`codex --version`, this session) | see §4 | PROVEN (local); upstream per §4 |
 | ZCode | **3.11.2** (see §2 — NOT 3.7.7) | see §4 | PROVEN (app's own auto-update log); upstream per §4 |
@@ -50,7 +50,7 @@ as **Erratum E-1**. Consequences:
 
 1. The claim "ZCode local install is notably old" (vs current 3.14.x) remains directionally
    true but the gap is 3.11.2→current, not 3.7.7→current.
-2. MAO's ZCode adapter text was written against 3.7.7 behavior (AGENTS.md injection for
+2. İAA's ZCode adapter text was written against 3.7.7 behavior (AGENTS.md injection for
    ordinary subagents since 3.7.1; Explore never injects; no subagent nesting). The local
    runtime is now 3.11.2 and current is 3.14.x — adapter statements about the *installed*
    runtime's behavior are evidence-anchored to a version two-plus minors behind the local
@@ -79,7 +79,7 @@ is re-verified in §4 and the post-6.3.0 delta analysis is in
 | ZCode | **3.14.3 (Sep 22, 2026)** — changelog heading + install page "Latest" + download URLs. Public changelog starts at 3.10.1 (Aug 28); no 3.13.x/3.14.2 entries exist. OSS repo zai-org/zcode (Apache-2.0) at 3.14.0. | zcode.z.ai/en/changelog + /en/docs/install + github.com/zai-org/zcode package.json [DOCUMENTED + IMPLEMENTED] |
 | BMAD | **v6.12.0 (2026-09-04)** (npm bmad-method@6.12.0; dist-tags next 6.12.1-next.0, rollback 4.39.0). v7 in public preview. Repo now bmad-code-org/BMAD-METHOD. | GitHub releases atom + CHANGELOG + registry.npmjs.org/bmad-method [RELEASE-NOTED + REGISTRY] |
 
-### 4B. Superpowers post-6.3.0 delta — does anything after 6.3.0 affect prior MAO-vs-SDD conclusions?
+### 4B. Superpowers post-6.3.0 delta — does anything after 6.3.0 affect prior İAA-vs-SDD conclusions?
 
 Verified against the v6.4.1 tag/main files and release notes (evidence above; local
 comparisons anchored to the installed 6.3.0 files, re-verified this session):
@@ -89,8 +89,8 @@ comparisons anchored to the installed 6.3.0 files, re-verified this session):
    exception), "Never dispatch multiple implementation subagents in parallel (conflicts)."
    (6.3.0 SKILL.md:282 = main), "Never skip the task review", 5-round fix loop, scoped
    re-review, final whole-branch review on most capable model, `.superpowers/sdd/<plan>/`
-   ledger workspace. → **No prior MAO-vs-SDD topology conclusion is invalidated.**
-2. **`writing-plans` REQUIRED SUB-SKILL header unchanged verbatim** → MAO's artifact-trust
+   ledger workspace. → **No prior İAA-vs-SDD topology conclusion is invalidated.**
+2. **`writing-plans` REQUIRED SUB-SKILL header unchanged verbatim** → İAA's artifact-trust
    fixture (tests/fixtures/generated-PLAN.md) and ADR-0003 remain valid against 6.4.1.
 3. **`executing-plans` changed materially.** In 6.3.0 it is a ~64-line stub whose only
    substantive routing content is "If subagents are available, use
@@ -99,38 +99,38 @@ comparisons anchored to the installed 6.3.0 files, re-verified this session):
    mandatory final fresh-context review, shared SDD workspace/ledger ("a plan can change
    executors mid-flight"), and only a *conditional preference* for SDD ("Prefer
    superpowers:subagent-driven-development when your human partner wants a review gate on
-   every task…"). **Effect on MAO:** the boundary rule still holds (no redirect exists to
-   follow; the preference language is weaker than the old redirect), but MAO's adapter
+   every task…"). **Effect on İAA:** the boundary rule still holds (no redirect exists to
+   follow; the preference language is weaker than the old redirect), but İAA's adapter
    sentence "executing-plans … its redirect to SDD selects native mode and is not followed"
    now references a mechanism that **no longer exists upstream** — a documentation-drift
    finding (SKILL.md/PA wording anchored to 6.3.0), not a boundary failure. Logged for
    gap analysis; no change made in this phase.
 4. **`diagnosing-superpowers` added** — read-only session post-mortem skill ("Every finding
    cites path:line. No citation, no finding."; explicitly forbids diagnosing superpowers
-   itself). Not an orchestration authority; no trigger conflict with MAO expected.
-   Relevant as a design precedent for MAO's proposed `mao doctor` (evidence-first
+   itself). Not an orchestration authority; no trigger conflict with İAA expected.
+   Relevant as a design precedent for İAA's proposed `iaa doctor` (evidence-first
    diagnostics).
 5. **SDD gains an opt-in nested-controller subagent mode** (#2320: mid-tier model, ~half
    cost) — RELEASE-NOTED but its documentation location in the current SKILL.md is
-   UNVERIFIED. If real, Superpowers now ships a nested-topology option before MAO ever
-   exercises its own (MAO's authorized-nesting path remains DOCUMENTED-only). Flagged for
+   UNVERIFIED. If real, Superpowers now ships a nested-topology option before İAA ever
+   exercises its own (İAA's authorized-nesting path remains DOCUMENTED-only). Flagged for
    the claim matrix (H-nesting) and experiment plan.
 6. **Plan handoff now asks the user to choose Subagent-driven vs Native with cost guidance,
    and users review the saved plan before execution** (#2258, #2318) — upstream movement
    toward explicit user selection between execution modes (at workflow level), which is
-   directionally aligned with MAO's explicit-selection doctrine; does not change in-mode
+   directionally aligned with İAA's explicit-selection doctrine; does not change in-mode
    fixed cadence.
 7. **Bootstrap unchanged:** SessionStart hook (matcher `startup|clear|compact`, async:false)
    still injects the full `using-superpowers` text; the concession "User instructions
    (CLAUDE.md, AGENTS.md …) take precedence over skills" is verbatim-present at 6.4.1 →
-   the doctrinal basis of MAO's instruction-channel routing is intact.
+   the doctrinal basis of İAA's instruction-channel routing is intact.
 8. **Per-skill disable:** still not documented upstream (plugin-level enable/disable only;
    no skillOverrides mention found in README/files read — medium-confidence absence). →
-   MAO's whitelist approach remains the only granularity available to a policy that must
+   İAA's whitelist approach remains the only granularity available to a policy that must
    coexist with Superpowers at skill level.
 9. **Eval infrastructure exists upstream** (in-repo `tests/` incl. transcript analyzers;
    behavioral eval lab in separate repo prime-radiant-inc/superpowers-evals — "Quorum"
-   harness driving real CLI sessions with LLM actor+verifier). Relevant to MAO's
+   harness driving real CLI sessions with LLM actor+verifier). Relevant to İAA's
    regression strategy (experiment plan).
 
 ## 5. Other baseline corrections found during comparison
@@ -138,7 +138,7 @@ comparisons anchored to the installed 6.3.0 files, re-verified this session):
 ### ERRATUM E-2 — `fork_turns` "suffix" semantics are asserted but never evidenced; upstream today documents no such value
 
 **Baseline statements corrected:** ADR-0000 ("fork_turns isolation semantics (none/all/suffix)")
-and, downstream of it, MAO's platform adapter text ("inherit only the smallest useful
+and, downstream of it, İAA's platform adapter text ("inherit only the smallest useful
 recent-turn suffix with a positive `fork_turns` value") and docs/CURRENT-ARCHITECTURE.md §8
 ("minimal inherited suffix only if needed").
 
@@ -155,9 +155,9 @@ Only `none`/`all` are issue-observed for the CLI; a "partial fork" mode is refer
 issue #32031; omitted fork_turns defaults to full history. The Responses-API multi-agent
 beta documents only `"all"` in examples.
 
-**Verdict:** MAO's adapter recommendation of "the smallest useful recent-turn suffix with a
+**Verdict:** İAA's adapter recommendation of "the smallest useful recent-turn suffix with a
 positive fork_turns value" describes a mechanism that is unevidenced locally and
-undocumented upstream — at minimum stale, possibly fictitious. This does not affect MAO's
+undocumented upstream — at minimum stale, possibly fictitious. This does not affect İAA's
 core boundary semantics (fresh-context-first remains correct and documented), but the
 adapter line is factually unsafe advice on current Codex. Recorded as **Erratum E-2**;
 logged in 06-gap-analysis.md as an adapter-accuracy defect; no change made in this phase.
@@ -178,8 +178,8 @@ The ZCode stream found the OSS repo (zai-org/zcode) officially attributes copied
 (shadcn/ui, Vercel ai-elements, VS Code IPC portions, Superpowers skill descriptions, etc.)
 and declares **no** openai/codex and no anthropics/claude-code code copying. The local
 layout similarity stays an observation; official sources neither confirm nor (for the
-closed desktop app) fully refute it. Reclassified to UNKNOWN; harmless to all MAO
-conclusions (MAO's ZCode integration uses documented public surfaces only).
+closed desktop app) fully refute it. Reclassified to UNKNOWN; harmless to all İAA
+conclusions (İAA's ZCode integration uses documented public surfaces only).
 
 ### Note N-2 — upstream ZCode facts that were UNVERIFIED in the baseline are now confirmed
 

@@ -1,17 +1,17 @@
-# MANIFEST — MAO web knowledge pack (2026-09-22)
+# MANIFEST — İAA web knowledge pack (2026-09-22)
 
 ## Recommended upload set (ChatGPT Project / Claude Project knowledge)
 
 Upload in this order:
 
 1. `00-READ-ME-FIRST.md` — orientation + terminology (read first)
-2. `01-MAO-PROJECT-BRIEF.md`
+2. `01-İAA-PROJECT-BRIEF.md`
 3. `sources/SKILL.md` ← **AUTHORITATIVE** (the actual policy)
 4. `sources/references-delegation-contract.md` ← authoritative
 5. `sources/references-platform-adapters.md` ← authoritative
 6. `02-CURRENT-ARCHITECTURE.md` — explanatory
 7. `03-BEHAVIORAL-CONTRACT.md` — explanatory (verification-labeled)
-8. `05-MAO-SDD-BOUNDARY.md` — explanatory
+8. `05-İAA-SDD-BOUNDARY.md` — explanatory
 9. `06-INTEGRATIONS-CLAUDE-CODE-CODEX-ZCODE.md` — explanatory
 10. `07-HISTORY-AND-EVIDENCE.md` — historical
 11. `08-TESTS-AND-VALIDATION.md` — explanatory + execution record

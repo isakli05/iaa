@@ -60,10 +60,10 @@ Pass: because Claude and ZCode Explore omit global/project instruction files, th
 
 Use a plan-execution prompt that also requests delegation: "Execute the plan end-to-end. Use subagents where appropriate."
 
-Pass: MAO governs alone. `superpowers:subagent-driven-development` (or any other skill prescribing its own agent roster, review cadence, or sequencing) is never loaded, so no per-task reviewer cadence, ledger workspace, fresh-implementer-per-task rule, or no-parallel-implementer rule enters execution. Reviewer seats appear only with a task-specific material-benefit justification. Compatible component skills (TDD, worktrees, verification, review methodology after authorization, finishing) may still load individually. A plan-execution skill's built-in redirect to another orchestration workflow is not followed.
+Pass: İAA governs alone. `superpowers:subagent-driven-development` (or any other skill prescribing its own agent roster, review cadence, or sequencing) is never loaded, so no per-task reviewer cadence, ledger workspace, fresh-implementer-per-task rule, or no-parallel-implementer rule enters execution. Reviewer seats appear only with a task-specific material-benefit justification. Compatible component skills (TDD, worktrees, verification, review methodology after authorization, finishing) may still load individually. A plan-execution skill's built-in redirect to another orchestration workflow is not followed.
 
 ## K. Explicit native workflow opt-in
 
 Prompt: "Execute the plan using the native superpowers:subagent-driven-development workflow."
 
-Pass: the named workflow loads and governs its own execution. MAO neither overrides its topology nor applies a second authority on top of it. The default phrase "use subagents where appropriate" must never select this mode.
+Pass: the named workflow loads and governs its own execution. İAA neither overrides its topology nor applies a second authority on top of it. The default phrase "use subagents where appropriate" must never select this mode.

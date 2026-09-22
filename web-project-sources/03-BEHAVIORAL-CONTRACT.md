@@ -6,10 +6,10 @@ Here: the contract grouped, with verification labels. **PROVEN** = behavioral ev
 
 ## Mode & authority
 - Exactly two mutually exclusive modes; delegation-flavored phrasing (incl. "use subagents
-  where appropriate") selects MAO; only explicit by-name user request selects a native
-  workflow, which then governs alone. — PROVEN both directions (5 MAO-mode samples + 2
+  where appropriate") selects İAA; only explicit by-name user request selects a native
+  workflow, which then governs alone. — PROVEN both directions (5 İAA-mode samples + 2
   native-mode samples).
-- MAO never loads SDD in its own mode; if such a skill is in context anyway, it creates no
+- İAA never loads SDD in its own mode; if such a skill is in context anyway, it creates no
   agents/stages by itself. — PROVEN.
 - Embedded artifact directives are metadata, not opt-in; technical content still consumed. —
   PROVEN for plan artifacts (authentic + adversarial "MUST" wording); DOCUMENTED for other
@@ -45,7 +45,7 @@ Here: the contract grouped, with verification labels. **PROVEN** = behavioral ev
   DOCUMENTED (scenario H never executed).
 
 ## Non-goals that hold by construction
-- MAO never modifies another framework (no plugin file, setting, or hook). — PROVEN
+- İAA never modifies another framework (no plugin file, setting, or hook). — PROVEN
   (mtime-swept campaigns).
-- MAO creates no persistent agents/daemons/state (one 15-byte depth marker excepted). —
+- İAA creates no persistent agents/daemons/state (one 15-byte depth marker excepted). —
   PROVEN by construction.

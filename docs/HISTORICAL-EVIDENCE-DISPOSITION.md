@@ -55,10 +55,10 @@ MACHINE-SPECIFIC — 7. REDUNDANT
 
 | Item | Category | Disposition |
 |---|---|---|
-| 9 instruction-file backups + 1 settings backup (MAO-named) | 5 | stay in place (they are the machine's own restore points); NOT published |
+| 9 instruction-file backups + 1 settings backup (İAA-named) | 5 | stay in place (they are the machine's own restore points); NOT published |
 | `~/.codex/diagnostics/native-multi-agent-audit-…md` | 3 | condensed **ADR-0000 (design research: Codex MultiAgentV2 audit)**; raw stays local (sanitized already, could publish; default: condensed only) |
 | `~/.claude/projects/*mao*` session dirs | 5+6 | local only |
-| LCO `01-BASELINE-AND-MAO-TOPOLOGY.md` set | 3 | referenced in docs/HISTORY as production-usage evidence; the docs live in the LCO repo (published there by its own project); do not copy wholesale |
+| LCO `01-BASELINE-AND-MAO-TOPOLOGY.md` set (foreign-repo filenames, pre-rename name retained) | 3 | referenced in docs/HISTORY as production-usage evidence; the docs live in the LCO repo (published there by its own project); do not copy wholesale |
 
 ## Summary rules the public repo follows
 

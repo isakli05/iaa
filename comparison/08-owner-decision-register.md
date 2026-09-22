@@ -7,7 +7,7 @@ offered as equals.
 
 ---
 
-## D1 — Trigger model for public MAO
+## D1 — Trigger model for public İAA
 
 **OPTION A — Explicit-only** (Claude `disable-model-invocation`; Codex
 `allow_implicit_invocation: false`; ZCode: no flag — description discouragement only)
@@ -46,11 +46,11 @@ assumed available.
 
 **A — Pure prose (status quo).** Cheapest, portable, non-invasive; variance and
 observability gaps remain (02 §4).
-**B — Prose + opt-in read-only instrumentation** (`mao doctor` + optional local logging
-of MAO-relevant events; REPORT never mutate).
-**C — Enforcement mechanisms** (SessionStart MAO-context injection every session;
+**B — Prose + opt-in read-only instrumentation** (`iaa doctor` + optional local logging
+of İAA-relevant events; REPORT never mutate).
+**C — Enforcement mechanisms** (SessionStart İAA-context injection every session;
 PreToolUse guards on foreign skills).
-- C breaks C11/P7 non-invasiveness or turns MAO into GSD; the analysis (02 §6) shows
+- C breaks C11/P7 non-invasiveness or turns İAA into GSD; the analysis (02 §6) shows
   authority is not mechanically enforceable anyway — C buys the wrong thing at the
   highest price.
 
@@ -63,9 +63,9 @@ unwanted; C is recommended against.
 **A — Remain a narrow policy layer** (current purpose; gaps C1–C3 solved only additively).
 **B — Grow** (state/ledger, roles, phases, per-runtime adapters-as-code — i.e., become a
 GSD/BMAD-class system).
-- Evidence: every capability MAO lacks that frameworks have (ledger, roles, resume,
-  guards) arrives bundled with framework costs MAO was created to avoid (02 §5, 06 C2–
-  C4); MAO's confirmed differentiators (H2, H4, H8, H10) are all *features of narrowness*.
+- Evidence: every capability İAA lacks that frameworks have (ledger, roles, resume,
+  guards) arrives bundled with framework costs İAA was created to avoid (02 §5, 06 C2–
+  C4); İAA's confirmed differentiators (H2, H4, H8, H10) are all *features of narrowness*.
 
 **Technical recommendation: A — remain narrow.** This is the clearest call in the
 register: the comparison found zero evidence that growth increases differentiation and
@@ -82,16 +82,22 @@ on Claude Code + glm-5.3; unknown for others; doctor reports what it sees").
 **Technical recommendation: A.** Not a close call — B would be the only dishonest option
 on the table. Owner's real choice is only how prominently to surface the untested list.
 
-## D5 — Public identity / plugin name (genuine owner choice; no technically superior answer)
+## D5 — Public identity / plugin name (**DECIDED 2026-09-23**: `İAA` / `iaa`)
 
-Constraints (from evidence): kebab-case, unique across claude-plugins-official +
+**Decision (owner, final):** display name `İAA — İştirak-i A‘mâl-i Ajanîye`; short name
+`İAA`; technical identifier / public plugin namespace `iaa`; primary public invocation
+`/iaa:orchestrate` (reserved for Gate-2 packaging). Executed in
+`identity-migration/` (same day). The marketplace-collision name search remains a
+Gate-2 prerequisite.
+
+Historical note — candidates evaluated before the decision (kept for the record):
+`mao-orchestration` · `iaa` (chosen; collision-risky only as a user-scope name,
+plugin-namespaced it is fine) · `adaptive-delegation` (category-descriptive). Original
+open framing: kebab-case, unique across claude-plugins-official +
 obra/superpowers-marketplace + ZCode public catalog + Codex directory; short enough to
-keep `/plugin-name:multi-agent-orchestration` usable; must not read as claiming authority
-over other tools. Candidates to evaluate (owner taste): `mao-orchestration` ·
-`multi-agent-orchestration` (current, collision-risky as user-scope name but
-plugin-namespaced it is fine) · `adaptive-delegation` (category-descriptive). A name
-search against live marketplaces is a prerequisite (cheap, listed in E7 prep). Also
-decide: versioning scheme start (recommend 3.x to reflect internal lineage v3).
+keep `/iaa:orchestrate` usable; must not read as claiming authority
+over other tools. Also decide: versioning scheme start (recommend 3.x to reflect
+internal lineage v3).
 
 ## D6 — Public distribution form and sequence
 

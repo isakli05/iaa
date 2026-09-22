@@ -15,17 +15,17 @@ assertions: "SDD skill invocation event present/absent." Version pins recorded p
 ---
 
 ## E1 — Superpowers 6.4.1 coexistence + upgrade-check (DUE NOW; highest priority)
-- **Falsifies/validates:** "MAO's boundary holds against 6.4.1" (residual risk 09 #2;
+- **Falsifies/validates:** "İAA's boundary holds against 6.4.1" (residual risk 09 #2;
   upgrade-check documented in canonical README).
 - **Method:** upgrade local Superpowers 6.3.0 → 6.4.1 (user decision — modifies a plugin
-  outside MAO; do via `/plugin`), then on a disposable repo run: (a) J default: "Execute
+  outside İAA; do via `/plugin`), then on a disposable repo run: (a) J default: "Execute
   the plan… use subagents where appropriate" + authentic 6.4.1 `writing-plans`-generated
   plan (regenerate fixture with 6.4.1 — its handoff section changed); (b) K explicit:
   "use native superpowers:subagent-driven-development"; (c) new 6.4.1 wrinkle:
   executing-plans no longer redirects — run "execute this plan inline" and verify
   executing-plans loads as a *component* without SDD loading and without mode flip.
-- **Pass:** J: SDD never invoked, MAO invoked or reasoned no-delegation; K: SDD cadence
-  runs, MAO absent; (c): no SDD invocation, no mode flip.
+- **Pass:** J: SDD never invoked, İAA invoked or reasoned no-delegation; K: SDD cadence
+  runs, İAA absent; (c): no SDD invocation, no mode flip.
 - **Fail action:** update SKILL wording (documented upgrade path) — owner decision.
 - **Cost:** $ (3 sessions + fixture generation).
 
@@ -54,18 +54,18 @@ contrast-table claims in public docs). Cost: included in E1.
 - **Pass:** adapter statements hold on 3.11.2; deviations recorded as adapter updates.
 - **Cost:** $ (manual UI session; no automation available).
 
-## E5 — GSD + MAO installed together (first-ever foreign-methodology test)
-- **Falsifies:** "MAO's generic yield wording works for non-SDD controllers" (P4 gap) and
-  "GSD global skills + MAO descriptions can co-trigger safely" (03 §2 open question).
+## E5 — GSD + İAA installed together (first-ever foreign-methodology test)
+- **Falsifies:** "İAA's generic yield wording works for non-SDD controllers" (P4 gap) and
+  "GSD global skills + İAA descriptions can co-trigger safely" (03 §2 open question).
 - **Method:** isolated fake-home or disposable machine profile (GSD is not installed on
   this machine — installing it is an environment change requiring owner approval; use
   `npx @opengsd/gsd-core` installer in a sandboxed HOME); then: (a) `/gsd-quick` task —
-  assert MAO stands down (by-name yield) and GSD runs its own agents; (b) plain
-  delegation-flavored prompt with both installed — assert MAO governs, no /gsd skill
-  self-loads (trigger contest observation); (c) MAO dispatch inside a `.planning/` GSD
-  project — assert GSD agent-isolation guard allows MAO's Explore dispatches (mechanism
+  assert İAA stands down (by-name yield) and GSD runs its own agents; (b) plain
+  delegation-flavored prompt with both installed — assert İAA governs, no /gsd skill
+  self-loads (trigger contest observation); (c) İAA dispatch inside a `.planning/` GSD
+  project — assert GSD agent-isolation guard allows İAA's Explore dispatches (mechanism
   says allow — verify live).
-- **Pass:** (a) GSD-only cadence; (b) MAO-only topology; (c) dispatch not blocked.
+- **Pass:** (a) GSD-only cadence; (b) İAA-only topology; (c) dispatch not blocked.
 - **Cost:** $$ (install + 3 sessions; first GSD-behavior evidence anywhere).
 - **Precondition:** owner approves installing GSD in an isolated HOME (does not touch the
   live machine config).
@@ -78,17 +78,17 @@ contrast-table claims in public docs). Cost: included in E1.
   design; assert exactly the authorized nesting occurs, bounded, with no runaway.
 - **Cost:** $ (1–2 sessions).
 
-## E7 — Claude plugin namespacing + MAO-as-plugin trigger behavior + `claude plugin eval`
+## E7 — Claude plugin namespacing + İAA-as-plugin trigger behavior + `claude plugin eval`
 - **Falsifies:** packaging assumptions (04 §2): namespaced invocation still routes; shim
-  sentence references resolve under `/mao-<name>:multi-agent-orchestration`; plugin+skill
-  duplicate behavior.
+  sentence references resolve under the final plugin invocation `/iaa:orchestrate`;
+  plugin+skill duplicate behavior.
 - **Method:** build a prototype plugin wrapper (local path marketplace, no publication) —
-  `.claude-plugin/plugin.json` + skills/multi-agent-orchestration (byte-identical core);
+  `.claude-plugin/plugin.json` + skills/iaa (byte-identical core);
   install alongside existing personal skill → observe both-load duplicate (assert doctor
   check would flag); remove personal copy; then author plugin-eval cases:
   J-eval (grader `tool_used` asserting Skill(superpowers:subagent-driven-development)
-  absent / MAO skill present, with Superpowers marketplace dependency installed);
-  trigger-rate arm (delegation prompts → MAO Skill used; trivial prompts → not used);
+  absent / İAA skill present, with Superpowers marketplace dependency installed);
+  trigger-rate arm (delegation prompts → İAA Skill used; trivial prompts → not used);
   no-plugin control arm (platform runs it automatically).
 - **Pass:** eval suite green in CI semantics (exit 0); duplicate case detected.
 - **Cost:** $$ (prototype + several automated eval runs).
@@ -97,7 +97,7 @@ contrast-table claims in public docs). Cost: included in E1.
 
 ## E8 — Failed/interrupted child recovery (scenario H)
 - **Falsifies:** C15 (DOCUMENTED-only).
-- **Method:** disposable repo; MAO-authorized write lane; kill/interrupt the child
+- **Method:** disposable repo; İAA-authorized write lane; kill/interrupt the child
   mid-task (SIGINT the session or unreachable dependency); observe primary's recovery per
   contract (task not complete; evidence preserved; proportionate retry; final validation
   still primary-owned).
@@ -113,35 +113,35 @@ contrast-table claims in public docs). Cost: included in E1.
   text; correct adapter wording (B/A5) from verified facts.
 - **Cost:** $ (cheap LLM probes, read-only sandbox).
 
-## E10 — MAO vs native Agent Teams topology + auto-formation interaction
-- **Falsifies:** matrix row "MAO + Agent Teams unknown"; the auto-formation caveat
+## E10 — İAA vs native Agent Teams topology + auto-formation interaction
+- **Falsifies:** matrix row "İAA + Agent Teams unknown"; the auto-formation caveat
   ("a subagent that Claude names launches as a teammate" while flag on).
 - **Method:** isolated environment with
   `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (flag is off by default; enabling in a
-  disposable profile only); (a) delegation-flavored task under MAO — observe whether
-  MAO-authorized dispatches become teammates, and whether topology/cost semantics change;
-  (b) explicit "use a team for this" — assert MAO yields (by-name analog) or document the
+  disposable profile only); (a) delegation-flavored task under İAA — observe whether
+  İAA-authorized dispatches become teammates, and whether topology/cost semantics change;
+  (b) explicit "use a team for this" — assert İAA yields (by-name analog) or document the
   gap (teams are invoked descriptively, not by skill name — the yield wording may not
   cover it).
 - **Pass/criteria:** documented behavior either way; wording fix if yield fails.
 - **Cost:** $$ (experimental surface; sessions may be expensive — teams are full
   instances).
 
-## E11 — Codex native MultiAgentV2 interaction (Ultra/proactive template vs MAO shim)
+## E11 — Codex native MultiAgentV2 interaction (Ultra/proactive template vs İAA shim)
 - **Falsifies:** "two delegation policies in one instruction space compose" (03 §2 Codex
   bullet (c)).
-- **Method:** Codex session with MAO AGENTS.md shim active at an intelligence tier where
+- **Method:** Codex session with İAA AGENTS.md shim active at an intelligence tier where
   the proactive-delegation template is injected; delegation-flavored + trivial tasks;
   observe which policy the model cites/obeys on conflict (e.g., template's "proactively
-  delegate" vs MAO's no-delegation default for trivial).
+  delegate" vs İAA's no-delegation default for trivial).
 - **Cost:** $$ (Ultra-tier sessions, if plan tier allows).
 
-## E12 — ZCode plugin-based MAO installation (packaging feasibility)
+## E12 — ZCode plugin-based İAA installation (packaging feasibility)
 - **Falsifies:** "one artifact serves Claude+ZCode without semantic divergence" (04 §3).
 - **Method:** local ZCode personal marketplace (local-path form) with the same plugin
   tree as E7's prototype (`.claude-plugin/plugin.json` variant); install per-workspace;
-  verify skill discovery, description injection (≤250), `$multi-agent-orchestration`
-  invocation, and (if hooks bundled) that MAO ships none; diff observed behavior vs
+  verify skill discovery, description injection (≤250), `$iaa`
+  invocation, and (if hooks bundled) that İAA ships none; diff observed behavior vs
   Claude plugin run on the same core (semantic-parity checklist).
 - **Cost:** $ (UI manual + one Claude comparison run).
 

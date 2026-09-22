@@ -3,7 +3,7 @@
 Raw evidence report from read-only Explore research subagent #1 (Superpowers stream).
 Recorded verbatim below for traceability; classification and comparative judgments live in
 the numbered comparison documents, not here. Controller: main session. The subagent only
-gathered evidence; it did not evaluate MAO or invoke any orchestration framework.
+gathered evidence; it did not evaluate İAA or invoke any orchestration framework.
 
 Subagent usage rationale: independent research stream over ~35 primary-source fetches
 (GitHub repo, releases, skill files at main and v6.3.0, hooks, eval repos); context

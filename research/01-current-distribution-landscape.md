@@ -48,8 +48,8 @@ command hook is injected as context — the bootstrap channel Superpowers uses.
 **Skill-vs-skill precedence (official position):** for same names, deterministic table; for
 overlapping *claims*, "Claude matches task against descriptions… may load the wrong skill";
 prose is "a request, not a guarantee — a hook is enforcement." **"Sole orchestration
-authority" appears in no official doc** (it is MAO's own phrasing). This is the doctrinal
-anchor for MAO's residual-risk documentation.
+authority" appears in no official doc** (it is İAA's own phrasing). This is the doctrinal
+anchor for İAA's residual-risk documentation.
 
 ## 2. Superpowers (github.com/obra/superpowers; claude-plugins-official)
 
@@ -86,7 +86,7 @@ anchor for MAO's residual-risk documentation.
   prompt/read/workflow/worktree/agent-isolation/secret guards; PostToolUse context-monitor,
   read-injection-scanner, phase-boundary; Stop/PreCompact/SubagentStop/FileChanged. This is
   mechanism-grade workflow enforcement — the strongest enforcement posture among surveyed
-  systems (contrast: MAO prose-only, Superpowers bootstrap-only).
+  systems (contrast: İAA prose-only, Superpowers bootstrap-only).
 - No explicit "only workflow" claim found (UNVERIFIED); `/gsd-quick`, `/gsd-fast` are
   documented lightweight escapes.
 
@@ -119,15 +119,15 @@ anchor for MAO's residual-risk documentation.
 - **Skills:** user `~/.zcode/skills/<name>/SKILL.md`, workspace `.zcode/skills/`; name+
   description required; **description hard limit 1024 chars (exceeding drops the skill)**;
   per-turn injection = description excerpt **up to 250 chars** (shared budget may degrade to
-  names-only) — MAO's 247–249-char description is sized exactly to this. Import supports
+  names-only) — İAA's 247–249-char description is sized exactly to this. Import supports
   **Symlink mode** (official) or Copy; `$skill-name` invocation; Settings→Skills→Refresh.
 - **AGENTS.md:** `~/.zcode/AGENTS.md` global rules (FAQ table); main-agent merge precedence
   UNVERIFIED. Subagents: since **v3.7.1** user+workspace AGENTS.md injected by default
   (opt-out `injectAgentsMd: false`); built-in Explore never injects — both facts match
-  MAO's adapter text exactly.
+  İAA's adapter text exactly.
 - **Subagents:** built-in general-purpose + Explore (undeletable); custom beta via
   `~/.zcode/agents/*.md`; **nesting explicitly forbidden** ("a subagent cannot spawn
-  sub-agents") — platform guarantee, as MAO documents. v3.14.0 added script-orchestrated
+  sub-agents") — platform guarantee, as İAA documents. v3.14.0 added script-orchestrated
   "dynamic workflows".
 - **Plugins: official store now exists** — Public (ZCode-curated, GitHub-served) +
   Personal marketplaces; manifest `.zcode-plugin/plugin.json` **or `.claude-plugin/plugin.json`
@@ -135,15 +135,15 @@ anchor for MAO's residual-risk documentation.
   "Claude Code marketplace" is preloaded as a personal marketplace source. **Skills
   distribute via plugins only** (no standalone skill marketplace).
 
-## 6. Implications for MAO (inputs to F/I docs, not decisions)
+## 6. Implications for İAA (inputs to F/I docs, not decisions)
 
-1. MAO's three integrations match each runtime's *current* documented mechanism (Codex
+1. İAA's three integrations match each runtime's *current* documented mechanism (Codex
    `~/.agents/skills`, ZCode symlink import + AGENTS.md, Claude skills symlink + CLAUDE.md) —
    no integration is riding deprecated paths.
-2. All three ecosystems now have plugin/marketplace mechanisms that could carry MAO; ZCode
+2. All three ecosystems now have plugin/marketplace mechanisms that could carry İAA; ZCode
    even accepts Claude plugin manifests, and Claude supports skills-dir plugins — a shared
    packaging core is feasible (details: docs/PUBLIC-DISTRIBUTION-ARCHITECTURE.md).
-3. Official precedence doctrine confirms MAO's boundary is behavioral, not mechanistic;
+3. Official precedence doctrine confirms İAA's boundary is behavioral, not mechanistic;
    mechanism-grade options exist on all sides (hooks in Claude/GSD style,
    `allow_implicit_invocation: false` in Codex, description budgets in ZCode).
 4. Upstream drift since install: Superpowers 6.4.1 (new skill; SDD contract stable),

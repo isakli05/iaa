@@ -1,12 +1,12 @@
-# MAO — Current Architecture (as installed, 2026-09-22)
+# İAA — Current Architecture (as installed, 2026-09-22)
 
 Reconstructed from primary sources only. Every claim cites its source. "SKILL.md:14" means
-`~/.local/share/ai-agent-orchestration/multi-agent-orchestration/SKILL.md` line 14;
+`~/.local/share/iaa/iaa/SKILL.md` line 14;
 `DC` = `references/delegation-contract.md`; `PA` = `references/platform-adapters.md`;
-`R` = `~/.local/share/ai-agent-orchestration/README.md`; `S` = `tests/scenarios.md`;
+`R` = `~/.local/share/iaa/README.md`; `S` = `tests/scenarios.md`;
 `M` = `scripts/manage.sh`. Nothing here is aspirational; historical behavior is marked.
 
-## 1. What MAO is
+## 1. What İAA is
 
 A **runtime-agnostic delegation-decision policy** distributed as a single skill directory
 (SKILL.md + 2 references + 1 installer script + 1 test-contract file) and installed into
@@ -14,9 +14,9 @@ three agent CLIs through identical relative symlinks plus short managed instruct
 ("shims") in each runtime's global instruction file (R:7–20). It is *pure policy*: no code
 runs at delegation time, no daemon, no state machine, no telemetry. Its only executable
 artifact is `manage.sh` (install/verify/uninstall), and its only persisted runtime state is
-one 15-byte marker (`~/.config/ai-agent-orchestration/claude-depth.state`, M:154–213).
+one 15-byte marker (`~/.config/iaa/claude-depth.state`, M:154–213).
 
-## 2. What MAO is NOT
+## 2. What İAA is NOT
 
 - Not an agent framework or execution engine — it decides **whether/how** to delegate; the
   runtime's native subagent mechanism executes (R:22–36).
@@ -32,9 +32,9 @@ one 15-byte marker (`~/.config/ai-agent-orchestration/claude-depth.state`, M:154
 
 | Runtime | Instruction surface | Skill surface | Notes |
 |---|---|---|---|
-| Claude Code 2.1.274 | `~/.claude/CLAUDE.md` managed block (model-invocable description; user-invocable `/multi-agent-orchestration`) | `~/.claude/skills/multi-agent-orchestration` symlink | description (245–249 chars) is the routing surface; ZCode's ~250-char injection limit constrained its length (archfix report) |
-| Codex CLI 0.154.0 | `~/.codex/AGENTS.md` managed block | `~/.agents/skills/multi-agent-orchestration` symlink (Codex user-skills dir; R:26,34) | Codex's own `[agents]` config + `reviewer.toml` pre-exist and are untouched (R:58–60) |
-| ZCode 3.7.7 (adapter anchor; local machine runs 3.11.2 — Erratum E-1, comparison/00) | `~/.zcode/AGENTS.md` managed block | `~/.zcode/skills/multi-agent-orchestration` symlink | only user-global + workspace AGENTS.md are read (R:70) |
+| Claude Code 2.1.274 | `~/.claude/CLAUDE.md` managed block (model-invocable description; user-invocable `/iaa`) | `~/.claude/skills/iaa` symlink | description (245–249 chars) is the routing surface; ZCode's ~250-char injection limit constrained its length (archfix report) |
+| Codex CLI 0.154.0 | `~/.codex/AGENTS.md` managed block | `~/.agents/skills/iaa` symlink (Codex user-skills dir; R:26,34) | Codex's own `[agents]` config + `reviewer.toml` pre-exist and are untouched (R:58–60) |
+| ZCode 3.7.7 (adapter anchor; local machine runs 3.11.2 — Erratum E-1, comparison/00) | `~/.zcode/AGENTS.md` managed block | `~/.zcode/skills/iaa` symlink | only user-global + workspace AGENTS.md are read (R:70) |
 
 Auto-activation semantics: the shim tells the primary agent to load the skill when delegation
 "is requested or materially useful" (M:88) — i.e. **model-invocable with proactive trigger**,
@@ -55,29 +55,29 @@ test (archfix report, key transcript evidence).
 
 Exactly one authority per task; two mutually exclusive modes:
 
-- **Adaptive MAO mode (default).** Selected by any delegation-flavored request ("use
+- **Adaptive İAA mode (default).** Selected by any delegation-flavored request ("use
   subagents where appropriate" included). SDD and any other roster/cadence/sequencing-
   prescribing skill is **not loaded** — "two engines governing one task produce
   nondeterministic topology" (SKILL.md:14). If such a skill is nevertheless in context, it
   creates no agents/stages by itself.
 - **Native workflow mode (explicit opt-in only).** Only a current user instruction naming the
-  workflow. That workflow then governs itself; MAO stands down entirely (SKILL.md:15).
+  workflow. That workflow then governs itself; İAA stands down entirely (SKILL.md:15).
 
 **Artifact trust boundary (Provenance rule, SKILL.md:17):** workflow directives embedded in
 plans, specs, generated artifacts, repo files, or prior agent output (e.g. a plan header's
 "REQUIRED SUB-SKILL: subagent-driven-development") are **orchestration metadata, not opt-in**.
-The executor notes them and keeps consuming the artifact's *technical* content in MAO mode.
+The executor notes them and keeps consuming the artifact's *technical* content in İAA mode.
 Enforcement hierarchy (artifact-boundary report): current explicit user selection →
-global/user routing (shim) → active MAO mode → artifact-embedded suggestions; a lower layer
+global/user routing (shim) → active İAA mode → artifact-embedded suggestions; a lower layer
 never silently overrides a higher one.
 
-**Component-skill whitelist (SKILL.md:19):** in MAO mode these Superpowers components remain
+**Component-skill whitelist (SKILL.md:19):** in İAA mode these Superpowers components remain
 individually usable on their own triggers: test-driven-development, using-git-worktrees,
 verification-before-completion, receiving-code-review, finishing-a-development-branch,
 systematic-debugging, writing-plans, executing-plans (discipline only; steering inside it
 toward another orchestration workflow — a redirect, handoff offer, or preference — does not
 by itself select native mode). Two components prescribe agent seats (requesting-code-review,
-dispatching-parallel-agents) and may only execute lanes MAO already authorized.
+dispatching-parallel-agents) and may only execute lanes İAA already authorized.
 
 **Seat economics (SKILL.md:21):** every implementer/reviewer/re-reviewer/fixer seat needs a
 task-specific material-benefit justification; template steps, completed implementation, or an
@@ -145,7 +145,7 @@ primary → own the final answer (DC:45–53).
   (Verified against Codex 0.154.0's compiled tool schema and upstream source — see
   `release-hardening/02-codex-fork-turns-verification.md`.)
 - **Claude Code** (PA:13–20): prefer built-in Explore/Plan/general-purpose; **pre-dispatch
-  mode check** before first Agent call — MAO never invokes SDD, and no skill text or plan
+  mode check** before first Agent call — İAA never invokes SDD, and no skill text or plan
   artifact switches modes, "whether a component skill's redirect, handoff offer, or
   preference toward SDD (`executing-plans`, `writing-plans`) or a `REQUIRED SUB-SKILL`
   directive embedded in the plan being executed" (PA:16, refreshed for Superpowers 6.4.1
@@ -188,12 +188,12 @@ depth is governed by Codex's own config).
 flowchart TD
     U[User task] --> SHIM{Global shim in<br/>CLAUDE.md / AGENTS.md:<br/>delegation requested or<br/>materially useful?}
     SHIM -- no --> P0[Primary proceeds single-agent]
-    SHIM -- yes --> LOAD[Load multi-agent-orchestration skill]
+    SHIM -- yes --> LOAD[Load iaa skill]
     LOAD --> MODE{Mode? SKILL.md Orchestration modes}
-    MODE -- "delegation-flavored request<br/>(incl. 'where appropriate')" --> MAO[Adaptive MAO mode]
-    MODE -- "explicit by-name request<br/>(e.g. 'use native superpowers:SDD')" --> NAT[Native workflow mode:<br/>named workflow governs itself,<br/>MAO stands down]
-    MAO --> PROV{Workflow directive found inside<br/>plan/spec/artifact/repo text?}
-    PROV -- yes --> META[Treat as orchestration metadata.<br/>Note it; consume technical content;<br/>stay in MAO mode]
+    MODE -- "delegation-flavored request<br/>(incl. 'where appropriate')" --> İAA[Adaptive İAA mode]
+    MODE -- "explicit by-name request<br/>(e.g. 'use native superpowers:SDD')" --> NAT[Native workflow mode:<br/>named workflow governs itself,<br/>İAA stands down]
+    İAA --> PROV{Workflow directive found inside<br/>plan/spec/artifact/repo text?}
+    PROV -- yes --> META[Treat as orchestration metadata.<br/>Note it; consume technical content;<br/>stay in İAA mode]
     PROV -- no --> CORE
     META --> CORE[Decision core:<br/>1 interpret intent<br/>2 orient proportionately<br/>3 concrete benefit test<br/>4 shape: waves + ownership<br/>5 dispatch via delegation contract<br/>6 integrate + primary final validation]
     CORE --> BEN{Material benefit?<br/>parallelism / isolation /<br/>specialization / offloading /<br/>independent verification}
@@ -208,8 +208,8 @@ flowchart TD
 
 | Behavior | Proven by | Samples/notes |
 |---|---|---|
-| Mode separation: SDD never loads in MAO mode | archfix tests A1, A2, C; artifact-boundary tests B, D; **6.4.1 revalidation runs J, D** (release-hardening/01) | 5 clean samples + 1 adversarial (6.3.0-era; transcripts quote the routing sentence while rejecting `executing-plans`→SDD redirect) + 2 samples on Superpowers 6.4.1 (SDD never loaded; provenance rule quoted in-run; 6.4.1 run J additionally exercised the rebuilt executing-plans as a whitelisted inline component) |
-| Native SDD opt-in still works | archfix test B (15 agents, worktree, ledger); artifact-boundary test C (11 agents); **6.4.1 revalidation run K** (release-hardening/01) | MAO never loaded in all |
+| Mode separation: SDD never loads in İAA mode | archfix tests A1, A2, C; artifact-boundary tests B, D; **6.4.1 revalidation runs J, D** (release-hardening/01) | 5 clean samples + 1 adversarial (6.3.0-era; transcripts quote the routing sentence while rejecting `executing-plans`→SDD redirect) + 2 samples on Superpowers 6.4.1 (SDD never loaded; provenance rule quoted in-run; 6.4.1 run J additionally exercised the rebuilt executing-plans as a whitelisted inline component) |
+| Native SDD opt-in still works | archfix test B (15 agents, worktree, ledger); artifact-boundary test C (11 agents); **6.4.1 revalidation run K** (release-hardening/01) | İAA never loaded in all |
 | Artifact-embedded directive ≠ opt-in | artifact-boundary B (authentic plan), D (adversarial MUST wording) | D has a priming caveat, honestly disclosed |
 | Adaptive topology (trivial stays primary; coupled stays primary; independent parallelized) | collision run 1; archfix A1/A2; artifact-boundary B; LCO production 2026-09-06 | across glm-5.3 samples + production |
 | No nested spawns | all campaign runs (0 child-spawns-child in every transcript); Claude depth=1; ZCode platform-impossible | Codex: policy-only (not behaviorally re-tested post-campaigns) |
@@ -242,7 +242,7 @@ flowchart TD
 
 ## 14. Historical behavior no longer active (for the record)
 
-1. v0/v1 prose precedence ("Workflow-skill compatibility": MAO controls shape *even when
+1. v0/v1 prose precedence ("Workflow-skill compatibility": İAA controls shape *even when
    SDD co-loaded") — replaced 2026-08-27 by selection-level separation.
 2. Post-load topology gate in the Claude adapter (attempt-3 mechanism) — replaced by the
    pre-dispatch mode check.

@@ -9,21 +9,21 @@ overlap. Optional improvements are deliberately NOT promoted to blockers.
 
 ### A1 — Un-namespaced identity + duplicate-install surface
 - **Evidence:** limitation #9; Claude docs: same-named personal+plugin skills **both
-  load**; two MAO copies = two routing sentences in one listing (trigger contest with
+  load**; two İAA copies = two routing sentences in one listing (trigger contest with
   itself). Plugin packaging namespaces but introduces exactly that duplicate class.
 - **Impact:** silent shadowing/duplication on other users' machines → nondeterministic
-  routing, the failure class MAO exists to prevent.
-- **Risk if shipped without fix: HIGH** (reputation: "MAO caused the collision it warns
+  routing, the failure class İAA exists to prevent.
+- **Risk if shipped without fix: HIGH** (reputation: "İAA caused the collision it warns
   about").
-- **Direction:** choose public plugin name (08-D5); ship duplicate detection in `mao
-  doctor` + install-time check; docs rule ("don't install both forms").
+- **Direction:** public plugin name decided (08-D5: `iaa`); ship duplicate detection in
+  `iaa doctor` + install-time check; docs rule ("don't install both forms").
 - **Complexity:** low-moderate (packaging + doctor).
 - **Host overlap:** partial — namespacing mechanics exist (plugin system); detection of
   duplicates does not.
 
 ### A2 — No version metadata / channel-sync guarantee
 - **Evidence:** limitation #10; Claude update pinning is semver-based; ZCode marketplace
-  requires manifest==entry version match; plugin auto-update can drift a plugin MAO past
+  requires manifest==entry version match; plugin auto-update can drift a plugin İAA past
   the owner's upgrade-check discipline.
 - **Impact:** users on mixed versions; support burden; untraceable bug reports.
 - **Risk: MEDIUM-HIGH.**
@@ -36,7 +36,7 @@ overlap. Optional improvements are deliberately NOT promoted to blockers.
 ### A3 — Trigger/coexistence regression suite not automatable today
 - **Evidence:** scenario J/K/A/B/D are manual (transcript analyzer); upgrade-check for
   Superpowers 6.4.1 **currently due and unrun** (limitation #2); `claude plugin eval`
-  exists with trigger-rate graders (2.1.269+) but MAO has no eval suite.
+  exists with trigger-rate graders (2.1.269+) but İAA has no eval suite.
 - **Impact:** every upstream drift re-opens the core contest with no automated tripwire;
   public users won't run manual scenarios.
 - **Risk: HIGH** (this is the product's central behavioral guarantee).
@@ -67,7 +67,7 @@ overlap. Optional improvements are deliberately NOT promoted to blockers.
 - **Direction:** adapter wording refresh pass, gated behind behavioral re-verification
   (07-E4/E9); keep adapters as verified-facts-only docs.
 - **Complexity:** low (wording) / moderate (verification).
-- **Host overlap:** no — this is MAO's own doc accuracy.
+- **Host overlap:** no — this is İAA's own doc accuracy.
 
 *(A1–A5 together = the honest minimum for "safe public distribution." Everything else
 below is not a release blocker.)*
@@ -79,21 +79,21 @@ below is not a release blocker.)*
   documents "Child agents can also spawn their own sub-agents" with "no fixed limit on…
   tree depth"; CLI `max_depth` issue-documented as ignored by V2 + open enforcement bugs
   (#46704 on 0.155.1).
-- **Impact:** the one runtime where MAO's root-to-child rule (C33) has no platform backstop
+- **Impact:** the one runtime where İAA's root-to-child rule (C33) has no platform backstop
   is the runtime moving *further* from one.
 - **Risk: MEDIUM** (briefs still carry "Do not spawn subagents"; rejection side proven at
   0.149.1; untested since).
 - **Direction:** behavioral re-verification on current Codex (07-E9); consider
   documenting the guard as best-effort on Codex in public claims.
-- **Complexity:** low (test) — no mechanism fix is available to MAO without violating its
+- **Complexity:** low (test) — no mechanism fix is available to İAA without violating its
   own non-invasiveness (it cannot patch Codex).
-- **Host overlap:** the host owns this gap; MAO can only verify and disclose.
+- **Host overlap:** the host owns this gap; İAA can only verify and disclose.
 
 ### B2 — Authorized-nesting positive path is unevidenced policy
 - **Evidence:** C33 positive path DOCUMENTED-only; scenarios F never run. Meanwhile SDD
   6.4.1 release-notes an opt-in nested-controller mode (#2320) — upstream shipped a
-  nested topology before MAO ever exercised its own.
-- **Impact:** a rule MAO advertises (raise depth deliberately for bounded designs) has
+  nested topology before İAA ever exercised its own.
+- **Impact:** a rule İAA advertises (raise depth deliberately for bounded designs) has
   zero behavioral evidence.
 - **Risk: LOW-MEDIUM.**
 - **Direction:** run 07-E6 once; or soften public wording to "untested path."
@@ -103,7 +103,7 @@ below is not a release blocker.)*
 - **Evidence:** C15 DOCUMENTED-only; 08-test record "gap". GSD/BMAD both ship failure
   machinery (GSD blocked-story semantics + forensics; BMAD "blocked" permanence + repair
   loop caps) — the class is real in the field.
-- **Impact:** MAO's recovery contract is untested prose.
+- **Impact:** İAA's recovery contract is untested prose.
 - **Risk: LOW** (rare event; primary-validation ownership bounds the blast radius).
 - **Direction:** 07-E8; keep as documented-gap disclosure if not run pre-release.
 - **Complexity:** low-moderate (needs fault injection in a disposable repo).
@@ -114,11 +114,11 @@ compatible — 00 §4B, 03).
 
 ## C. CAPABILITY GAPS (useful, absent)
 
-### C1 — Diagnostics surface (`mao doctor`)
+### C1 — Diagnostics surface (`iaa doctor`)
 - **Evidence:** proposal exists (design/); Superpowers ships diagnosing-superpowers
-  (path:line forensics); GSD ships /gsd-health + /gsd-forensics + runtime-identity; MAO
+  (path:line forensics); GSD ships /gsd-health + /gsd-forensics + runtime-identity; İAA
   ships verify() (self-integrity only).
-- **Impact:** public users cannot answer "is my MAO healthy; what else can claim
+- **Impact:** public users cannot answer "is my İAA healthy; what else can claim
   authority here?"
 - **Risk of absence: MEDIUM** for public; **Direction:** implement proposal as read-only
   reporter (REPORT never mutate — its own hard constraint is right).
@@ -127,27 +127,27 @@ compatible — 00 §4B, 03).
 
 ### C2 — Observability/ledger of delegation decisions
 - **Evidence:** 02 §4.3; SDD ledger (compaction-respawn rationale verbatim upstream);
-  GSD STATE.md. MAO: nothing (by design, but the *decision-trace* absence is distinct
+  GSD STATE.md. İAA: nothing (by design, but the *decision-trace* absence is distinct
   from the state absence).
-- **Impact:** debugging MAO-mode runs requires transcript archaeology.
+- **Impact:** debugging İAA-mode runs requires transcript archaeology.
 - **Risk: LOW. Direction:** EXPERIMENT class — a SubagentStop/Stop observer hook that
-  *logs* (never blocks) MAO-relevant events to a local file; must stay opt-in and
+  *logs* (never blocks) İAA-relevant events to a local file; must stay opt-in and
   non-invasive-compliant. **Complexity:** moderate. **Host overlap:** OTel hook events
   (2.1.280 hook_execution_complete etc.) partially cover telemetry — check host first.
 
 ### C3 — Resume/continuity across compaction
 - **Evidence:** SDD ledger exists specifically because "controllers that lost their place
-  have re-dispatched entire completed task sequences"; GSD state survives /clear. MAO's
+  have re-dispatched entire completed task sequences"; GSD state survives /clear. İAA's
   primary-agent contract has no compaction story.
-- **Impact:** long MAO-mode runs can repeat completed work after compaction.
+- **Impact:** long İAA-mode runs can repeat completed work after compaction.
 - **Risk: LOW-MEDIUM on long tasks. Direction:** EXPERIMENT — light "delegation state"
   scratchpad convention inside the brief (not a framework ledger); evaluate before
   adopting. **Host overlap:** workflows/teams solve resume their own way; not applicable
-  to MAO's mode.
+  to İAA's mode.
 
 ### C4 — Per-seat skill attachment (GSD-style) / model-tier guidance
 - **Evidence:** GSD `agent_skills` config attaches plugin skills to agents; model
-  profiles. MAO deliberately maps to capability classes (C21) — **no gap; keep** (recorded
+  profiles. İAA deliberately maps to capability classes (C21) — **no gap; keep** (recorded
   here because it surfaced; classified DO-NOT-ADOPT in final table).
 
 ## D. EVIDENCE GAPS (claims not yet provable)
@@ -164,9 +164,9 @@ compatible — 00 §4B, 03).
    Test: 07-E4/E9.
 6. ZCode local skew: machine at 3.11.2, adapter anchored to 3.7.7, current 3.14.3 — live
    refresh + behavioral spot-check needed. Test: 07-E4.
-7. Claude-native Workflow / ZCode dynamic workflow invoked inside an MAO task (yield-rule
+7. Claude-native Workflow / ZCode dynamic workflow invoked inside an İAA task (yield-rule
    coverage for by-name workflow *tools*, not just skills). Test: 07-E10.
-8. `skillOverrides`-style mute interactions with a future plugin-form MAO (knob gap is
+8. `skillOverrides`-style mute interactions with a future plugin-form İAA (knob gap is
    official — public doc must state it).
 
 ## E. OPTIONAL IMPROVEMENTS (non-essential)
@@ -186,7 +186,7 @@ compatible — 00 §4B, 03).
 ## Blocker count discipline (task §13)
 
 Five blockers (A1–A5), all packaging/validation-layer. **Zero blockers demand changing
-MAO's orchestration semantics.** The frozen v3 policy survived the entire current-state
+İAA's orchestration semantics.** The frozen v3 policy survived the entire current-state
 comparison without a single counter-finding (see FINAL report §3); the defects found (B1–
 B3) are verification/disclosure items, and B1's root cause is upstream. This is the
 strongest single output of the gap analysis: **public readiness is a packaging-and-evidence

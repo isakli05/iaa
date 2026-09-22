@@ -1,14 +1,14 @@
 # Comparison 04 — Public Packaging Implications
 
-Date: 2026-09-22. Research-based implications for MAO distribution. **Nothing here is
-implemented.** The historical MAO/SDD boundary rests on the managed-shim routing sentence;
+Date: 2026-09-22. Research-based implications for İAA distribution. **Nothing here is
+implemented.** The historical İAA/SDD boundary rests on the managed-shim routing sentence;
 per the task mandate, its removal is not recommended merely because plugin systems exist —
 any replacement must reproduce and test the same routing guarantee.
 
 ## 1. The candidate architecture, re-evaluated against current platform facts
 
 ```
-one runtime-agnostic MAO behavioral core  (mao-core/ = current skill, byte-identical)
+one runtime-agnostic İAA behavioral core  (iaa-core/ = current skill, byte-identical)
               |
       runtime packaging/adapters
         /        |         \
@@ -39,24 +39,24 @@ Favorable current facts: plugin manifests need only `name`; skills bundle under
 `skills/<name>/SKILL.md`; marketplaces from GitHub repos; `claude plugin validate
 --strict`; `claude plugin eval` (v2.1.269+) runs **behavioral evals with trigger-rate
 graders (`tool_used: Skill`) in isolated sandboxed sessions, with a no-plugin control
-arm** — i.e., the platform now ships exactly the harness MAO's scenario J needs (see §6);
+arm** — i.e., the platform now ships exactly the harness İAA's scenario J needs (see §6);
 `/skill-doctor` surfaces per-skill cost/usage for users.
 
 Costs/risks (documented):
 - **Namespacing changes the invocation name.** Plugin skills are `/plugin-name:skill-name`;
-  a same-named personal skill and plugin skill **both load** (documented) → duplicate-MAO
+  a same-named personal skill and plugin skill **both load** (documented) → duplicate-İAA
   hazard (two routing sentences in one listing) unless the doctor flags it. The **shim
-  text names the skill** ("load and follow the installed `multi-agent-orchestration`
+  text names the skill** ("load and follow the installed `iaa`
   skill") — under a plugin, the stable reference is the description/trigger wording, not
   the bare name; the shim sentence and SKILL cross-references must be validated against
   the namespaced form (behavioral test, not just wording).
 - **skillOverrides does not reach plugin skills** (official) → users cannot mute a plugin
-  MAO the way they can mute a personal skill; the explicit-only fallback (research/03
+  İAA the way they can mute a personal skill; the explicit-only fallback (research/03
   model A) would work via `disable-model-invocation` in the skill's own frontmatter, not
   via user override.
-- Plugin auto-update is per-marketplace; a plugin MAO can drift versions without the
+- Plugin auto-update is per-marketplace; a plugin İAA can drift versions without the
   owner's upgrade-check discipline → the shim/skill version pin must be checkable by
-  `mao doctor` (hash comparison, as manage.sh verify already does against canonical).
+  `iaa doctor` (hash comparison, as manage.sh verify already does against canonical).
 - Marketplace trust review (community: SHA-pin + screening) does not fit an installer that
   writes managed blocks into user instruction files — see §4; distribution channel and
   integration step must remain separable.
@@ -66,13 +66,13 @@ Costs/risks (documented):
 - `.zcode-plugin/plugin.json` recommended, `.claude-plugin/plugin.json` accepted → the
   **same published Claude artifact can serve ZCode**; per-workspace plugin install exists
   (3.11.2+); public catalog is curated (GitHub-fed); personal marketplaces from any GitHub
-  repo — a public MAO can ship one repo usable in both stores without forking semantics.
+  repo — a public İAA can ship one repo usable in both stores without forking semantics.
 - Constraints unchanged from baseline (description ≤1024 hard drop / ~250 injection;
   skills-only-flat layout; hooks limited to 7 events). No implicit-invocation disable
   flag — trigger discipline stays description-based on ZCode regardless of packaging.
 - Note: ZCode also reads `~/.agents/skills` as a *fallback* root (source-verified) —
-  MAO's existing Codex symlink is visible to ZCode only when no same-named `.zcode/skills`
-  skill exists; MAO's own `.zcode/skills` symlink wins. No conflict, but worth a doctor
+  İAA's existing Codex symlink is visible to ZCode only when no same-named `.zcode/skills`
+  skill exists; İAA's own `.zcode/skills` symlink wins. No conflict, but worth a doctor
   check (two discovery paths to one canonical).
 
 ## 4. The shim question — why it survives plugin distribution (load-bearing analysis)
@@ -87,11 +87,11 @@ All current evidence says **plugins cannot replace the shim**:
    possible injection channel — see below) but do not manage AGENTS.md.
 2. The routing guarantee the evidence rests on is **instruction-channel**: models in 3+
    samples quoted the *shim sentence* while rejecting redirects (C8 PROVEN); Superpowers'
-  own bootstrap defers to user instructions. A description-only MAO loses the layer that
+  own bootstrap defers to user instructions. A description-only İAA loses the layer that
    made selection-time exclusion win (ADR-0002's enforcement surfaces list the shim
    explicitly).
 3. The alternative channels are worse or semantics-changing: a SessionStart hook injecting
-   MAO text every session is Superpowers' channel (context cost; pressure-not-authority;
+   İAA text every session is Superpowers' channel (context cost; pressure-not-authority;
    and on Claude it would run in *every* session including native-mode ones — a behavior
    change the frozen baseline explicitly rejected); relying on plugin skill description
    alone is the "weaker" option the baseline already ranked below the shim.
@@ -110,14 +110,14 @@ guarantee, (b) pass scenario-J-style behavioral proof (now cheap via plugin eval
 - Official universal plugin system is public and shipping (ChatGPT+Codex shared
   directory; `/plugins` browser; root `plugin.json` + skills/; submission portal with
   identity verification, domain checks, automated scanning, human review, **5 positive +
-  3 negative test cases required** — note for planning: MAO would need a maintained test
+  3 negative test cases required** — note for planning: İAA would need a maintained test
   suite to submit, which it currently lacks in automatable form).
 - Enterprise GitHub-marketplace path accepts Claude manifests — good for org-internal
   distribution without portal review.
 - Consumer path friction: portal review timelines "may vary"; the plain `~/.agents/skills`
   symlink + AGENTS.md shim (current install) remains fully supported and lighter. For a
   policy skill whose value is the shim, **skills-dir + script likely remains the primary
-  Codex form; plugin form is optional reach** (submitting MAO to the universal directory
+  Codex form; plugin form is optional reach** (submitting İAA to the universal directory
   would distribute a skill *without* its integration step — users would still need
   manage.sh for the shim; the listing must say so).
 
@@ -126,9 +126,9 @@ guarantee, (b) pass scenario-J-style behavioral proof (now cheap via plugin eval
 `claude plugin eval` (2.1.269+) evaluates a plugin in isolated sessions with graders —
 `tool_used: Skill` (trigger rate), `tool_order`, `llm` judge, `file_exists`, `regex` —
 each case 3× by default **plus a no-plugin control arm** (Δ = plugin contribution), with
-JSON/HTML reports and CI exit codes. This converts MAO's highest-value manual scenarios
+JSON/HTML reports and CI exit codes. This converts İAA's highest-value manual scenarios
 into repeatable artifacts: J (delegation prompt → assert `superpowers:subagent-driven-
-development` skill NOT used, MAO skill used), K (explicit SDD request → SDD used, MAO
+development` skill NOT used, İAA skill used), K (explicit SDD request → SDD used, İAA
 not), A (trivial task → no Skill/spawn), artifact-boundary B/D (fixture plan in context).
 Caveats for the experiment plan: eval sessions load *only the evaluated plugin* — the
 Superpowers co-presence arm needs Superpowers also installed in the eval environment
@@ -138,7 +138,7 @@ must be constructed deliberately).
 
 ## 7. Identity, versioning, and claim discipline for the public artifact
 
-- **Name/namespace**: un-namespaced `multi-agent-orchestration` at user scope is the
+- **Name/namespace**: un-namespaced `iaa` at user scope is the
   known shadowing risk (limitation #9); plugin forms namespace it. Public identity must
   be chosen once (plugin name, marketplace entries, Codex/ZCode listings all reference
   it) and pre-checked against existing marketplace entries (Superpowers' author
