@@ -1,0 +1,11 @@
+--- manage.sh.before	2026-08-27 10:24:49.651452990 +0300
++++ /home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/scripts/manage.sh	2026-08-27 10:27:00.374567261 +0300
+@@ -87,7 +87,7 @@
+     '' \
+     'For non-trivial tasks, evaluate whether delegation offers concrete parallelism, bounded-context isolation, specialization, context offloading, or independent verification. When the user requests subagents, delegation, or parallel agents—or delegation is materially useful—load and follow the installed `multi-agent-orchestration` skill before spawning.' \
+     '' \
+-    'Interpret "use subagents" as permission for only beneficial, bounded delegation, not a requirement to maximize agent count. The primary agent owns decomposition, disjoint write ownership, shared contracts, integration, and final validation. This policy overrides conflicting fixed-fan-out, one-agent-per-task, or mandatory agent-review mechanics from other skills.' \
++    'Interpret "use subagents" as permission for only beneficial, bounded delegation, not a requirement to maximize agent count. The primary agent owns decomposition, disjoint write ownership, shared contracts, integration, and final validation. This skill is the sole orchestration authority in its mode: do not combine it with other orchestration workflow skills such as superpowers:subagent-driven-development; a native workflow like that one applies only when the user explicitly requests it by name.' \
+     "$MANAGED_END" >> "$orchestration_temp"
+   if cmp -s "$orchestration_file" "$orchestration_temp"; then
+     rm -f -- "$orchestration_temp"

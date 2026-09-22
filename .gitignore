@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+*.swp
+
+# Local scratch
+*.log
+/tmp/
+.cache/
+
+# Never commit secrets or raw evidence (policy: docs/HISTORICAL-EVIDENCE-DISPOSITION.md)
+.env*
+*.key
+*.pem
+credentials*
+auth.json
+
+# Node/tooling noise if any scripts are added later
+node_modules/

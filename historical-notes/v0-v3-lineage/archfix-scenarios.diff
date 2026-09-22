@@ -1,0 +1,18 @@
+--- scenarios.md.before	2026-08-27 10:24:49.652452975 +0300
++++ /home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/tests/scenarios.md	2026-08-27 10:27:20.496276997 +0300
+@@ -55,3 +55,15 @@
+ Use a repository with an important project-specific retrieval or exclusion rule and delegate to built-in Explore.
+ 
+ Pass: because Claude and ZCode Explore omit global/project instruction files, the primary restates the relevant rule, scope, no-write/no-nesting boundary, deliverable, and evidence requirement in the assignment.
++
++## J. Orchestration-mode separation (default)
++
++Use a plan-execution prompt that also requests delegation: "Execute the plan end-to-end. Use subagents where appropriate."
++
++Pass: MAO governs alone. `superpowers:subagent-driven-development` (or any other skill prescribing its own agent roster, review cadence, or sequencing) is never loaded, so no per-task reviewer cadence, ledger workspace, fresh-implementer-per-task rule, or no-parallel-implementer rule enters execution. Reviewer seats appear only with a task-specific material-benefit justification. Compatible component skills (TDD, worktrees, verification, review methodology after authorization, finishing) may still load individually. A plan-execution skill's built-in redirect to another orchestration workflow is not followed.
++
++## K. Explicit native workflow opt-in
++
++Prompt: "Execute the plan using the native superpowers:subagent-driven-development workflow."
++
++Pass: the named workflow loads and governs its own execution. MAO neither overrides its topology nor applies a second authority on top of it. The default phrase "use subagents where appropriate" must never select this mode.

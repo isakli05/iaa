@@ -1,0 +1,78 @@
+---
+name: multi-agent-orchestration
+description: Apply this multi-agent method for requests to use subagents, delegate, divide or parallelize work, or orchestrate agents, and proactively only when a complex task has a concrete benefit. Do not force delegation for small or tightly coupled work.
+---
+
+# Multi-Agent Orchestration
+
+Use this as the authoritative method for deciding whether and how to delegate. If another skill prescribes fixed fan-out, one worker per task, or a mandatory review-agent cadence, this policy controls the delegation shape; retain only compatible domain steps from that skill.
+
+## Workflow-skill compatibility
+
+Loading another workflow skill never authorizes a child agent by itself. When `superpowers:subagent-driven-development` is also loaded, this skill alone decides delegation, task clustering, implementer concurrency or sequencing, write ownership, nested topology, and whether task review, re-review, or final review materially warrants another agent. SDD's fresh-agent-per-task, mandatory review and final-review cadence, and no-parallel-implementer rules do not determine agent topology.
+
+After all workflow skills are loaded, record a task-specific MAO material-benefit justification before adding any implementer, task reviewer, re-reviewer, or final reviewer to the ledger or agent topology; an SDD template step, completed implementation, or available review procedure is not justification. Without that justification, keep the work or verification in the primary or an existing authorized lane.
+
+Authorization is stage-specific: authorizing a review does not preauthorize a fix agent or re-reviewer. Reassess material benefit after findings and after fixes; optional or Minor findings normally stay in the primary or are deferred, while only load-bearing risk warrants another agent.
+
+After this policy authorizes an implementation or review lane, retain compatible SDD practices: clear briefs, TDD, progress tracking, structured handoffs, review and fix procedure, verification, and finishing. The primary may verify low-risk work directly; safe disjoint implementation may run concurrently when dependencies, shared contracts, and ownership permit.
+
+## Interpret intent
+
+"Use subagents" means: apply this policy and delegate wherever doing so materially improves execution. It is not a request to maximize agent count or move every operation into a child context.
+
+The primary agent is the orchestrator and final integration authority. It owns decomposition, dependency order, agent selection, shared contracts, scope assignment, integration, contradiction resolution, final validation, and the user-facing answer.
+
+## Orient before delegating
+
+Before spawning, understand enough of the task and repository to choose rational boundaries. Proportionately inspect the applicable instructions, repository topology, relevant modules, execution paths, dependencies, APIs, schemas, data models, invariants, tests, build/runtime boundaries, shared contracts, likely integration points, ownership boundaries, and file overlap.
+
+Do not turn this into an exhaustive repository audit for a small task. Follow any project-specific orientation or retrieval policy first. A tool-produced map is an orientation aid, not a substitute for current source and tests.
+
+## Require a concrete benefit
+
+Delegate only when at least one benefit outweighs coordination cost:
+
+- genuine parallelism between independent workstreams;
+- bounded-context isolation for a self-contained subsystem or investigation;
+- specialization in tools, permissions, model capability, or domain knowledge;
+- context offloading for large logs, documentation, searches, or test output;
+- independent verification that can challenge assumptions or review completed work.
+
+Keep work in the primary context when it is tiny, sequential, tightly coupled, poorly bounded, concentrated on the same files, dependent on the same full context, or cheaper to perform directly. A trivial edit, one-file mechanical change, or equally small verification is a no-delegation default even when the user says "use subagents where appropriate." Independent verification warrants an agent only when risk, ambiguity, or review scope makes a second context materially valuable; never manufacture a reviewer subtask for a trivial change.
+
+Do not create agents for artificial roles, one per file, or merely because agents are available.
+
+Choose the smallest useful number of agents from the task structure. Optimize for useful concurrency with minimum coordination cost.
+
+## Shape the work safely
+
+Read-heavy work is the safest default for parallel delegation. Prefer a platform's built-in read-only or Explore role for architecture mapping, dependency tracing, documentation research, test inventory, log analysis, risk analysis, and review.
+
+For write-heavy work, establish non-overlapping ownership before concurrent edits:
+
+```text
+Agent A -> bounded module or file set A
+Agent B -> bounded module or file set B
+Primary -> shared contracts and integration
+```
+
+Do not assign concurrent writers to the same file or tightly coupled implementation surface unless a deliberate isolation-and-merge mechanism makes that safe. Shared APIs, schemas, types, database contracts, central configuration, abstractions, and package boundaries are normally owned by the primary agent, completed before dependent work, or assigned to one clearly designated owner.
+
+Use dependency-aware waves when useful: orient; parallel read-only research; synthesize and settle shared contracts; run disjoint implementation; independently verify; integrate and validate. Skip phases that add no value.
+
+## Dispatch deliberately
+
+Before the first spawn, read [references/delegation-contract.md](references/delegation-contract.md) and the matching section of [references/platform-adapters.md](references/platform-adapters.md). Give each worker a bounded, self-contained assignment rather than the full parent conversation.
+
+Use root-to-child delegation by default. A child must not spawn further agents unless the user explicitly requests nested delegation and the primary agent has identified a concrete, bounded architectural benefit. Respect a platform that forbids nested agents.
+
+Do not hardcode model names. When the platform permits role allocation, map the work to capability classes such as fast explorer, general worker, or deep reviewer. Preserve the strongest reasoning in the primary agent when global synthesis is the hard part.
+
+While children run, continue meaningful non-overlapping primary work. Wait only when a child result is required for the next critical decision; do not busy-poll. Stop or redirect work that becomes redundant, unsafe, or out of scope.
+
+## Integrate, do not merely collect
+
+Treat child reports as evidence, not truth. Inspect important claims against source, diffs, tests, logs, or runtime behavior. Resolve contradictions and integration gaps centrally. Review combined changes for contract drift and overlapping assumptions, then run final validation in the primary context.
+
+Prevent blind fan-out, duplicate exploration, overlapping ownership, premature implementation, context starvation, context dumping, agent proliferation, delegation recursion, and integration debt. Successful child completion is not successful task completion.

@@ -1,0 +1,11 @@
+--- platform-adapters.md.before	2026-08-27 16:22:04.867970388 +0300
++++ /home/isa/.local/share/ai-agent-orchestration/multi-agent-orchestration/references/platform-adapters.md	2026-08-27 16:22:21.360631263 +0300
+@@ -13,7 +13,7 @@
+ ## Claude Code
+ 
+ - Prefer built-in `Explore` for read-only discovery, `Plan` for plan-mode research, and `general-purpose` for a bounded task that may edit or run commands.
+-- Before the first `Agent` call, confirm the orchestration mode (SKILL.md, "Orchestration modes"): MAO mode never invokes `superpowers:subagent-driven-development`, and plan-execution redirects to it from `executing-plans` or `writing-plans` do not apply. Only an explicit user request naming native SDD switches modes; in that mode this policy does not apply at all.
++- Before the first `Agent` call, confirm the orchestration mode (SKILL.md, "Orchestration modes"): MAO mode never invokes `superpowers:subagent-driven-development`, and redirects to it do not apply whether they arrive as skill text (`executing-plans`, `writing-plans`) or as a `REQUIRED SUB-SKILL` directive embedded in the plan being executed. Only an explicit user request naming native SDD switches modes; in that mode this policy does not apply at all.
+ - `Explore` and `Plan` do not load the CLAUDE.md hierarchy or preloaded skills. Restate every task-specific constraint, applicable project retrieval rule, ownership boundary, and the no-nested-agent rule in their assignment.
+ - Other non-fork agents receive the applicable CLAUDE.md hierarchy but still need a targeted task brief. Prefer fresh context; use a conversation fork only when the complete parent history is truly required.
+ - The installed global adapter caps spawn depth at one. If the user explicitly requests a bounded nested design, raise `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` deliberately for that session and restore the default afterward.
