@@ -54,7 +54,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 
 ## Cost and context (point 14)
 
-- **C30** Context isolation is a benefit AND a cost: prefer fresh-context spawns; inherit history (Codex fork_turns>0, Claude fork) only when genuinely required. — PA:8,18 — PROVEN (fresh spawns standard in runs).
+- **C30** Context isolation is a benefit AND a cost: prefer fresh-context spawns; inherit history (Codex `fork_turns` beyond `"none"` — `"all"` or a positive-integer-string recent-turns count; Claude fork) only when genuinely required. — PA:8,18 — PROVEN (fresh spawns standard in runs; Codex value surface schema-verified 2026-09-23, see release-hardening/02).
 - **C31** Context offloading (large logs/docs/searches/test output) is a legitimate delegation benefit. — SKILL.md:42 — PROVEN (Explore usage; LCO wave 1).
 - **C32** Cost awareness is evidentiary, not enforced: measured campaign costs (MAO-mode $2.90–3.27 vs co-loaded SDD $9.57 vs native SDD $8.16–11.24) document the economic rationale; no runtime metering exists. — campaign reports — PROVEN (as measurement).
 

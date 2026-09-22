@@ -3,8 +3,13 @@
 Scored per collision class (research/02): **I**nstallation, **N**amespace, **T**rigger,
 **O**rchestration-policy. Values: OK / RISK / N-A / unknown. "Tested" = behavioral evidence
 exists; "Documented" = policy text only. Local evidence base: audit/04, campaigns 1–3,
-research/01. Machine context: Claude 2.1.274, Superpowers 6.3.0 installed, Codex 0.154,
-ZCode 3.7.7; GSD/BMAD absent.
+research/01. Machine context (labels corrected 2026-09-23 — original snapshot said
+"Superpowers 6.3.0 installed … ZCode 3.7.7"; see comparison/00 Erratum E-1 and
+release-hardening/01): Claude Code 2.1.274; Superpowers **6.4.1** installed
+(upgraded from 6.3.0 on 2026-09-22 for the Gate-1 upgrade check — the campaign-era
+behavioral evidence below was gathered against 6.3.0, the 6.4.1 revalidation against
+6.4.1); Codex 0.154.0; ZCode **3.11.2** (adapter text anchored to 3.7.7 behavior);
+GSD/BMAD absent.
 
 | Combination | I | N | T | O | Tested? | Documented? | Safe? | Notes |
 |---|---|---|---|---|---|---|---|---|

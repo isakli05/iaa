@@ -6,7 +6,7 @@ tested, not aspirational. Companion: `docs/adr/0001–0003`, `docs/BEHAVIORAL-CO
 
 ## The two engines (what each claims)
 
-| Dimension | MAO (adaptive) | superpowers:subagent-driven-development 6.3.0 |
+| Dimension | MAO (adaptive) | superpowers:subagent-driven-development 6.3.0 (cadence lines verified verbatim-unchanged at 6.4.1 — release-hardening/01) |
 |---|---|---|
 | Selection | any delegation-flavored request, incl. "use subagents where appropriate" | only explicit by-name user request ("use native superpowers:subagent-driven-development") |
 | Implementers | smallest useful number; clustering by coupling/shape; trivial stays primary | fresh implementer subagent per task |

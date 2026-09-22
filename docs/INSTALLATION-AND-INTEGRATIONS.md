@@ -50,5 +50,7 @@ session; ZCode Settings→Skills→Refresh.
 ## Coexistence with other installed systems
 
 See `audit/04-coexisting-orchestrators.md` (local census) and
-`docs/COMPATIBILITY-MATRIX.md`. Key neighbor: Superpowers 6.3.0 plugin (Claude) with its
-SessionStart bootstrap hook; boundary rules in `docs/MAO-VS-SDD-BOUNDARY.md`.
+`docs/COMPATIBILITY-MATRIX.md`. Key neighbor: the Superpowers plugin (Claude) with its
+SessionStart bootstrap hook — **6.4.1 installed since 2026-09-22** (was 6.3.0 at audit
+time; the 6.4.1 boundary revalidation is `release-hardening/01-superpowers-6.4.1-upgrade-check.md`);
+boundary rules in `docs/MAO-VS-SDD-BOUNDARY.md`.

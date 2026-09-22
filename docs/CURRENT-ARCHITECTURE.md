@@ -34,7 +34,7 @@ one 15-byte marker (`~/.config/ai-agent-orchestration/claude-depth.state`, M:154
 |---|---|---|---|
 | Claude Code 2.1.274 | `~/.claude/CLAUDE.md` managed block (model-invocable description; user-invocable `/multi-agent-orchestration`) | `~/.claude/skills/multi-agent-orchestration` symlink | description (245–249 chars) is the routing surface; ZCode's ~250-char injection limit constrained its length (archfix report) |
 | Codex CLI 0.154.0 | `~/.codex/AGENTS.md` managed block | `~/.agents/skills/multi-agent-orchestration` symlink (Codex user-skills dir; R:26,34) | Codex's own `[agents]` config + `reviewer.toml` pre-exist and are untouched (R:58–60) |
-| ZCode 3.7.7 | `~/.zcode/AGENTS.md` managed block | `~/.zcode/skills/multi-agent-orchestration` symlink | only user-global + workspace AGENTS.md are read (R:70) |
+| ZCode 3.7.7 (adapter anchor; local machine runs 3.11.2 — Erratum E-1, comparison/00) | `~/.zcode/AGENTS.md` managed block | `~/.zcode/skills/multi-agent-orchestration` symlink | only user-global + workspace AGENTS.md are read (R:70) |
 
 Auto-activation semantics: the shim tells the primary agent to load the skill when delegation
 "is requested or materially useful" (M:88) — i.e. **model-invocable with proactive trigger**,
@@ -74,8 +74,9 @@ never silently overrides a higher one.
 **Component-skill whitelist (SKILL.md:19):** in MAO mode these Superpowers components remain
 individually usable on their own triggers: test-driven-development, using-git-worktrees,
 verification-before-completion, receiving-code-review, finishing-a-development-branch,
-systematic-debugging, writing-plans, executing-plans (discipline only; its SDD redirect is
-not followed). Two components prescribe agent seats (requesting-code-review,
+systematic-debugging, writing-plans, executing-plans (discipline only; steering inside it
+toward another orchestration workflow — a redirect, handoff offer, or preference — does not
+by itself select native mode). Two components prescribe agent seats (requesting-code-review,
 dispatching-parallel-agents) and may only execute lanes MAO already authorized.
 
 **Seat economics (SKILL.md:21):** every implementer/reviewer/re-reviewer/fixer seat needs a
@@ -135,19 +136,25 @@ primary → own the final answer (DC:45–53).
 ## 8. Platform adapters (PA)
 
 - **Codex** (PA:5–11): prefer `explorer`/`worker`/`default` built-ins; fresh-context spawn
-  (`fork_turns: "none"`) by default, minimal inherited suffix only if needed, `fork_turns:
-  "all"` only when full parent history is genuinely required (any inheritance weakens
-  isolation and costs tokens); explicit file ownership stated; direct children unless user
-  authorizes nesting; use runtime steering/interrupt/wait to prevent duplicate/abandoned
-  work.
+  (`fork_turns: "none"`) by default — note omitted `fork_turns` defaults to full history,
+  not fresh context — smallest useful recent-turns count as a positive integer string
+  (e.g. `fork_turns: "3"`) if bounded inheritance is needed, `fork_turns: "all"` only when
+  full parent history is genuinely required (any inheritance weakens isolation and costs
+  tokens); explicit file ownership stated; direct children unless user authorizes nesting;
+  use runtime steering/interrupt/wait to prevent duplicate/abandoned work.
+  (Verified against Codex 0.154.0's compiled tool schema and upstream source — see
+  `release-hardening/02-codex-fork-turns-verification.md`.)
 - **Claude Code** (PA:13–20): prefer built-in Explore/Plan/general-purpose; **pre-dispatch
-  mode check** before first Agent call — MAO never invokes SDD, redirects not followed
-  "whether they arrive as skill text (`executing-plans`, `writing-plans`) or as a
-  `REQUIRED SUB-SKILL` directive embedded in the plan" (PA:16); Explore/Plan don't inherit
-  CLAUDE.md or skills → restate constraints/ownership/no-nesting in every such brief
-  (PA:17); spawn depth capped at 1 by the installed adapter — raise deliberately per-session
-  for an explicitly requested bounded nested design, restore after (PA:19); no permanent
-  custom agents unless a recurring specialization truly needs them.
+  mode check** before first Agent call — MAO never invokes SDD, and no skill text or plan
+  artifact switches modes, "whether a component skill's redirect, handoff offer, or
+  preference toward SDD (`executing-plans`, `writing-plans`) or a `REQUIRED SUB-SKILL`
+  directive embedded in the plan being executed" (PA:16, refreshed for Superpowers 6.4.1
+  where executing-plans is a real inline mode and writing-plans' handoff asks the user to
+  choose; see `release-hardening/03-superpowers-adapter-refresh.md`); Explore/Plan don't
+  inherit CLAUDE.md or skills → restate constraints/ownership/no-nesting in every such
+  brief (PA:17); spawn depth capped at 1 by the installed adapter — raise deliberately
+  per-session for an explicitly requested bounded nested design, restore after (PA:19);
+  no permanent custom agents unless a recurring specialization truly needs them.
 - **ZCode** (PA:22–28): built-in Explore (read-only; no AGENTS.md injection → restate
   rules in prompt) + general-purpose (injects AGENTS.md but still needs targeted brief);
   custom-tool allowlists may remove skill/shell access — don't assume tools; **ZCode
@@ -201,8 +208,8 @@ flowchart TD
 
 | Behavior | Proven by | Samples/notes |
 |---|---|---|
-| Mode separation: SDD never loads in MAO mode | archfix tests A1, A2, C; artifact-boundary tests B, D | 5 clean samples + 1 adversarial; transcripts quote the routing sentence while rejecting `executing-plans`→SDD redirect |
-| Native SDD opt-in still works | archfix test B (15 agents, worktree, ledger); artifact-boundary test C (11 agents) | MAO never loaded in both |
+| Mode separation: SDD never loads in MAO mode | archfix tests A1, A2, C; artifact-boundary tests B, D; **6.4.1 revalidation runs J, D** (release-hardening/01) | 5 clean samples + 1 adversarial (6.3.0-era; transcripts quote the routing sentence while rejecting `executing-plans`→SDD redirect) + 2 samples on Superpowers 6.4.1 (SDD never loaded; provenance rule quoted in-run; 6.4.1 run J additionally exercised the rebuilt executing-plans as a whitelisted inline component) |
+| Native SDD opt-in still works | archfix test B (15 agents, worktree, ledger); artifact-boundary test C (11 agents); **6.4.1 revalidation run K** (release-hardening/01) | MAO never loaded in all |
 | Artifact-embedded directive ≠ opt-in | artifact-boundary B (authentic plan), D (adversarial MUST wording) | D has a priming caveat, honestly disclosed |
 | Adaptive topology (trivial stays primary; coupled stays primary; independent parallelized) | collision run 1; archfix A1/A2; artifact-boundary B; LCO production 2026-09-06 | across glm-5.3 samples + production |
 | No nested spawns | all campaign runs (0 child-spawns-child in every transcript); Claude depth=1; ZCode platform-impossible | Codex: policy-only (not behaviorally re-tested post-campaigns) |

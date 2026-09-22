@@ -67,10 +67,21 @@ Public packaging plans: `docs/PUBLIC-DISTRIBUTION-ARCHITECTURE.md`.
 
 ## Current status
 
-Installed and live in three runtimes since 2026-08-26; source unchanged since 2026-08-27
-(v3). Production usage documented (LCO program audits, 2026-09-06). Known limitations:
-`docs/KNOWN-LIMITATIONS.md`. The next planned step is *not* more implementation — it is an
-evidence-based comparison against SDD/Superpowers, GSD, Claude native subagents/Agent
-Teams/plugins, BMAD and peers (see `web-project-sources/10-COMPARISON-RESEARCH-BRIEF.md`).
+Installed and live in three runtimes since 2026-08-26; core orchestration semantics
+unchanged since 2026-08-27 (v3). Production usage documented (LCO program audits,
+2026-09-06). Known limitations: `docs/KNOWN-LIMITATIONS.md`.
 
-No superiority over any other system is claimed here; that comparison is future work.
+The evidence-based comparison against SDD/Superpowers, GSD, Claude native
+subagents/Agent Teams/plugins, BMAD and peers has been completed
+(`comparison/`, 2026-09-22; its outcome: no core-semantics redesign required; five
+public-release blockers, all packaging/validation-layer). Release-hardening Gate 1
+(2026-09-23, `release-hardening/`): Superpowers 6.4.1 upgrade check re-run
+(boundary behaviors re-verified), two factually-drifted adapter sentences corrected
+(Codex `fork_turns`; the removed `executing-plans`→SDD redirect) with core semantics
+provably unchanged, and the first automated regression foundation established
+(`claude plugin eval` dev scaffold + behavioral companion harness). Historical
+snapshots (`audit/`, `comparison/`, `web-project-sources/`) are dated records and are
+not rewritten.
+
+No superiority over any other system is claimed here; see
+`comparison/FINAL-COMPARISON-REPORT.md` for the bounded, evidence-cited findings.
