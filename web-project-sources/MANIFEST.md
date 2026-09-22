@@ -5,13 +5,13 @@
 Upload in this order:
 
 1. `00-READ-ME-FIRST.md` — orientation + terminology (read first)
-2. `01-İAA-PROJECT-BRIEF.md`
+2. `01-IAA-PROJECT-BRIEF.md`
 3. `sources/SKILL.md` ← **AUTHORITATIVE** (the actual policy)
 4. `sources/references-delegation-contract.md` ← authoritative
 5. `sources/references-platform-adapters.md` ← authoritative
 6. `02-CURRENT-ARCHITECTURE.md` — explanatory
 7. `03-BEHAVIORAL-CONTRACT.md` — explanatory (verification-labeled)
-8. `05-İAA-SDD-BOUNDARY.md` — explanatory
+8. `05-IAA-SDD-BOUNDARY.md` — explanatory
 9. `06-INTEGRATIONS-CLAUDE-CODE-CODEX-ZCODE.md` — explanatory
 10. `07-HISTORY-AND-EVIDENCE.md` — historical
 11. `08-TESTS-AND-VALIDATION.md` — explanatory + execution record
@@ -28,6 +28,12 @@ questions).
 
 - **Authoritative (override everything else):** everything under `sources/` — byte-exact
   copies of the live canonical files (SKILL.md sha256 fee98091…).
+  **Parity status (2026-09-23, after the İAA/`iaa` identity rename):** identity tokens
+  were updated in every `sources/` file; `scripts-manage.sh`, `references-delegation-contract.md`,
+  and `CANONICAL-README.md` are byte-identical to the live canonical tree, while
+  `SKILL.md`, `references-platform-adapters.md`, and `tests-scenarios.md` are still the
+  pre-Gate-1 snapshots this pack was built from (pre-existing drift, predating the
+  rename; refresh before upload if adapter-fix parity matters).
 - **Explanatory summaries:** 01–06, 08–09 — audit-written; every claim sourced; if a
   summary conflicts with a source file, the source file wins.
 - **Historical:** 07 — describes past states; explicitly labels what is no longer active.

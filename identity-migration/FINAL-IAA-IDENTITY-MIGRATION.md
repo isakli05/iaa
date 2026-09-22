@@ -120,8 +120,13 @@ the renamed private repo; Gate-1 commit remains in ancestry; no force push; bran
 
 ## 18. Unresolved / noted (none blocking)
 
-- `web-project-sources/sources/SKILL.md` remains the pre-Gate-1 snapshot
-  (`fee98091…`, not `ade65cf7…`) — drift predates this task; identity-edited in place.
+- `web-project-sources/sources/` pre-existing pre-Gate-1 content drift: `SKILL.md`
+  (`fee98091…`), `references-platform-adapters.md`, `tests-scenarios.md` remain the
+  pack's original snapshots (identity tokens updated only). `scripts-manage.sh`,
+  `references-delegation-contract.md`, and `CANONICAL-README.md` are byte-identical to
+  the canonical tree (the installer copy was synced to include the LEGACY migration
+  guards after a post-commit security review flagged the missing-gate parity — all four
+  manage.sh copies hash `21964702…`). MANIFEST carries an explicit parity-status note.
 - Companion harness `REPO_ROOT` off-by-one vs its comment (pre-existing, identical
   behavior pre/post rename) — for Gate-2 wiring.
 - `~/.codex/config.toml` stale `/tmp` project entries (legacy residue, left untouched).

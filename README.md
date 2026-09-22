@@ -32,7 +32,7 @@ ownership, and briefs; and how to integrate and finally validate in the primary 
   agents, hooks, or daemons of its own.
 
 These boundary behaviors are **evidence-backed** (2026-08-27 campaigns; see
-`docs/adr/0001–0003`, `docs/İAA-VS-SDD-BOUNDARY.md`), including against the installed
+`docs/adr/0001–0003`, `docs/IAA-VS-SDD-BOUNDARY.md`), including against the installed
 Superpowers plugin's subagent-driven-development workflow.
 
 ## Repository layout

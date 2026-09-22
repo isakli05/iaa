@@ -85,7 +85,7 @@ hashes before/after recorded there):
 
 Plus: explanatory docs updated to match (CURRENT-ARCHITECTURE quotes,
 BEHAVIORAL-CONTRACT C30 mechanism parenthetical, COMPATIBILITY-MATRIX /
-INSTALLATION / İAA-VS-SDD-BOUNDARY / README current-status labels — all with
+INSTALLATION / IAA-VS-SDD-BOUNDARY / README current-status labels — all with
 dated corrections, historical snapshots untouched), and the new
 `release-hardening/` tree (reports + eval scaffold). Live canonical tree was
 synchronized per the documented procedure (edit live → copy to repo →

@@ -11,6 +11,13 @@ ORCHESTRATION_DEPTH_STATE="$ORCHESTRATION_STATE_DIR/claude-depth.state"
 MANAGED_BEGIN='<!-- BEGIN managed: iaa -->'
 MANAGED_END='<!-- END managed: iaa -->'
 
+# LEGACY: pre-rename identity (multi-agent-orchestration), recognized only so old
+# installs can be migrated/cleaned. New installs never create these.
+LEGACY_MANAGED_BEGIN='<!-- BEGIN managed: multi-agent-orchestration -->'
+LEGACY_MANAGED_END='<!-- END managed: multi-agent-orchestration -->'
+LEGACY_STATE_DIR="$ORCHESTRATION_USER_HOME/.config/ai-agent-orchestration"
+LEGACY_SKILL_NAME='multi-agent-orchestration'
+
 orchestration_backup_name() {
   orchestration_source=$1
   orchestration_stamp=$(date +%Y%m%dT%H%M%S%z)
@@ -151,6 +158,74 @@ orchestration_remove_link() {
   fi
 }
 
+orchestration_without_legacy_block() {
+  orchestration_file=$1
+  awk -v begin="$LEGACY_MANAGED_BEGIN" -v end="$LEGACY_MANAGED_END" '
+    $0 == begin { skip = 1; next }
+    $0 == end { skip = 0; next }
+    !skip { print }
+  ' "$orchestration_file" | awk '
+    /^[[:space:]]*$/ { blanks++; next }
+    {
+      while (blanks > 0) { print ""; blanks-- }
+      print
+    }
+  '
+}
+
+orchestration_remove_legacy_shim() {
+  # LEGACY: strip a pre-rename managed block so the current marker set can replace it.
+  orchestration_file=$1
+  [ -f "$orchestration_file" ] || return 0
+  if ! grep -Fqx "$LEGACY_MANAGED_BEGIN" "$orchestration_file"; then
+    return 0
+  fi
+  orchestration_temp=$(mktemp "$orchestration_file.orchestration.XXXXXX")
+  orchestration_without_legacy_block "$orchestration_file" > "$orchestration_temp"
+  orchestration_backup_copy "$orchestration_file"
+  chmod --reference="$orchestration_file" "$orchestration_temp" 2>/dev/null || chmod 0644 "$orchestration_temp"
+  mv -f -- "$orchestration_temp" "$orchestration_file"
+  printf 'removed legacy managed shim (pre-rename) from: %s\n' "$orchestration_file"
+}
+
+orchestration_remove_legacy_links() {
+  # LEGACY: unlink pre-rename skill-link names when they point at this source (by
+  # resolution OR by literal legacy target — the target dangles once the source has
+  # moved to its renamed location), so only one active copy can trigger.
+  for orchestration_destination in \
+    "$ORCHESTRATION_USER_HOME/.agents/skills/$LEGACY_SKILL_NAME" \
+    "$ORCHESTRATION_USER_HOME/.claude/skills/$LEGACY_SKILL_NAME" \
+    "$ORCHESTRATION_USER_HOME/.zcode/skills/$LEGACY_SKILL_NAME"
+  do
+    [ -L "$orchestration_destination" ] || continue
+    orchestration_literal_target=$(readlink -- "$orchestration_destination")
+    orchestration_resolved=$(readlink -f -- "$orchestration_destination" 2>/dev/null || true)
+    if [ "$orchestration_resolved" = "$ORCHESTRATION_ROOT" ] || \
+       [ "${orchestration_literal_target#*ai-agent-orchestration/}" != "$orchestration_literal_target" ]; then
+      unlink -- "$orchestration_destination"
+      printf 'unlinked legacy skill link (pre-rename): %s\n' "$orchestration_destination"
+    else
+      printf 'preserved unrelated symlink: %s\n' "$orchestration_destination"
+    fi
+  done
+}
+
+orchestration_migrate_legacy_state() {
+  # LEGACY: adopt the pre-rename state dir so uninstall semantics survive upgrades.
+  [ -d "$LEGACY_STATE_DIR" ] || return 0
+  if [ -e "$ORCHESTRATION_DEPTH_STATE" ]; then
+    printf 'legacy state present; current state already exists: %s\n' "$ORCHESTRATION_DEPTH_STATE"
+    return 0
+  fi
+  mkdir -p -- "$ORCHESTRATION_STATE_DIR"
+  if [ -f "$LEGACY_STATE_DIR/claude-depth.state" ]; then
+    mv -- "$LEGACY_STATE_DIR/claude-depth.state" "$ORCHESTRATION_DEPTH_STATE"
+    printf 'migrated legacy state (pre-rename): %s\n' "$ORCHESTRATION_DEPTH_STATE"
+  fi
+  rmdir -- "$LEGACY_STATE_DIR" 2>/dev/null || \
+    printf 'legacy state dir not empty; retained: %s\n' "$LEGACY_STATE_DIR"
+}
+
 orchestration_set_claude_depth() {
   orchestration_settings="$ORCHESTRATION_USER_HOME/.claude/settings.json"
   mkdir -p -- "$ORCHESTRATION_USER_HOME/.claude" "$ORCHESTRATION_STATE_DIR"
@@ -268,9 +343,14 @@ orchestration_verify() {
 }
 
 orchestration_install() {
+  orchestration_migrate_legacy_state
   orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.agents/skills/iaa"
   orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.claude/skills/iaa"
   orchestration_ensure_link "$ORCHESTRATION_USER_HOME/.zcode/skills/iaa"
+  orchestration_remove_legacy_links
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
   orchestration_write_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
@@ -297,9 +377,13 @@ orchestration_uninstall() {
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
   orchestration_remove_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.codex/AGENTS.md"
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.claude/CLAUDE.md"
+  orchestration_remove_legacy_shim "$ORCHESTRATION_USER_HOME/.zcode/AGENTS.md"
   orchestration_remove_link "$ORCHESTRATION_USER_HOME/.agents/skills/iaa"
   orchestration_remove_link "$ORCHESTRATION_USER_HOME/.claude/skills/iaa"
   orchestration_remove_link "$ORCHESTRATION_USER_HOME/.zcode/skills/iaa"
+  orchestration_remove_legacy_links
   printf 'source retained: %s\n' "$ORCHESTRATION_ROOT"
 }
 
