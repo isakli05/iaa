@@ -1,0 +1,745 @@
+#!/bin/sh
+# iaa — İAA management CLI (doctor / integrate / unintegrate / deploy / version)
+#
+# Non-destructive by construction for `doctor`; mutation only via explicit
+# `integrate`/`unintegrate`/`deploy` subcommands, always backup-first and
+# marker-delimited, touching only İAA-owned state.
+#
+# Environment overrides (for tests and disposable environments):
+#   IAA_HOME          effective user home (default: $HOME)
+#   CLAUDE_CONFIG_DIR Claude config dir (default: $IAA_HOME/.claude)
+#   CODEX_HOME        Codex home       (default: $IAA_HOME/.codex)
+set -eu
+
+IAA_COMMAND=${1:-}
+[ $# -gt 0 ] && shift
+
+IAA_HOME=${IAA_HOME:-${HOME:?HOME is not set}}
+IAA_CLAUDE_DIR=${CLAUDE_CONFIG_DIR:-$IAA_HOME/.claude}
+IAA_CODEX_DIR=${CODEX_HOME:-$IAA_HOME/.codex}
+IAA_ZCODE_DIR="$IAA_HOME/.zcode"
+IAA_SHARE_DIR="$IAA_HOME/.local/share/iaa"
+IAA_STATE_DIR="$IAA_HOME/.config/iaa"
+
+IAA_VERSION='unknown'
+IAA_POLICY_REVISION='v3'
+IAA_SOURCE_REV=''
+
+# ---- locate the repository/packaged root for this copy ----------------------
+# scripts/iaa lives at <repo>/scripts/iaa (repo mode) or <plugin>/bin/iaa
+# (packaged mode). VERSION/PROVENANCE discovery walks up one level.
+iaa_self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+iaa_root=''
+iaa_located=''
+if [ -f "$iaa_self_dir/../VERSION" ] && [ -d "$iaa_self_dir/../iaa" ]; then
+  iaa_root=$(CDPATH= cd -- "$iaa_self_dir/.." && pwd -P)
+  iaa_located=repo
+elif [ -f "$iaa_self_dir/../PROVENANCE" ]; then
+  iaa_root=$(CDPATH= cd -- "$iaa_self_dir/.." && pwd -P)
+  iaa_located=package
+fi
+if [ "$iaa_located" = repo ]; then
+  IAA_VERSION=$(sed -n '1p' "$iaa_root/VERSION"); IAA_VERSION=${IAA_VERSION%%[[:space:]]}
+  if command -v git >/dev/null 2>&1 && [ -d "$iaa_root/.git" ]; then
+    IAA_SOURCE_REV=$(git -C "$iaa_root" rev-parse --short HEAD 2>/dev/null || true)
+  fi
+elif [ "$iaa_located" = package ]; then
+  IAA_VERSION=$(sed -n 's/^version: //p' "$iaa_root/PROVENANCE" | head -1)
+fi
+
+# ---- managed markers (identical constants to iaa/scripts/manage.sh) ---------
+MANAGED_BEGIN='<!-- BEGIN managed: iaa -->'
+MANAGED_END='<!-- END managed: iaa -->'
+
+# LEGACY: pre-rename identity (multi-agent-orchestration), recognized only for
+# detection/migration reporting. Current İAA never creates these.
+LEGACY_MANAGED_BEGIN='<!-- BEGIN managed: multi-agent-orchestration -->'
+LEGACY_MANAGED_END='<!-- END managed: multi-agent-orchestration -->'
+LEGACY_SKILL_NAME='multi-agent-orchestration'
+LEGACY_SHARE_DIR="$IAA_HOME/.local/share/ai-agent-orchestration"
+LEGACY_STATE_DIR="$IAA_HOME/.config/ai-agent-orchestration"
+
+# Shim body — MUST stay byte-identical to the two routing paragraphs embedded
+# in iaa/scripts/manage.sh (enforced by scripts/check-parity.sh and by the
+# functional shim-parity unit test under tests/).
+iaa_shim_paragraph_1='For non-trivial tasks, evaluate whether delegation offers concrete parallelism, bounded-context isolation, specialization, context offloading, or independent verification. When the user requests subagents, delegation, or parallel agents—or delegation is materially useful—load and follow the installed `iaa` skill before spawning.'
+iaa_shim_paragraph_2='Interpret "use subagents" as permission for only beneficial, bounded delegation, not a requirement to maximize agent count. The primary agent owns decomposition, disjoint write ownership, shared contracts, integration, and final validation. This skill is the sole orchestration authority in its mode: do not combine it with other orchestration workflow skills such as superpowers:subagent-driven-development; a native workflow like that one applies only when the user explicitly requests it by name.'
+
+# =====================================================================
+# doctor
+# =====================================================================
+DOCTOR_JSON=0
+DOCTOR_PROBLEMS=0
+doctor_emit() { # severity, code, detail
+  if [ "$DOCTOR_JSON" -eq 1 ]; then
+    printf '  {"severity":"%s","code":"%s","detail":"%s"},\n' \
+      "$(printf '%s' "$1" | tr -d '\"\\\\')" \
+      "$(printf '%s' "$2" | tr -d '\"\\\\')" \
+      "$(printf '%s' "$3" | tr -d '\"\\\\')"
+  else
+    printf '%-7s %-26s %s\n' "$1" "$2" "$3"
+  fi
+  if [ "$1" = PROBLEM ]; then DOCTOR_PROBLEMS=$((DOCTOR_PROBLEMS + 1)); fi
+  return 0
+}
+
+doctor_marker_check() { # $1 = file path, $2 = runtime label
+  iaa_dc_file=$1
+  iaa_dc_label=$2
+  if [ ! -f "$iaa_dc_file" ]; then
+    doctor_emit INFO "shim:$iaa_dc_label" "no instruction file at $iaa_dc_file (not integrated)"
+    return 0
+  fi
+  iaa_dc_begin=$(grep -Fxc "$MANAGED_BEGIN" "$iaa_dc_file" 2>/dev/null || true)
+  iaa_dc_end=$(grep -Fxc "$MANAGED_END" "$iaa_dc_file" 2>/dev/null || true)
+  iaa_dc_lbegin=$(grep -Fxc "$LEGACY_MANAGED_BEGIN" "$iaa_dc_file" 2>/dev/null || true)
+  if [ "$iaa_dc_lbegin" -gt 0 ]; then
+    doctor_emit PROBLEM "legacy-shim:$iaa_dc_label" "LEGACY pre-rename managed block present in $iaa_dc_file — migrate: sh <repo>/iaa/scripts/manage.sh install"
+  fi
+  if [ "$iaa_dc_begin" -gt 1 ] || [ "$iaa_dc_end" -gt 1 ] || [ "$iaa_dc_begin" -ne "$iaa_dc_end" ]; then
+    doctor_emit PROBLEM "marker-malformed:$iaa_dc_label" "$iaa_dc_file: malformed or duplicated managed markers — refusing to guess; inspect manually"
+    return 0
+  fi
+  if [ "$iaa_dc_begin" -eq 1 ]; then
+    doctor_emit OK "shim:$iaa_dc_label" "one well-formed managed block in $iaa_dc_file"
+  else
+    doctor_emit INFO "shim:$iaa_dc_label" "no managed block in $iaa_dc_file"
+  fi
+}
+
+doctor_skill_link() { # $1 = link path, $2 = runtime label
+  iaa_sl_link=$1; iaa_sl_label=$2
+  if [ -L "$iaa_sl_link" ]; then
+    iaa_sl_res=$(readlink -f -- "$iaa_sl_link" 2>/dev/null || true)
+    if [ -z "$iaa_sl_res" ] || [ ! -d "$iaa_sl_res" ]; then
+      doctor_emit PROBLEM "stale-link:$iaa_sl_label" "$iaa_sl_link -> dangling target"
+    elif [ -f "$iaa_sl_res/SKILL.md" ]; then
+      doctor_emit OK "skill:$iaa_sl_label" "$iaa_sl_link -> $iaa_sl_res"
+    else
+      doctor_emit PROBLEM "stale-link:$iaa_sl_label" "$iaa_sl_link -> $iaa_sl_res (no SKILL.md)"
+    fi
+  elif [ -d "$iaa_sl_link" ]; then
+    if [ -f "$iaa_sl_link/SKILL.md" ]; then
+      doctor_emit OK "skill:$iaa_sl_label" "$iaa_sl_link (directory install)"
+    else
+      doctor_emit PROBLEM "skill:$iaa_sl_label" "$iaa_sl_link exists but has no SKILL.md"
+    fi
+  else
+    doctor_emit INFO "skill:$iaa_sl_label" "not installed at $iaa_sl_link"
+  fi
+  # LEGACY link of the former name (report only; never removed by doctor)
+  iaa_sl_legacy=$(printf '%s' "$iaa_sl_link" | sed "s|/iaa\$|/$LEGACY_SKILL_NAME|")
+  if [ -e "$iaa_sl_legacy" ] || [ -L "$iaa_sl_legacy" ]; then
+    doctor_emit PROBLEM "legacy-skill:$iaa_sl_label" "LEGACY $iaa_sl_legacy still present — migrate: sh <repo>/iaa/scripts/manage.sh install"
+  fi
+  # Backup links left inside a skills dir are themselves discoverable as extra
+  # skills (duplicate-activation class, observed live 2026-09-23): report them.
+  iaa_sl_dir=$(dirname -- "$iaa_sl_link")
+  if [ -d "$iaa_sl_dir" ]; then
+    for iaa_sl_bak in "$iaa_sl_dir"/iaa.iaa-backup-* "$iaa_sl_dir"/iaa.*.iaa-backup-*; do
+      [ -L "$iaa_sl_bak" ] || continue
+      doctor_emit PROBLEM "backup-link:$iaa_sl_label" "$iaa_sl_bak is a loadable duplicate skill (link backup inside the skills dir) — remove it after confirming the active link is correct"
+    done
+  fi
+}
+
+doctor_hash_lines() { # $1 = dir containing SKILL.md; prints "file hash" lines
+  iaa_hl_dir=$1
+  [ -f "$iaa_hl_dir/SKILL.md" ] || return 0
+  for iaa_hl_f in SKILL.md references/delegation-contract.md references/platform-adapters.md tests/scenarios.md scripts/manage.sh; do
+    if [ -f "$iaa_hl_dir/$iaa_hl_f" ]; then
+      printf '%s %s\n' "$iaa_hl_f" "$(sha256sum -- "$iaa_hl_dir/$iaa_hl_f" | awk '{print $1}')"
+    fi
+  done
+}
+
+doctor_hash_drift() { # $1 = label, $2 = core dir to check (POSIX: temp files, no process substitution)
+  iaa_hd_label=$1; iaa_hd_dir=$2
+  [ -f "$iaa_hd_dir/SKILL.md" ] || return 0
+  iaa_hd_ref="$IAA_STATE_DIR/provenance.json"
+  if [ -f "$iaa_hd_ref" ] && command -v python3 >/dev/null 2>&1; then
+    iaa_hd_drift=$(python3 - "$iaa_hd_ref" "$iaa_hd_dir" <<'PY' || true
+import hashlib, json, sys
+ref, core = sys.argv[1], sys.argv[2]
+try:
+    d = json.load(open(ref))
+except Exception:
+    sys.exit(0)
+drift = []
+for rel, want in (d.get("core_hashes") or {}).items():
+    try:
+        got = hashlib.sha256(open(f"{core}/{rel}", "rb").read()).hexdigest()
+    except OSError:
+        continue
+    if got != want:
+        drift.append(rel)
+print(",".join(drift))
+PY
+)
+    if [ -n "$iaa_hd_drift" ]; then
+      doctor_emit PROBLEM "hash-drift:$iaa_hd_label" "differs from recorded provenance: $iaa_hd_drift (redeploy: scripts/iaa deploy)"
+    else
+      doctor_emit OK "hash:$iaa_hd_label" "matches recorded provenance hashes"
+    fi
+  elif [ "$iaa_located" = repo ] && [ -f "$iaa_root/iaa/SKILL.md" ]; then
+    iaa_hd_a=$(mktemp); iaa_hd_b=$(mktemp)
+    doctor_hash_lines "$iaa_hd_dir" > "$iaa_hd_a"
+    doctor_hash_lines "$iaa_root/iaa" > "$iaa_hd_b"
+    if cmp -s "$iaa_hd_a" "$iaa_hd_b"; then
+      doctor_emit OK "hash:$iaa_hd_label" "byte-identical to repository core"
+    else
+      doctor_emit PROBLEM "hash-drift:$iaa_hd_label" "differs from repository core — redeploy: scripts/iaa deploy"
+    fi
+    rm -f -- "$iaa_hd_a" "$iaa_hd_b"
+  else
+    doctor_emit INFO "hash:$iaa_hd_label" "no provenance record and no repo checkout; cannot verify"
+  fi
+}
+
+doctor_claude_plugins() {
+  iaa_cp_inst="$IAA_CLAUDE_DIR/plugins/installed_plugins.json"
+  iaa_cp_any=0
+  if [ -f "$iaa_cp_inst" ] && command -v python3 >/dev/null 2>&1; then
+    iaa_cp_list=$(mktemp)
+    python3 - "$iaa_cp_inst" > "$iaa_cp_list" <<'PY' || true
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+except Exception:
+    sys.exit(0)
+for pid, installs in (d.get("plugins") or {}).items():
+    name = pid.split("@")[0]
+    if name == "iaa":
+        for i in installs:
+            print(f"{pid}|{i.get('version','?')}|{i.get('installPath','?')}")
+PY
+    if [ -s "$iaa_cp_list" ]; then
+      iaa_cp_any=1
+      while IFS='|' read -r iaa_cp_pid iaa_cp_ver iaa_cp_path; do
+        doctor_emit OK "claude-plugin" "$iaa_cp_pid $iaa_cp_ver at $iaa_cp_path"
+        if [ -f "$iaa_cp_path/skills/iaa/SKILL.md" ] && [ "$iaa_located" = repo ] && [ -f "$iaa_root/iaa/SKILL.md" ]; then
+          iaa_cp_a=$(mktemp); iaa_cp_b=$(mktemp)
+          doctor_hash_lines "$iaa_cp_path/skills/iaa" > "$iaa_cp_a"
+          doctor_hash_lines "$iaa_root/iaa" > "$iaa_cp_b"
+          if cmp -s "$iaa_cp_a" "$iaa_cp_b"; then
+            doctor_emit OK "hash:claude-plugin" "plugin skill core byte-identical to repository core"
+          else
+            doctor_emit PROBLEM "hash-drift:claude-plugin" "plugin skill core differs from this checkout (stale plugin or mixed versions?)"
+          fi
+          rm -f -- "$iaa_cp_a" "$iaa_cp_b"
+        fi
+      done < "$iaa_cp_list"
+    fi
+    # Superpowers (known framework: TESTED coexistence) and others (UNVERIFIED)
+    iaa_cp_fw=$(mktemp)
+    python3 - "$iaa_cp_inst" > "$iaa_cp_fw" <<'PY' || true
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+except Exception:
+    sys.exit(0)
+for pid, installs in (d.get("plugins") or {}).items():
+    n = pid.split("@")[0]
+    v = installs[0].get("version", "?") if installs else "?"
+    if n == "superpowers":
+        print(f"TESTED|{pid}|{v}")
+    elif "gsd" in n or "bmad" in n:
+        print(f"UNVERIFIED|{pid}|{v}")
+PY
+    while IFS='|' read -r iaa_fw_status iaa_fw_pid iaa_fw_ver; do
+      [ -n "$iaa_fw_pid" ] || continue
+      doctor_emit INFO "framework" "$iaa_fw_pid $iaa_fw_ver detected — coexistence $iaa_fw_status (docs/COMPATIBILITY.md)"
+    done < "$iaa_cp_fw"
+    rm -f -- "$iaa_cp_list" "$iaa_cp_fw"
+  fi
+  if [ "$iaa_cp_any" -eq 0 ]; then
+    doctor_emit INFO "claude-plugin" "no iaa plugin registered in $iaa_cp_inst"
+  fi
+  # duplicate detection: plugin + personal skill both active on Claude
+  if [ "$iaa_cp_any" -eq 1 ] && { [ -e "$IAA_CLAUDE_DIR/skills/iaa" ] || [ -L "$IAA_CLAUDE_DIR/skills/iaa" ]; }; then
+    doctor_emit PROBLEM "duplicate:claude" "both the iaa plugin and a personal skill at $IAA_CLAUDE_DIR/skills/iaa are active — both would load; remove one form"
+  fi
+  # Agent Teams experimental flag
+  if [ -f "$IAA_CLAUDE_DIR/settings.json" ] && grep -q 'CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS' "$IAA_CLAUDE_DIR/settings.json" 2>/dev/null; then
+    doctor_emit INFO "framework:agent-teams" "Agent Teams flag present in Claude settings — coexistence UNVERIFIED"
+  fi
+  # spawn depth (informational; managed value is 1)
+  iaa_cp_depth=$(jq -r '.env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH // ""' "$IAA_CLAUDE_DIR/settings.json" 2>/dev/null || true)
+  if [ "$iaa_cp_depth" = "1" ]; then
+    doctor_emit OK "claude-spawn-depth" "capped at 1 (root-to-child enforced by harness)"
+  elif [ -n "$iaa_cp_depth" ]; then
+    doctor_emit INFO "claude-spawn-depth" "user-managed value: $iaa_cp_depth"
+  else
+    doctor_emit INFO "claude-spawn-depth" "not set (platform default applies)"
+  fi
+}
+
+doctor_codex() {
+  if [ ! -d "$IAA_CODEX_DIR" ]; then
+    doctor_emit INFO "codex" "no $IAA_CODEX_DIR"
+    return 0
+  fi
+  if grep -q 'plugins."iaa' "$IAA_CODEX_DIR/config.toml" 2>/dev/null; then
+    doctor_emit OK "codex-plugin" "iaa registered in $IAA_CODEX_DIR/config.toml"
+    if [ -e "$IAA_HOME/.agents/skills/iaa" ] || [ -L "$IAA_HOME/.agents/skills/iaa" ]; then
+      doctor_emit PROBLEM "duplicate:codex" "both the codex plugin and the skills-dir install are active — remove one form"
+    fi
+  fi
+  if [ -f "$IAA_CODEX_DIR/config.toml" ]; then
+    iaa_cx_agents=$(sed -n '/^\[agents\]/,/^\[/p' "$IAA_CODEX_DIR/config.toml" 2>/dev/null | sed '1d;$d' | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$' | tr '\n' ';')
+    if [ -n "$iaa_cx_agents" ]; then
+      doctor_emit INFO "codex-multiagent" "[agents] config present: $iaa_cx_agents (not İAA-owned; reported read-only)"
+    fi
+  fi
+  if grep -q 'plugins."warp@' "$IAA_CODEX_DIR/config.toml" 2>/dev/null; then
+    doctor_emit INFO "framework:warp-codex" "warp codex plugin detected — coexistence UNVERIFIED"
+  fi
+}
+
+doctor_zcode() {
+  if [ ! -d "$IAA_ZCODE_DIR" ]; then
+    doctor_emit INFO "zcode" "no $IAA_ZCODE_DIR"
+    return 0
+  fi
+  if [ -d "$IAA_ZCODE_DIR/plugin-workspace" ] && [ -n "$(ls -A "$IAA_ZCODE_DIR/plugin-workspace" 2>/dev/null)" ]; then
+    doctor_emit INFO "zcode-plugin" "plugin-workspace contents: $(ls "$IAA_ZCODE_DIR/plugin-workspace" | tr '\n' ' ')"
+  fi
+}
+
+doctor_legacy() {
+  if [ -d "$LEGACY_SHARE_DIR" ]; then
+    doctor_emit PROBLEM "legacy:share-dir" "LEGACY $LEGACY_SHARE_DIR present (former-MAO source tree) — see docs/LEGACY-MIGRATION.md"
+  fi
+  if [ -d "$LEGACY_STATE_DIR" ]; then
+    doctor_emit PROBLEM "legacy:state-dir" "LEGACY $LEGACY_STATE_DIR present — migrate: sh <repo>/iaa/scripts/manage.sh install"
+  fi
+}
+
+doctor_source_of_truth() {
+  if [ "$iaa_located" = repo ]; then
+    doctor_emit OK "source-of-truth" "this checkout: $iaa_root (version $IAA_VERSION${IAA_SOURCE_REV:+, commit $IAA_SOURCE_REV})"
+  elif [ "$iaa_located" = package ]; then
+    doctor_emit OK "source-of-truth" "packaged copy: $iaa_root (version $IAA_VERSION)"
+  else
+    doctor_emit INFO "source-of-truth" "standalone copy (no VERSION/PROVENANCE located)"
+  fi
+  if [ -d "$IAA_SHARE_DIR/iaa" ]; then
+    doctor_hash_drift "live-tree" "$IAA_SHARE_DIR/iaa"
+  fi
+}
+
+doctor_run() {
+  for iaa_arg in "$@"; do
+    case "$iaa_arg" in
+      --json) DOCTOR_JSON=1 ;;
+      *) printf 'usage: iaa doctor [--json]\n' >&2; exit 2 ;;
+    esac
+  done
+  if [ "$DOCTOR_JSON" -eq 1 ]; then
+    printf '{"iaa_version":"%s","policy_revision":"%s","source_revision":"%s","home":"%s","findings":[\n' \
+      "$IAA_VERSION" "$IAA_POLICY_REVISION" "${IAA_SOURCE_REV:-}" "$IAA_HOME"
+  else
+    printf 'İAA doctor — version %s (policy revision %s%s)\n' "$IAA_VERSION" "$IAA_POLICY_REVISION" "${IAA_SOURCE_REV:+, commit $IAA_SOURCE_REV}"
+    printf 'home: %s\n\n' "$IAA_HOME"
+  fi
+
+  doctor_source_of_truth
+  doctor_skill_link "$IAA_HOME/.agents/skills/iaa" codex
+  doctor_skill_link "$IAA_CLAUDE_DIR/skills/iaa" claude
+  doctor_skill_link "$IAA_ZCODE_DIR/skills/iaa" zcode
+  doctor_marker_check "$IAA_CODEX_DIR/AGENTS.md" codex
+  doctor_marker_check "$IAA_CLAUDE_DIR/CLAUDE.md" claude
+  doctor_marker_check "$IAA_ZCODE_DIR/AGENTS.md" zcode
+  doctor_claude_plugins
+  doctor_codex
+  doctor_zcode
+  doctor_legacy
+
+  if [ "$DOCTOR_JSON" -eq 1 ]; then
+    printf ' {"severity":"INFO","code":"summary","detail":"problems=%s"}\n]}\n' "$DOCTOR_PROBLEMS"
+  else
+    printf '\nsummary: %s actionable İAA installation problem(s)\n' "$DOCTOR_PROBLEMS"
+    printf 'exit codes: 0 = healthy/informational · 1 = actionable İAA problem · 2 = usage error\n'
+    printf 'doctor is read-only: nothing was modified, uninstalled, disabled, or uploaded\n'
+  fi
+  [ "$DOCTOR_PROBLEMS" -eq 0 ] || exit 1
+  exit 0
+}
+
+# =====================================================================
+# integrate / unintegrate (explicit, reversible, backup-first)
+# =====================================================================
+iaa_backup_name() {
+  iaa_bn_src=$1
+  iaa_bn_stamp=$(date +%Y%m%dT%H%M%S%z)
+  iaa_bn_candidate="$iaa_bn_src.iaa-backup-$iaa_bn_stamp"
+  iaa_bn_i=1
+  while [ -e "$iaa_bn_candidate" ] || [ -L "$iaa_bn_candidate" ]; do
+    iaa_bn_candidate="$iaa_bn_src.iaa-backup-$iaa_bn_stamp-$iaa_bn_i"
+    iaa_bn_i=$((iaa_bn_i + 1))
+  done
+  printf '%s\n' "$iaa_bn_candidate"
+}
+
+iaa_backup_copy() { # $1 file
+  if [ -e "$1" ] || [ -L "$1" ]; then
+    iaa_bk_dest=$(iaa_backup_name "$1")
+    cp -a -- "$1" "$iaa_bk_dest"
+    printf 'backup: %s\n' "$iaa_bk_dest"
+  fi
+}
+
+iaa_validate_markers() { # $1 file — identical contract to manage.sh
+  iaa_vm_file=$1
+  [ -f "$iaa_vm_file" ] || return 0
+  iaa_vm_begin=$(grep -Fxc "$MANAGED_BEGIN" "$iaa_vm_file" || true)
+  iaa_vm_end=$(grep -Fxc "$MANAGED_END" "$iaa_vm_file" || true)
+  if [ "$iaa_vm_begin" -gt 1 ] || [ "$iaa_vm_end" -gt 1 ] || [ "$iaa_vm_begin" -ne "$iaa_vm_end" ]; then
+    printf 'refusing malformed managed markers in %s\n' "$iaa_vm_file" >&2
+    return 1
+  fi
+  if [ "$iaa_vm_begin" -eq 1 ]; then
+    iaa_vm_bl=$(grep -nF "$MANAGED_BEGIN" "$iaa_vm_file" | cut -d: -f1)
+    iaa_vm_el=$(grep -nF "$MANAGED_END" "$iaa_vm_file" | cut -d: -f1)
+    if [ "$iaa_vm_el" -le "$iaa_vm_bl" ]; then
+      printf 'refusing reversed managed markers in %s\n' "$iaa_vm_file" >&2
+      return 1
+    fi
+  fi
+}
+
+iaa_without_managed_block() { # $1 file — same normalization as manage.sh
+  awk -v begin="$MANAGED_BEGIN" -v end="$MANAGED_END" '
+    $0 == begin { skip = 1; next }
+    $0 == end { skip = 0; next }
+    !skip { print }
+  ' "$1" | awk '
+    /^[[:space:]]*$/ { blanks++; next }
+    {
+      while (blanks > 0) { print ""; blanks-- }
+      print
+    }
+  '
+}
+
+iaa_write_shim() { # $1 file, $2 dry|run — block layout byte-matches manage.sh
+  iaa_ws_file=$1; iaa_ws_dry=$2
+  if [ ! -f "$iaa_ws_file" ]; then
+    if [ "$iaa_ws_dry" = dry ]; then
+      printf 'would create %s (plus parent directory if absent) containing one managed block\n' "$iaa_ws_file"
+      return 0
+    fi
+    mkdir -p -- "$(dirname -- "$iaa_ws_file")"
+    : > "$iaa_ws_file"
+  fi
+  iaa_ws_existed=1
+  if ! iaa_validate_markers "$iaa_ws_file"; then
+    if [ "$iaa_ws_existed" -eq 0 ]; then rm -f -- "$iaa_ws_file"; fi
+    return 1
+  fi
+  iaa_ws_temp=$(mktemp "$iaa_ws_file.iaa.XXXXXX")
+  iaa_without_managed_block "$iaa_ws_file" > "$iaa_ws_temp"
+  if [ -s "$iaa_ws_temp" ]; then printf '\n\n' >> "$iaa_ws_temp"; fi
+  printf '%s\n' \
+    "$MANAGED_BEGIN" \
+    '## İAA orchestration' \
+    '' \
+    "$iaa_shim_paragraph_1" \
+    '' \
+    "$iaa_shim_paragraph_2" \
+    "$MANAGED_END" >> "$iaa_ws_temp"
+  if cmp -s "$iaa_ws_file" "$iaa_ws_temp"; then
+    rm -f -- "$iaa_ws_temp"
+    printf 'unchanged: %s\n' "$iaa_ws_file"
+    return 0
+  fi
+  if [ "$iaa_ws_dry" = dry ]; then
+    printf 'would update managed block in: %s\n' "$iaa_ws_file"
+    awk -v b="$MANAGED_BEGIN" -v e="$MANAGED_END" '
+      $0 == b { show = 1 }
+      show { print }
+      $0 == e { show = 0 }
+    ' "$iaa_ws_temp" | sed 's/^/    | /'
+    rm -f -- "$iaa_ws_temp"
+    return 0
+  fi
+  if [ "$iaa_ws_existed" -eq 1 ]; then iaa_backup_copy "$iaa_ws_file"; fi
+  chmod --reference="$iaa_ws_file" "$iaa_ws_temp" 2>/dev/null || chmod 0644 "$iaa_ws_temp"
+  mv -f -- "$iaa_ws_temp" "$iaa_ws_file"
+  printf 'updated: %s\n' "$iaa_ws_file"
+}
+
+iaa_remove_shim() { # $1 file, $2 dry|run
+  iaa_rs_file=$1; iaa_rs_dry=$2
+  [ -f "$iaa_rs_file" ] || return 0
+  iaa_validate_markers "$iaa_rs_file" || return 1
+  if ! grep -Fqx "$MANAGED_BEGIN" "$iaa_rs_file"; then
+    printf 'no managed block in: %s\n' "$iaa_rs_file"
+    return 0
+  fi
+  if [ "$iaa_rs_dry" = dry ]; then
+    printf 'would remove managed block from: %s (backup created first)\n' "$iaa_rs_file"
+    return 0
+  fi
+  iaa_rs_temp=$(mktemp "$iaa_rs_file.iaa.XXXXXX")
+  iaa_without_managed_block "$iaa_rs_file" > "$iaa_rs_temp"
+  iaa_backup_copy "$iaa_rs_file"
+  chmod --reference="$iaa_rs_file" "$iaa_rs_temp" 2>/dev/null || chmod 0644 "$iaa_rs_temp"
+  mv -f -- "$iaa_rs_temp" "$iaa_rs_file"
+  printf 'removed managed shim: %s\n' "$iaa_rs_file"
+}
+
+iaa_set_claude_depth() { # $1 dry|run — state-file logic mirrors manage.sh
+  iaa_sd_dry=$1
+  iaa_sd_settings="$IAA_CLAUDE_DIR/settings.json"
+  command -v jq >/dev/null 2>&1 || { printf 'jq is required to manage the Claude depth key safely\n' >&2; return 1; }
+  if [ "$iaa_sd_dry" = dry ]; then
+    printf 'would ensure %s env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH = "1" (pre-existing values preserved; state in %s/claude-depth.state)\n' "$iaa_sd_settings" "$IAA_STATE_DIR"
+    return 0
+  fi
+  mkdir -p -- "$IAA_CLAUDE_DIR" "$IAA_STATE_DIR"
+  iaa_sd_existed=1
+  if [ ! -f "$iaa_sd_settings" ]; then
+    iaa_sd_existed=0
+    printf '%s\n' '{}' > "$iaa_sd_settings"
+  fi
+  jq empty "$iaa_sd_settings"
+  iaa_sd_state="$IAA_STATE_DIR/claude-depth.state"
+  if [ ! -f "$iaa_sd_state" ]; then
+    iaa_sd_existing=$(jq -r 'if (.env // {}) | has("CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH") then .env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH else "__ABSENT__" end' "$iaa_sd_settings")
+    if [ "$iaa_sd_existing" = '__ABSENT__' ]; then
+      printf '%s\n' 'managed-absent' > "$iaa_sd_state"
+    else
+      printf '%s\n' 'preserve-existing' > "$iaa_sd_state"
+      printf 'preserved existing Claude spawn-depth value: %s\n' "$iaa_sd_existing"
+      return 0
+    fi
+  fi
+  iaa_sd_mode=$(sed -n '1p' "$iaa_sd_state")
+  [ "$iaa_sd_mode" = 'managed-absent' ] || return 0
+  iaa_sd_current=$(jq -r '.env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH // ""' "$iaa_sd_settings")
+  if [ "$iaa_sd_current" = '1' ]; then
+    printf 'unchanged: Claude subagent spawn depth = 1\n'
+    return 0
+  fi
+  iaa_sd_temp=$(mktemp "$iaa_sd_settings.iaa.XXXXXX")
+  jq '.env = (.env // {}) | .env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH = "1"' "$iaa_sd_settings" > "$iaa_sd_temp"
+  if [ "$iaa_sd_existed" -eq 1 ]; then iaa_backup_copy "$iaa_sd_settings"; fi
+  chmod --reference="$iaa_sd_settings" "$iaa_sd_temp" 2>/dev/null || chmod 0600 "$iaa_sd_temp"
+  mv -f -- "$iaa_sd_temp" "$iaa_sd_settings"
+  printf 'updated: Claude subagent spawn depth = 1\n'
+}
+
+iaa_restore_claude_depth() { # $1 dry|run
+  iaa_rd_dry=$1
+  iaa_rd_state="$IAA_STATE_DIR/claude-depth.state"
+  if [ ! -f "$iaa_rd_state" ]; then
+    printf 'no depth state file (nothing managed by this tool)\n'
+    return 0
+  fi
+  command -v jq >/dev/null 2>&1 || { printf 'jq is required to restore Claude settings safely\n' >&2; return 1; }
+  iaa_rd_settings="$IAA_CLAUDE_DIR/settings.json"
+  if [ "$iaa_rd_dry" = dry ]; then
+    printf 'would restore managed Claude spawn-depth value (state: %s)\n' "$(sed -n 1p "$iaa_rd_state")"
+    return 0
+  fi
+  [ -f "$iaa_rd_settings" ] && jq empty "$iaa_rd_settings"
+  iaa_rd_mode=$(sed -n '1p' "$iaa_rd_state")
+  if [ "$iaa_rd_mode" = 'managed-absent' ] && [ -f "$iaa_rd_settings" ]; then
+    iaa_rd_current=$(jq -r '.env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH // ""' "$iaa_rd_settings")
+    if [ "$iaa_rd_current" = '1' ]; then
+      iaa_rd_temp=$(mktemp "$iaa_rd_settings.iaa.XXXXXX")
+      jq 'del(.env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH) | if .env == {} then del(.env) else . end' "$iaa_rd_settings" > "$iaa_rd_temp"
+      iaa_backup_copy "$iaa_rd_settings"
+      chmod --reference="$iaa_rd_settings" "$iaa_rd_temp" 2>/dev/null || chmod 0600 "$iaa_rd_temp"
+      mv -f -- "$iaa_rd_temp" "$iaa_rd_settings"
+      printf 'restored: removed managed Claude spawn-depth value\n'
+    else
+      printf 'preserved user-changed Claude spawn-depth value: %s\n' "$iaa_rd_current"
+    fi
+  fi
+  rm -f -- "$iaa_rd_state"
+}
+
+iaa_integrate() {
+  iaa_in_mode=script
+  iaa_in_runtime=claude
+  iaa_in_dry=run
+  for iaa_arg in "$@"; do
+    case "$iaa_arg" in
+      --mode=*) iaa_in_mode=${iaa_arg#--mode=} ;;
+      --runtime=*) iaa_in_runtime=${iaa_arg#--runtime=} ;;
+      --dry-run) iaa_in_dry=dry ;;
+      *) printf 'usage: iaa integrate [--mode script|plugin] [--runtime claude|codex|zcode|all] [--dry-run]\n' >&2; exit 2 ;;
+    esac
+  done
+  case "$iaa_in_mode" in
+    script)
+      case "$iaa_located" in
+        repo) ;;
+        package)
+          printf 'refusing --mode script from a packaged plugin copy:\n' >&2
+          printf 'it would symlink personal skills into the plugin cache (duplicate activation).\n' >&2
+          printf 'use: iaa integrate --mode plugin  (the plugin already provides the skill)\n' >&2
+          exit 1 ;;
+        *)
+          printf 'cannot locate the repository core for --mode script\n' >&2; exit 1 ;;
+      esac
+      printf 'script mode delegates to the tested installer (links + shims + depth):\n'
+      if [ "$iaa_in_dry" = dry ]; then
+        printf 'would run: sh %s/iaa/scripts/manage.sh install\n' "$iaa_root"
+        return 0
+      fi
+      # manage.sh reads ORCHESTRATION_HOME; propagate the effective home
+      ORCHESTRATION_HOME=$IAA_HOME
+      export ORCHESTRATION_HOME
+      exec sh "$iaa_root/iaa/scripts/manage.sh" install
+      ;;
+    plugin)
+      # writes ONLY the instruction-channel block (+ Claude depth for claude);
+      # the plugin provides the skill, so NO personal links are created.
+      iaa_in_targets=''
+      case "$iaa_in_runtime" in
+        claude) iaa_in_targets="$IAA_CLAUDE_DIR/CLAUDE.md" ;;
+        codex) iaa_in_targets="$IAA_CODEX_DIR/AGENTS.md" ;;
+        zcode) iaa_in_targets="$IAA_ZCODE_DIR/AGENTS.md" ;;
+        all) iaa_in_targets="$IAA_CLAUDE_DIR/CLAUDE.md $IAA_CODEX_DIR/AGENTS.md $IAA_ZCODE_DIR/AGENTS.md" ;;
+        *) printf 'unknown --runtime %s\n' "$iaa_in_runtime" >&2; exit 2 ;;
+      esac
+      for iaa_in_target in $iaa_in_targets; do
+        iaa_write_shim "$iaa_in_target" "$iaa_in_dry"
+      done
+      case " $iaa_in_runtime " in
+        *" claude "*|*" all "*) iaa_set_claude_depth "$iaa_in_dry" ;;
+      esac
+      printf 'plugin-mode integration complete (marker-delimited, backed up; reverse with: iaa unintegrate --mode plugin --runtime %s)\n' "$iaa_in_runtime"
+      ;;
+    *) printf 'unknown --mode %s\n' "$iaa_in_mode" >&2; exit 2 ;;
+  esac
+}
+
+iaa_unintegrate() {
+  iaa_un_mode=plugin
+  iaa_un_runtime=claude
+  iaa_un_dry=run
+  for iaa_arg in "$@"; do
+    case "$iaa_arg" in
+      --mode=*) iaa_un_mode=${iaa_arg#--mode=} ;;
+      --runtime=*) iaa_un_runtime=${iaa_arg#--runtime=} ;;
+      --dry-run) iaa_un_dry=dry ;;
+      *) printf 'usage: iaa unintegrate [--mode script|plugin] [--runtime claude|codex|zcode|all] [--dry-run]\n' >&2; exit 2 ;;
+    esac
+  done
+  case "$iaa_un_mode" in
+    script)
+      [ "$iaa_located" = repo ] || { printf '--mode script requires the repository\n' >&2; exit 1; }
+      if [ "$iaa_un_dry" = dry ]; then
+        printf 'would run: sh %s/iaa/scripts/manage.sh uninstall\n' "$iaa_root"
+        return 0
+      fi
+      ORCHESTRATION_HOME=$IAA_HOME
+      export ORCHESTRATION_HOME
+      exec sh "$iaa_root/iaa/scripts/manage.sh" uninstall
+      ;;
+    plugin)
+      iaa_un_targets=''
+      case "$iaa_un_runtime" in
+        claude) iaa_un_targets="$IAA_CLAUDE_DIR/CLAUDE.md" ;;
+        codex) iaa_un_targets="$IAA_CODEX_DIR/AGENTS.md" ;;
+        zcode) iaa_un_targets="$IAA_ZCODE_DIR/AGENTS.md" ;;
+        all) iaa_un_targets="$IAA_CLAUDE_DIR/CLAUDE.md $IAA_CODEX_DIR/AGENTS.md $IAA_ZCODE_DIR/AGENTS.md" ;;
+        *) printf 'unknown --runtime %s\n' "$iaa_un_runtime" >&2; exit 2 ;;
+      esac
+      for iaa_un_target in $iaa_un_targets; do
+        iaa_remove_shim "$iaa_un_target" "$iaa_un_dry"
+      done
+      case " $iaa_un_runtime " in
+        *" claude "*|*" all "*) iaa_restore_claude_depth "$iaa_un_dry" ;;
+      esac
+      printf 'plugin-mode unintegration complete (uninstall the plugin itself via the runtime plugin manager)\n'
+      ;;
+    *) printf 'unknown --mode %s\n' "$iaa_un_mode" >&2; exit 2 ;;
+  esac
+}
+
+# =====================================================================
+# deploy — repo-authoritative deployment of the runtime source tree
+# =====================================================================
+iaa_deploy() {
+  [ "$iaa_located" = repo ] || { printf 'deploy requires a repository checkout\n' >&2; exit 1; }
+  iaa_dp_dry=run
+  for iaa_arg in "$@"; do
+    case "$iaa_arg" in
+      --dry-run) iaa_dp_dry=dry ;;
+      *) printf 'usage: iaa deploy [--dry-run]\n' >&2; exit 2 ;;
+    esac
+  done
+  iaa_dp_target_parent=$(dirname -- "$IAA_SHARE_DIR")
+  iaa_dp_stamp=$(date +%Y%m%dT%H%M%S%z)
+  iaa_dp_stage="$iaa_dp_target_parent/.iaa-stage-$iaa_dp_stamp"
+  if [ "$iaa_dp_dry" = dry ]; then
+    printf 'would: stage iaa/ + CANONICAL-README.md -> %s\n' "$iaa_dp_stage"
+    printf 'would: move existing %s aside to %s.iaa-previous-%s\n' "$IAA_SHARE_DIR" "$IAA_SHARE_DIR" "$iaa_dp_stamp"
+    printf 'would: move the staged tree into place at %s (consumer links keep resolving: same path)\n' "$IAA_SHARE_DIR"
+    printf 'would: write provenance to %s/provenance.json\n' "$IAA_STATE_DIR"
+    return 0
+  fi
+  mkdir -p -- "$iaa_dp_stage" "$IAA_STATE_DIR"
+  cp -a -- "$iaa_root/iaa" "$iaa_dp_stage/iaa"
+  cp -- "$iaa_root/CANONICAL-README.md" "$iaa_dp_stage/README.md"
+  if ! diff -r -- "$iaa_root/iaa" "$iaa_dp_stage/iaa" >/dev/null; then
+    rm -rf -- "$iaa_dp_stage"
+    printf 'staging verification failed; aborted before touching anything\n' >&2
+    exit 1
+  fi
+  python3 - "$iaa_root" "$IAA_STATE_DIR/provenance.json" "$IAA_VERSION" "$IAA_POLICY_REVISION" "${IAA_SOURCE_REV:-}" <<'PY'
+import hashlib, json, os, subprocess, sys
+root, out, version, policy, commit = sys.argv[1:6]
+core = os.path.join(root, "iaa")
+files = ["SKILL.md", "references/delegation-contract.md", "references/platform-adapters.md",
+         "tests/scenarios.md", "scripts/manage.sh"]
+hashes = {}
+for f in files:
+    p = os.path.join(core, f)
+    if os.path.isfile(p):
+        hashes[f] = hashlib.sha256(open(p, "rb").read()).hexdigest()
+try:
+    dirty = bool(subprocess.run(["git", "status", "--porcelain", "--", "iaa"], cwd=root,
+                                capture_output=True, text=True).stdout.strip())
+except Exception:
+    dirty = None
+json.dump({"version": version, "policy_revision": policy, "source_commit": commit or None,
+           "core_dirty_at_deploy": dirty, "core_hashes": hashes},
+          open(out, "w"), indent=1, sort_keys=True)
+print("provenance:", out)
+PY
+  if [ -d "$IAA_SHARE_DIR" ]; then
+    iaa_dp_prev="$IAA_SHARE_DIR.iaa-previous-$iaa_dp_stamp"
+    mv -- "$IAA_SHARE_DIR" "$iaa_dp_prev"
+    printf 'previous live tree retained: %s\n' "$iaa_dp_prev"
+  fi
+  mv -- "$iaa_dp_stage" "$IAA_SHARE_DIR"
+  printf 'deployed: %s (version %s%s)\n' "$IAA_SHARE_DIR" "$IAA_VERSION" "${IAA_SOURCE_REV:+ from commit $IAA_SOURCE_REV}"
+  printf 'verify consumer links: sh "%s/iaa/scripts/manage.sh" verify\n' "$IAA_SHARE_DIR"
+  printf 'rollback: mv "%s.iaa-previous-%s" "%s"\n' "$IAA_SHARE_DIR" "$iaa_dp_stamp" "$IAA_SHARE_DIR"
+}
+
+# =====================================================================
+# dispatch
+# =====================================================================
+case "$IAA_COMMAND" in
+  doctor) doctor_run "$@" ;;
+  integrate) iaa_integrate "$@" ;;
+  unintegrate) iaa_unintegrate "$@" ;;
+  deploy) iaa_deploy "$@" ;;
+  version) printf 'iaa %s (policy revision %s)\n' "$IAA_VERSION" "$IAA_POLICY_REVISION" ;;
+  '')
+    printf 'usage: iaa <command> [options]\n' >&2
+    printf '  doctor [--json]                                  read-only installation/environment diagnostic\n' >&2
+    printf '  integrate [--mode M] [--runtime R] [--dry-run]   explicit integration (script|plugin)\n' >&2
+    printf '  unintegrate [--mode M] [--runtime R] [--dry-run] reverse integration\n' >&2
+    printf '  deploy [--dry-run]                               deploy repo core to the runtime source tree\n' >&2
+    printf '  version                                          print package + policy version\n' >&2
+    exit 2 ;;
+  *) printf 'unknown command: %s\n' "$IAA_COMMAND" >&2; exit 2 ;;
+esac

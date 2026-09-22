@@ -1,0 +1,20 @@
+{
+  "name": "iaa",
+  "version": "0.1.0-rc.1",
+  "description": "İAA delegation-decision policy: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work. Sole orchestration authority in its mode.",
+  "author": {
+    "name": "isakli05",
+    "url": "https://github.com/isakli05/iaa"
+  },
+  "homepage": "https://github.com/isakli05/iaa",
+  "repository": "https://github.com/isakli05/iaa",
+  "license": "UNLICENSED",
+  "keywords": [
+    "orchestration",
+    "delegation",
+    "subagents",
+    "policy",
+    "coexistence"
+  ],
+  "skills": "skills"
+}

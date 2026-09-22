@@ -1,0 +1,17 @@
+{
+  "name": "iaa",
+  "description": "İAA — İştirak-i A‘mâl-i Ajanîye: a delegation-decision policy for agent CLIs",
+  "owner": {
+    "name": "isakli05",
+    "url": "https://github.com/isakli05"
+  },
+  "plugins": [
+    {
+      "name": "iaa",
+      "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+      "source": "./packaging/claude",
+      "category": "development",
+      "homepage": "https://github.com/isakli05/iaa"
+    }
+  ]
+}

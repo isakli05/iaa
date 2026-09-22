@@ -1,0 +1,20 @@
+{
+  "name": "iaa",
+  "displayName": "İAA — İştirak-i A‘mâl-i Ajanîye",
+  "version": "__VERSION__",
+  "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work. Sole orchestration authority in its mode.",
+  "author": {
+    "name": "isakli05",
+    "url": "https://github.com/isakli05/iaa"
+  },
+  "homepage": "https://github.com/isakli05/iaa",
+  "repository": "https://github.com/isakli05/iaa",
+  "keywords": [
+    "orchestration",
+    "delegation",
+    "subagents",
+    "multi-agent",
+    "policy",
+    "coexistence"
+  ]
+}
