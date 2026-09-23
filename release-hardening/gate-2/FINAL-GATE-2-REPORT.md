@@ -164,9 +164,14 @@ automatic, topology category where observable.)
 
 ## Q17. Did packaged Superpowers 6.4.1 coexistence remain correct?
 
-⏳ (companion j/k in flight on the real machine; expectation per Gate-1
-baseline: J — SDD never loads, İAA governs adaptively; K — SDD governs, İAA
-never loads.)
+**Yes — j PASS + k PASS on the real machine** (12-packaged-boundary-validation.md):
+J: İAA governed, SDD never loaded, REQUIRED SUB-SKILL ignored,
+executing-plans used as a whitelisted inline component, 1 risk-justified
+Explore reviewer ($4.71). K: SDD governed its full 6.4.1 cadence (11 agents,
+identical topology to Gate 1, $7.85) with **zero** İAA invocations. One
+verdict-mechanics bug in the companion's SDD grep (case sensitivity) was found
+on first true end-to-end execution, fixed, and disclosed — the behavioral
+evidence is transcript-derived and unaffected.
 
 ## Q18. Which installation-matrix cases passed?
 
