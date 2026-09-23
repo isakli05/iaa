@@ -1,4 +1,12 @@
-# Public Distribution Architecture (design constraints — NOT implemented)
+# Public Distribution Architecture
+
+**Status (2026-09-23, Gate 2): IMPLEMENTED** as `packaging/{claude,codex,zcode}`
+generated from the single core by `scripts/build-packages.sh`, enforced by
+`scripts/check-parity.sh` — see `release-hardening/gate-2/03-package-architecture.md`
+for the as-built design and its departures from the sketch below (kept as the
+historical design rationale). The open shim decision below was resolved as
+"plugin distributes, script integrates" (option a), validated in
+`release-hardening/gate-2/05-claude-packaging.md` §4.
 
 Goal: İAA as a publicly installable project that coexists politely with installed
 frameworks. Grounded in research/01 (2026-09-22 official mechanisms). No semantics change:
