@@ -16,15 +16,15 @@
 
 ## The two 2026-08-27 evidence trees (what the task brief asked about) — and a third
 
-1. `/home/isa/mao-sdd-archfix-20260827/` — campaign 2 evidence: before/after snapshots +
+1. `~/mao-sdd-archfix-20260827/` — campaign 2 evidence: before/after snapshots +
    exact diffs (the only surviving pre-git lineage), 4 test runs (repos/transcripts/runs),
    FINAL-REPORT (PASS). Pure evidence; every source change in it is hash-proven present in
    current canonical.
-2. `/home/isa/mao-sdd-artifact-boundary-20260827/` — campaign 3 evidence: snapshots +
+2. `~/mao-sdd-artifact-boundary-20260827/` — campaign 3 evidence: snapshots +
    additions-only diffs, the authentic generated adversarial plan (438 lines, real
    "REQUIRED SUB-SKILL" header), session-a plan generation + tests B/C/D, FINAL-REPORT
    (PASS). Pure evidence.
-3. `/home/isa/collision-smoke-test-evidence/` (+ report + zip at home root) — the brief
+3. `~/collision-smoke-test-evidence/` (+ report + zip at home root) — the brief
    didn't name this one: campaigns 1 + 1b (taskcli seed repo with git history, 12 session
    transcripts, 4 post-fix attempts, policy snapshots v0/v1). PARTIAL PASS ×2 — the
    *failure* evidence that justifies the current design.

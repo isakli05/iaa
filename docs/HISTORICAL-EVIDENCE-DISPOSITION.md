@@ -14,7 +14,7 @@ MACHINE-SPECIFIC — 7. REDUNDANT
 
 ## Item-by-item
 
-### `/home/isa/mao-sdd-archfix-20260827/` (campaign 2 — structural separation, PASS)
+### `~/mao-sdd-archfix-20260827/` (campaign 2 — structural separation, PASS)
 
 | Item | Category | Disposition |
 |---|---|---|
@@ -27,7 +27,7 @@ MACHINE-SPECIFIC — 7. REDUNDANT
 | `repos/test-{a1,a2,b,c}` (taskcli clones w/ results) | 5 | local only |
 | `analyze_run.py` | **2** | **promote** into maintained repo `tests/tools/` (dedup with campaign 3's identical copy) |
 
-### `/home/isa/mao-sdd-artifact-boundary-20260827/` (campaign 3 — artifact boundary, PASS)
+### `~/mao-sdd-artifact-boundary-20260827/` (campaign 3 — artifact boundary, PASS)
 
 | Item | Category | Disposition |
 |---|---|---|
@@ -38,7 +38,7 @@ MACHINE-SPECIFIC — 7. REDUNDANT
 | `runs/`, `transcripts/`, `repos/` (incl. test-c SDD worktree) | 5+6 | local only |
 | `analyze_run.py` | 2 (dup) | same promotion as above |
 
-### `/home/isa/collision-smoke-test-evidence/` + `~/collision-smoke-test-report.md` + `.zip` (campaigns 1 + 1b, PARTIAL PASS ×2)
+### `~/collision-smoke-test-evidence/` + `~/collision-smoke-test-report.md` + `.zip` (campaigns 1 + 1b, PARTIAL PASS ×2)
 
 | Item | Category | Disposition |
 |---|---|---|
