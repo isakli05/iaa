@@ -63,6 +63,38 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   disposition here and close.
 - **Links:** https://github.com/zai-org/zcode-plugins/pull/42
 
+### IAA-BL-016 — Static CI red on main: plugin.zip sha not reproducible on GitHub runners
+- **Status:** `OPEN` · **Category:** maintenance / CI (category-A infrastructure; no semantic impact)
+- **Problem / motivation:** the `static` workflow fails on every `main` push since
+  the 0.1.1 merge (runs 35915378608, 35917592138):
+  `check-parity: FAIL: marketplace.remote.json sha256 (621bdd1f…) != freshly
+  built plugin.zip (856df553…)`.
+- **Evidence / root cause (diagnosed 2026-09-24):** DEFLATE output is
+  zlib-implementation-dependent. The released, sha-pinned zip was built on the
+  owner machine (Python 3.14.7, **zlib-ng** 1.3.1.zlib-ng); GitHub ubuntu-24.04
+  runners use stock zlib; identical plugin content compresses to different
+  bytes. Fresh-checkout reproduction on the owner machine **passes**
+  (worktree of the same commit), proving content parity — only the compressed
+  bytes differ per environment.
+- **Why it matters:** CI is red on every push to `main` (noise hides real
+  failures); the cross-environment reproducibility implied by
+  "deterministic build" evidence holds only per zlib implementation (the
+  upstream `build_dist.py` byte-parity evidence was likewise produced on the
+  zlib-ng machine — honest, but same-environment).
+- **Impact boundary:** none on published 0.1.1 artifacts — the pin equals the
+  published release asset and ZCode's client-side sha gate verified it in GUI
+  acceptance; this is purely a CI-side reproduction check.
+- **Dependencies / blockers:** none; fix direction is an owner decision
+  (candidates: build release artifacts in a stock-zlib/CI environment; make
+  the CI regeneration check compare archive *content* rather than raw sha
+  while keeping the raw-sha pin for distribution; or a pinned build container).
+- **Acceptance criteria:** `static` green on a `main` push again; the chosen
+  direction recorded here; determinism wording in evidence docs qualified if
+  needed.
+- **Links:** run 35917592138 (failure log); `scripts/build-plugin-zip.py`
+  (fixed-timestamp builder — content-deterministic, zlib-sensitive);
+  `scripts/check-parity.sh` (remote marketplace pin check).
+
 ## NEXT
 
 ### IAA-BL-002 — ZCode feedback #699 confirming comment: post or drop

@@ -18,6 +18,10 @@
   sha256-pinned artifacts.
 - **Release stance:** no next release planned; 0.1.1 left zero defects and no
   v0.1.2 is warranted (publication report §29).
+- **Known open internal issue:** `static` CI fails on `main` pushes since the
+  0.1.1 merge — the sha-pinned `plugin.zip` was built with zlib-ng and is not
+  byte-reproducible on GitHub's stock-zlib runners (content-identical;
+  artifacts and the distribution pin unaffected) → **IAA-BL-016**.
 
 ## Tested baseline (version-pinned; claim statuses in docs/COMPATIBILITY.md)
 
@@ -56,7 +60,8 @@ ZCode 3.14.3, Superpowers 6.4.1 (= tested).
 
 ## Backlog snapshot (live authority: docs/BACKLOG.md)
 
-- ACTIVE: IAA-BL-001 (upstream PR #42 monitor).
+- ACTIVE: IAA-BL-001 (upstream PR #42 monitor) · IAA-BL-016 (CI sha
+  reproducibility fix — owner decision on direction).
 - NEXT / owner decision: IAA-BL-002 (#699 comment).
 - PROPOSED validation: IAA-BL-003/004/005 (scenarios F/H/I; non-plan channels;
   non-SDD yield). RESEARCH: JEV (006), model families (007), topology aids
