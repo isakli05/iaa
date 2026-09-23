@@ -20,3 +20,6 @@ dist/
 
 # transient eval staging (release-hardening/evals/gate2 runner stages these at run time)
 packaging/claude/evals/
+
+# local export of the Claude Project upload bundle (owner convenience; never committed)
+.claude-web-project-upload/
