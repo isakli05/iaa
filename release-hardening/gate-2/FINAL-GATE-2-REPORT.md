@@ -14,11 +14,6 @@ Expected outcome, checked:
 CLAUDE PACKAGE + CODEX PACKAGE + ZCODE PACKAGE + iaa doctor + LEGACY MIGRATION +
 CI/EVALS + CLEAN INSTALL/UPDATE/UNINSTALL + PRIVATE RELEASE CANDIDATE.**
 
-> STATUS: this file is being finalized; the section answers below marked ⏳
-> await the two in-flight validation campaigns (trigger characterization,
-> boundary companion). Do not treat this revision as final until this notice is
-> removed.
-
 ## Q1. What public package version model was selected?
 
 `0.1.0` SemVer first-public-release model with a separate behavioral/policy
@@ -66,9 +61,8 @@ the repository itself a Claude marketplace. (05-claude-packaging.md)
 Yes. Live run (disposable config + repo, Claude Code 2.1.274, GLM-5.3 profile):
 `/iaa:orchestrate <trivial task>` resolved → `Skill: iaa:iaa` loaded → task
 completed inline with **0 agent spawns**, $0.10, transcript-verified. Eval case
-`explicit-orchestrate`: pilot 3/3 runs — invocation indicator fired 3/3,
-zero-agent 3/3 (case's file grader had a design flaw in the pilot, fixed; full
-campaign results in 10-trigger-characterization.md). Contract documented in
+`explicit-orchestrate`: 3/3 in the full campaign — invocation indicator fired
+3/3, zero-agent 3/3, score 1.00 (10-trigger-characterization.md). Contract documented in
 docs/INVOCATION.md. It is a thin entry to the same core — no second
 implementation exists.
 
@@ -77,9 +71,10 @@ implementation exists.
 Yes — determination **B** (explicit integration step): plugins cannot write
 instruction files (structural, verified); the instruction channel is the
 load-bearing routing layer of every boundary campaign (ADR-0001/0002);
-description-only triggering is measurably weaker (Gate-1 pilot 1/2; Gate-2
-characterization ⏳). A SessionStart-hook injection was rejected as a semantics
-change. (05 §4)
+the instruction channel additionally correlates with the delegation decision
+itself (measured: delegation followed in 5/5 shim-sim vs 2/5 description-only
+runs on the same prompt), and contest behavior is unmeasurable without it.
+A SessionStart-hook injection was rejected as a semantics change. (05 §4)
 
 ## Q8. If required, how is it installed safely?
 
@@ -158,9 +153,21 @@ C: real-machine companion (`boundary-companion.yml` — self-hosted
 
 ## Q16. What did trigger characterization show?
 
-⏳ (campaign in flight — will state: per-class n, trigger counts, false
-positives/negatives, model/provider/version, plugin version, explicit vs
-automatic, topology category where observable.)
+68 real sessions against the public package (two-arm; GLM-5.3 profile, Claude
+Code 2.1.274, plugin 0.1.0-rc.1; $15.74). Headlines (10-trigger doc):
+**false positives 0/13**; **false negatives on obvious positives 0/5** (skill
+fired 5/5 — the Gate-1 1/2 pilot is revised as small-sample variance);
+**explicit `/iaa:orchestrate` 3/3** resolution with 3/3 zero-agent fallback;
+**by-name yield 6/6** (SDD-named and unknown-workflow-named); anti-overdelegation
+5/5+5/5. The one sub-1.0 score (trigger-positive 0.73) decomposes into a
+grader band stricter than the policy (3 in-policy 0-agent choices) + one z.ai
+529 judge failure; the grader was NOT weakened — band decision recorded for
+the owner. New A/B datum: description-only and shim-simulated channels both
+load the skill 5/5, but delegation followed in 2/5 vs 5/5 runs — a measured
+channel-dependent behavioral delta that supports keeping the explicit
+integration step (Q7/Q8) while correcting the earlier "weaker triggering"
+claim to "equal loading, divergent delegation choice, contest behavior
+unmeasurable in-sandbox".
 
 ## Q17. Did packaged Superpowers 6.4.1 coexistence remain correct?
 
@@ -201,10 +208,12 @@ Unicode prose verified (validate-static).
 
 ## Q21. Did any core orchestration semantics change?
 
-**No — D = NONE** (proof in 14-semantic-parity.md: the five core files are
-byte-identical to base `330d0c1` by sha256; every Gate-2 change is category A
-[packaging/infra], C [invocation mechanics], or B [none — no adapter text
-changed this Gate]).
+**No — D = NONE, proven by hash** (14-semantic-parity.md: the five core files
+are byte-identical to base `330d0c1`; all five projections byte-exact; the
+deployed live tree byte-exact; category B = zero adapter edits — E9 only
+*confirmed* existing text; category C limited to the thin entry skill and
+byte-parity shim mechanics). The frozen-invariant table maps every invariant
+to unchanged text plus this Gate's behavioral re-exercise where testable.
 
 ## Q22. Which publication blockers were closed?
 

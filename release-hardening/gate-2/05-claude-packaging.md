@@ -67,11 +67,19 @@ explicit global integration step is still required (B).
    boundary campaign's routing rested on (ADR-0001/0002; 6+ samples quoting
    the shim sentence while rejecting embedded redirects) — cannot be
    reproduced by plugin installation.
-2. **Behavioral**: the plugin-eval sandbox has no user CLAUDE.md; Gate-1's
-   pilot measured description-only trigger firing at 1/2 on the positive
-   class, and Gate 2's characterization (10-trigger doc) repeats this at
-   larger n: plugin-only (description-only) triggering is materially weaker
-   than the instruction-channel configuration the boundary evidence rests on.
+2. **Behavioral (measured, with an honest correction)**: the plugin-eval
+   sandbox has no user CLAUDE.md, so its measurements bound
+   description-only/plugin-only routing. Gate-1's pilot measured skill-body
+   loading at 1/2 on the positive class; Gate 2's larger characterization
+   (10-trigger doc) revises this: on the obvious-positive class the skill
+   fired **5/5** plugin-only and 5/5 under the shim simulation —
+   description-only *triggering* is not materially weaker on obvious
+   positives. What the sandbox cannot measure at all is contest behavior
+   (skill-selection vs a co-installed competing orchestration engine), which
+   is the property the instruction channel was proven to carry (6+ samples
+   quoting the shim sentence while rejecting embedded redirects, ADR-0002).
+   "Not weaker where measurable" ≠ "equivalent where it matters"; the
+   boundary guarantee remains evidenced only in the shim configuration.
 3. **Negative control**: a SessionStart hook injecting İAA text every session
    was already rejected in the baseline (it would run in native-mode sessions
    too — a semantics change; and it is Superpowers' channel, which İAA's
