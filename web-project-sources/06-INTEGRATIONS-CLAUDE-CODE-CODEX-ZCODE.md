@@ -7,7 +7,7 @@ All three integrations are identical in *meaning*, different only in *mechanism*
 |---|---|---|---|
 | Instruction surface | `~/.claude/CLAUDE.md` (managed block) | `~/.codex/AGENTS.md` (managed block) | `~/.zcode/AGENTS.md` (managed block) |
 | Skill surface | `~/.claude/skills/…` symlink | `~/.agents/skills/…` symlink (official Codex user-skills dir) | `~/.zcode/skills/…` symlink (official Symlink import mode) |
-| Invocation | description-matched + `/iaa` | implicit + `$iaa` | per-turn description injection (≤250 chars) + `$iaa` |
+| Invocation | description-matched + `/iaa` (plugin form: `/iaa:orchestrate` explicit entry, `iaa:iaa` skill) | implicit + `$iaa` | per-turn description injection (≤250 chars) + `$iaa` |
 | Extra integration | spawn-depth=1 env key (managed) | none (pre-existing `[agents]` config + reviewer.toml untouched) | none |
 | Adapter advice (PA) | Explore/Plan/general-purpose; pre-dispatch mode check; restate constraints to Explore/Plan | explorer/worker/default; fork_turns none preferred; steering; nesting policy-only | Explore (restate rules — no AGENTS.md injection) / general-purpose; nesting impossible |
 

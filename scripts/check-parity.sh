@@ -85,7 +85,9 @@ cmp -s "$REPO_ROOT/scripts/iaa" "$REPO_ROOT/packaging/claude/bin/iaa" || fail "p
 
 # 6. deterministic regeneration (only meaningful in a git checkout) --------------
 if command -v git >/dev/null 2>&1 && git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if git -C "$REPO_ROOT" status --porcelain -- packaging .claude-plugin/marketplace.json scripts/iaa VERSION | grep -q .; then
+  if [ -d "$REPO_ROOT/packaging/claude/evals" ]; then
+    note "NOTE: transient eval staging present (campaign in flight); skipping regeneration determinism check"
+  elif git -C "$REPO_ROOT" status --porcelain -- packaging .claude-plugin/marketplace.json scripts/iaa VERSION | grep -q .; then
     note "NOTE: packaging inputs have uncommitted changes; skipping regeneration determinism check"
   else
     sh "$REPO_ROOT/scripts/build-packages.sh" >/dev/null

@@ -5,7 +5,9 @@ machine on **2026-09-22** — a frozen, audited baseline. It exists so a fresh m
 prior context can understand İAA accurately.
 
 **How to treat this pack:**
-- `sources/` files are **verbatim copies of the live canonical source** — authoritative.
+- `sources/` files are **verbatim copies of the repository canonical source**
+  (`iaa/` in the maintained repo; the runtime tree is a deployed projection) —
+  authoritative.
   Where any summary and a source file disagree, the source file wins.
 - Numbered docs (01–09) are explanations written during the audit, every claim sourced.
 - `10-COMPARISON-RESEARCH-BRIEF.md` defines a *future* comparison task — it does NOT

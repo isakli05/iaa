@@ -17,7 +17,7 @@ set -euo pipefail
 EV="${1:?usage: $0 <evidence-dir> [j|k|d ...]}"
 shift
 RUNS="${*:-j k d}"
-REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"   # .../release-hardening
+REPO_ROOT="$(cd "$(dirname "$0")/../../../.." && pwd -P)"   # .../release-hardening
 IAA_REPO="$(cd "$REPO_ROOT/.." && pwd)"               # İAA repository root
 FIXTURE="$IAA_REPO/tests/fixtures/generated-PLAN.md"
 ANALYZER="$IAA_REPO/tests/tools/analyze_run.py"
@@ -40,7 +40,8 @@ transcript_for() { # $1 = session_id — find its jsonl anywhere under ~/.claude
 }
 
 run_case() { # $1 = case letter, $2 = prompt
-  local letter="$1" prompt="$2" repo="$EV/repos/notectl-$letter"
+  local letter="$1" prompt="$2"
+  local repo="$EV/repos/notectl-$letter"
   seed_repo "$repo"
   cp "$FIXTURE" "$repo/PLAN.md"
   if [ "$letter" = "d" ]; then
@@ -53,7 +54,9 @@ assert old in t
 p.write_text(t.replace(old, new))
 PY
   fi
-  (cd "$repo" && git add PLAN.md && git -c user.email=seed@local -c user.name=seed commit -qm "add PLAN")
+  # the fixture seeds and commits PLAN.md itself; this commit is best-effort
+  # (a no-op when the tree is already committed)
+  (cd "$repo" && git add -A && git -c user.email=seed@local -c user.name=seed commit -qm "add PLAN") || true
   echo "[$(date -Is)] run $letter starting"
   (cd "$repo" && "$CLAUDE" -p --dangerously-skip-permissions --output-format json "$prompt" \
      > "$EV/runs/run-$letter.json" 2> "$EV/runs/run-$letter-stderr.log")
@@ -67,7 +70,8 @@ PY
 }
 
 verdicts() { # $1 = letter, $2 = expect_sdd (yes|no), $3 = expect_iaa (yes|no|any)
-  local letter="$1" expect_sdd="$2" expect_iaa="$3" tr="$EV/transcripts/run-$letter.jsonl"
+  local letter="$1" expect_sdd="$2" expect_iaa="$3"
+  local tr="$EV/transcripts/run-$letter.jsonl"
   if [ ! -f "$tr" ]; then echo "run $letter: NO TRANSCRIPT — INCONCLUSIVE"; return 2; fi
   python3 "$ANALYZER" "$tr" "$EV/runs/run-$letter.json" > "$EV/runs/analyze-$letter.txt"
   local sdd iaa

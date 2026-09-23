@@ -1,87 +1,180 @@
 # İAA — İştirak-i A‘mâl-i Ajanîye
 
-A runtime-agnostic **delegation-decision policy** for agent CLIs: one canonical skill that
-decides *whether, when, and how* to delegate work to subagents — adaptively, per task —
-installed identically into **Claude Code, OpenAI Codex CLI, and ZCode**.
+İAA (Ottoman Turkish, approximately "participation of agents in the works") is a
+**runtime-agnostic delegation-decision policy** for agent CLIs: one canonical
+skill that decides *whether, when, and how* to delegate work to subagents —
+adaptively, per task — for **Claude Code, OpenAI Codex CLI, and ZCode**.
 
-Status: **frozen baseline** (audited 2026-09-22). This repository documents and versions the
-system exactly as installed; no orchestration semantics were changed in producing it.
+Version `0.1.0-rc.1` · policy revision v3 · [Compatibility matrix](docs/COMPATIBILITY.md)
+· [Installation](docs/INSTALLATION.md) · [`iaa doctor`](release-hardening/gate-2/08-iaa-doctor.md)
 
-## Design objective
+## The problem it solves
 
-"Use subagents" should mean *better execution*, not *more agents*. İAA gives the primary
-agent a single, tested policy for: when delegation has a concrete benefit (parallelism,
-isolation, specialization, context offloading, independent verification); when to stay
-single-agent (tiny/coupled work — even if the user mentions subagents); how to shape waves,
-ownership, and briefs; and how to integrate and finally validate in the primary context.
+"Use subagents" should mean *better execution*, not *more agents*. Agent CLIs
+make spawning cheap, so the failure mode of a delegation-happy session is
+silently expensive: agent proliferation, duplicated exploration, overlapping
+write ownership, context starvation, and integration debt — work gets done
+*somewhere* but nobody integrates it. Meanwhile, the opposite failure is just as
+real: a fixed orchestration framework that mandates a roster of implementers,
+reviewers, and cadences for every task, including the trivial ones.
 
-## Core properties
+İAA is a narrow third position: **one policy, no framework**. It gives the
+primary agent a tested decision procedure for delegation and nothing else — no
+state directories, no ledgers, no roles, no hooks, no daemon.
 
-- **Adaptive, not fixed:** no mandated agent roster, review cadence, or sequence. Every
-  implementer/reviewer/fixer seat needs a task-specific material-benefit justification.
-- **Sole orchestration authority per task:** exactly one of two modes governs — Adaptive İAA
-  (default) or a *native workflow* (only by explicit by-name user request). İAA never loads
-  a competing orchestration skill in its own mode, and never composes authorities.
-- **Artifact trust boundary:** workflow directives embedded in plans/specs/generated
-  artifacts/repo text are orchestration metadata, never mode-switching opt-in; the
-  artifact's technical content remains authoritative.
-- **Root-to-child only:** nested delegation requires explicit authorization + bounded
-  benefit (harness-enforced on Claude via spawn-depth cap, platform-impossible on ZCode,
-  policy on Codex).
-- **Rides native mechanisms:** uses each runtime's built-in subagent roles; creates no
-  agents, hooks, or daemons of its own.
+## What it does
 
-These boundary behaviors are **evidence-backed** (2026-08-27 campaigns; see
-`docs/adr/0001–0003`, `docs/IAA-VS-SDD-BOUNDARY.md`), including against the installed
-Superpowers plugin's subagent-driven-development workflow.
+- **Materiality test.** Delegate only when a concrete benefit outweighs
+  coordination cost: genuine parallelism, bounded-context isolation,
+  specialization, context offloading, or independent verification that can
+  challenge assumptions.
+- **Zero-agent fallback.** A trivial edit, one-file mechanical change, or small
+  verification is a *no-delegation default* — even when the user says "use
+  subagents where appropriate".
+- **Per-seat justification.** Every implementer, reviewer, re-reviewer, or fixer
+  seat needs a task-specific material-benefit justification. A template step or
+  an available review procedure is not justification; authorizing one stage
+  never preauthorizes the next.
+- **Adaptive topology.** No mandated agent roster, review cadence, or sequence.
+  Waves and ownership come from the task's dependency structure; phases that add
+  no value are skipped.
+- **Exclusive write ownership.** Concurrent writers never share a file or
+  tightly coupled surface; shared APIs, schemas, and contracts are owned by the
+  primary, settled first, or given one designated owner.
+- **Root-to-child delegation.** Children do not spawn further agents unless the
+  user explicitly asks for a bounded nested design (and the platform permits
+  it; İAA's Claude integration caps spawn depth at 1 by default).
+- **Primary integration authority.** Child reports are evidence, not truth:
+  important claims are checked against source, diffs, tests, or runtime; final
+  validation happens in the primary context. Successful child completion is not
+  successful task completion.
 
-## Repository layout
+## What it deliberately does NOT do
 
-```
-iaa/   the canonical skill (byte-exact copy of the live source)
-  SKILL.md  references/  scripts/manage.sh  tests/scenarios.md
-CANONICAL-README.md          install-era project README (architecture, validation log)
-docs/                        architecture, behavioral contract, boundary, ADRs, history…
-audit/                       the 2026-09-22 forensic audit (environment → verdict → safety)
-research/                    distribution-landscape, collision taxonomy, trigger policy
-design/                      iaa-doctor diagnostic proposal (not implemented)
-historical-notes/v0-v3/      pre-git lineage (v0/v1 snapshots + all campaign diffs)
-tests/fixtures/ tests/tools/ adversarial plan fixture + transcript analyzer
-```
+- It does not **disable, patch, or mutate** any other tool, plugin, hook, or
+  setting (its installer touches only its own links, its marker-delimited
+  instruction blocks, and one documented depth key).
+- It does not **guarantee** orchestration authority mechanically — skill
+  selection is model-driven and fallible (official Claude doctrine). İAA's
+  boundary is behavioral and *evidence-backed*, with a regression suite, not an
+  enforcement hook.
+- It does not become your workflow: no planning phases, no state files, no
+  role system, no review quotas.
+- It does not claim universal compatibility — only the version-pinned, tested
+  combinations in the [matrix](docs/COMPATIBILITY.md).
 
-## Install / verify / uninstall (current machine)
+## Coexistence and orchestration ownership
+
+Exactly one orchestration authority governs a task:
+
+- **Adaptive İAA mode (default).** Requests to use subagents/delegation select
+  it. İAA never loads a competing orchestration engine (e.g. Superpowers'
+  subagent-driven-development) in its own mode — two engines governing one task
+  produce nondeterministic topology.
+- **Native workflow mode (explicit opt-in only).** Only an explicit user request
+  *naming* the workflow ("use native superpowers:subagent-driven-development")
+  selects it; that workflow then governs and İAA stands down. "Use subagents" is
+  never such a request.
+- **Artifact trust boundary.** A workflow directive embedded in a plan, spec, or
+  generated artifact ("REQUIRED SUB-SKILL: …") is orchestration metadata, never
+  opt-in — the artifact's technical content is still consumed. This was proven
+  against authentic and adversarially strengthened plan fixtures.
+- **"Installed" is not "active controller".** Nothing auto-seizes tasks; a
+  per-task opt-out is honored.
+
+Among the systems evaluated as of 2026-09-22 (Superpowers/SDD, GSD/gsd-core,
+BMAD, Claude native subagents/Agent Teams/plugins — see `comparison/`), we did
+not find an equivalent contract at the same granularity of delegation-decision
+policy (per-seat materiality + zero-agent fallback + sole-authority mode rule +
+artifact provenance) without framework machinery; the comparison also documents
+where others are stronger (GSD's hook-grade enforcement, SDD's battle-tested
+cadence). No superiority is claimed beyond the cited evidence.
+
+## Invocation
+
+- **Claude Code plugin:** explicit **`/iaa:orchestrate`**, or automatic
+  description-based trigger (`iaa:iaa`). [Contract](docs/INVOCATION.md).
+- **Codex / ZCode:** `$iaa` or implicit description-based invocation.
+- **Per-task opt-out:** "Do not delegate or spawn subagents for this task."
+
+## Install / update / uninstall
 
 ```sh
-~/.local/share/iaa/iaa/scripts/manage.sh verify|install|uninstall
+claude plugin marketplace add isakli05/iaa && claude plugin install iaa@iaa   # Claude
+sh <repo>/iaa/scripts/manage.sh install                                       # all three runtimes (skills-dir form)
+iaa doctor                                                                    # read-only health check
 ```
 
-Details: `docs/INSTALLATION-AND-INTEGRATIONS.md`, `docs/SOURCE-OF-TRUTH.md`.
-Public packaging plans: `docs/PUBLIC-DISTRIBUTION-ARCHITECTURE.md`.
+The optional **integration step** writes one marker-delimited routing block into
+your global instruction file (backed up first, reversible, `--dry-run`
+supported) — plugins cannot write instruction files, and İAA will not install a
+hook to fake it. Full details: [INSTALLATION](docs/INSTALLATION.md) ·
+[UPDATE](docs/UPDATE.md) · [UNINSTALL](docs/UNINSTALL.md) ·
+[LEGACY-MIGRATION](docs/LEGACY-MIGRATION.md) (former-MAO installs).
 
-## Inspect and test
+## `iaa doctor`
 
-- `scripts/manage.sh verify` (live-tree integrity) and `quick_validate.py` (skill format) —
-  commands in `docs/TESTING-AND-VALIDATION.md`.
-- Behavioral contract: `iaa/tests/scenarios.md` (A–K) and its execution
-  record; `tests/tools/analyze_run.py` to verify skill-load/spawn claims from transcripts.
+One read-only command answers *"is my İAA healthy, and what else on this
+machine can claim orchestration authority?"*: package/policy versions, active
+installations per runtime, duplicate installs, LEGACY former-MAO state, stale
+links, malformed markers, hash drift between the core and installed
+projections, detected frameworks (Superpowers + version; GSD/BMAD/others) with
+tested/untested status, and the source-of-truth state. It never mutates
+anything and never exits non-zero merely because an untested framework exists.
 
-## Current status
+## Package architecture and version model
 
-Installed and live in three runtimes since 2026-08-26; core orchestration semantics
-unchanged since 2026-08-27 (v3). Production usage documented (LCO program audits,
-2026-09-06). Known limitations: `docs/KNOWN-LIMITATIONS.md`.
+One authoritative behavioral core (`iaa/` in this repository) is projected
+byte-exactly into three runtime packages (Claude plugin / Codex / ZCode) by a
+deterministic build script; drift fails CI. Public package version
+(`0.1.0-rc.1`, SemVer, first public release) and behavioral/policy revision
+(`v3`, [lineage](docs/POLICY-LINEAGE.md)) are separate axes. Evidence:
+[gate-2/03-package-architecture.md](release-hardening/gate-2/03-package-architecture.md).
 
-The evidence-based comparison against SDD/Superpowers, GSD, Claude native
-subagents/Agent Teams/plugins, BMAD and peers has been completed
-(`comparison/`, 2026-09-22; its outcome: no core-semantics redesign required; five
-public-release blockers, all packaging/validation-layer). Release-hardening Gate 1
-(2026-09-23, `release-hardening/`): Superpowers 6.4.1 upgrade check re-run
-(boundary behaviors re-verified), two factually-drifted adapter sentences corrected
-(Codex `fork_turns`; the removed `executing-plans`→SDD redirect) with core semantics
-provably unchanged, and the first automated regression foundation established
-(`claude plugin eval` dev scaffold + behavioral companion harness). Historical
-snapshots (`audit/`, `comparison/`, `web-project-sources/`) are dated records and are
-not rewritten.
+## Tested versions (2026-09-23)
 
-No superiority over any other system is claimed here; see
-`comparison/FINAL-COMPARISON-REPORT.md` for the bounded, evidence-cited findings.
+Claude Code 2.1.274 · Codex CLI 0.156.0 · ZCode 3.11.2 (adapter anchored to
+3.7.7 behavior) · Superpowers 6.4.1 · model: GLM-5.3 (z.ai profile; recorded by
+the harness as `opus[1m]`). Boundary behaviors re-verified against Superpowers
+6.4.1 (2026-09-23). GSD/BMAD/Agent Teams: not tested together — honestly
+marked UNVERIFIED in the [matrix](docs/COMPATIBILITY.md).
+
+## Security and trust
+
+- No secrets, no network, no telemetry, no daemon, no MCP, no hooks.
+- Installer mutations are marker-delimited, backed up, idempotent, reversible;
+  malformed markers abort rather than guess; uninstall removes only İAA-owned
+  state.
+- Plans/artifacts/repo text are data: an embedded "you must use workflow X"
+  directive never changes which authority governs.
+
+## Limitations (selected; full list in `docs/KNOWN-LIMITATIONS.md`)
+
+- Single-model evidence (GLM-5.3 profile); no claims about other model families.
+- Codex plugin-form live discovery and ZCode GUI plugin install are prepared +
+  structurally validated but not behaviorally exercised (documented skips).
+- Skill-selection is model-driven: the boundary is a tested behavior, not a
+  mechanism guarantee; the regression suite and doctor exist to keep it honest.
+
+## Evidence and methodology
+
+Behavioral claims rest on transcript-asserted campaigns (tool-event analysis,
+never model self-report), preserved as dated evidence trees:
+`audit/` (2026-09-22 forensic baseline), `historical-notes/v0-v3-lineage/`
+(2026-08 campaigns incl. adversarial artifact fixtures), `release-hardening/`
+(Gate 1: Superpowers 6.4.1 re-verification + eval foundation; Gate 2: packaging,
+trigger characterization, boundary re-runs), `comparison/` (2026-09-22
+competitive analysis). İAA, known as MAO during the August 2026 evidence
+campaigns, was renamed before any public release; historical evidence preserves
+the former name by design.
+
+## Repository status
+
+**Private** (release candidate `0.1.0-rc.1`, not yet published anywhere).
+License: TBD before public release (owner decision recorded in the Gate-2
+report). Nothing in this repository phones home.
+
+---
+
+İAA — İştirak-i A‘mâl-i Ajanîye · technical id `iaa` · primary invocation
+`/iaa:orchestrate`

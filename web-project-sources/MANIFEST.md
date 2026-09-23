@@ -1,4 +1,4 @@
-# MANIFEST — İAA web knowledge pack (2026-09-22)
+# MANIFEST — İAA web knowledge pack (refreshed 2026-09-23, Gate 2 §20)
 
 ## Recommended upload set (ChatGPT Project / Claude Project knowledge)
 
@@ -27,13 +27,15 @@ questions).
 ## Authority classes
 
 - **Authoritative (override everything else):** everything under `sources/` — byte-exact
-  copies of the live canonical files (SKILL.md sha256 fee98091…).
-  **Parity status (2026-09-23, after the İAA/`iaa` identity rename):** identity tokens
-  were updated in every `sources/` file; `scripts-manage.sh`, `references-delegation-contract.md`,
-  and `CANONICAL-README.md` are byte-identical to the live canonical tree, while
-  `SKILL.md`, `references-platform-adapters.md`, and `tests-scenarios.md` are still the
-  pre-Gate-1 snapshots this pack was built from (pre-existing drift, predating the
-  rename; refresh before upload if adapter-fix parity matters).
+  copies of the repository canonical files.
+  **Parity status (2026-09-23, Gate-2 refresh):** all six `sources/` files are
+  byte-identical to the current approved repository core (SKILL.md sha256
+  `73f7b887…` = post-Gate-1 corrected core; `references-platform-adapters.md`
+  `849b769c…` incl. the `fork_turns` and `executing-plans` factual corrections;
+  `tests-scenarios.md` `5fa9617e…` with the widened scenario-J criterion;
+  `scripts-manage.sh` `21964702…` with LEGACY migration guards). The pre-Gate-1
+  snapshot drift noted on 2026-09-23 is closed. Re-verify with `sha256sum`
+  against the repository before any future upload.
 - **Explanatory summaries:** 01–06, 08–09 — audit-written; every claim sourced; if a
   summary conflicts with a source file, the source file wins.
 - **Historical:** 07 — describes past states; explicitly labels what is no longer active.

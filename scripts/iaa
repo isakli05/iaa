@@ -682,6 +682,7 @@ iaa_deploy() {
     printf 'would: move existing %s aside to %s.iaa-previous-%s\n' "$IAA_SHARE_DIR" "$IAA_SHARE_DIR" "$iaa_dp_stamp"
     printf 'would: move the staged tree into place at %s (consumer links keep resolving: same path)\n' "$IAA_SHARE_DIR"
     printf 'would: write provenance to %s/provenance.json\n' "$IAA_STATE_DIR"
+    printf 'rollback (if needed): rm -rf "%s" && mv "%s.iaa-previous-%s" "%s"\n' "$IAA_SHARE_DIR" "$IAA_SHARE_DIR" "$iaa_dp_stamp" "$IAA_SHARE_DIR"
     return 0
   fi
   mkdir -p -- "$iaa_dp_stage" "$IAA_STATE_DIR"
@@ -721,7 +722,7 @@ PY
   mv -- "$iaa_dp_stage" "$IAA_SHARE_DIR"
   printf 'deployed: %s (version %s%s)\n' "$IAA_SHARE_DIR" "$IAA_VERSION" "${IAA_SOURCE_REV:+ from commit $IAA_SOURCE_REV}"
   printf 'verify consumer links: sh "%s/iaa/scripts/manage.sh" verify\n' "$IAA_SHARE_DIR"
-  printf 'rollback: mv "%s.iaa-previous-%s" "%s"\n' "$IAA_SHARE_DIR" "$iaa_dp_stamp" "$IAA_SHARE_DIR"
+  printf 'rollback: rm -rf "%s" && mv "%s.iaa-previous-%s" "%s"\n' "$IAA_SHARE_DIR" "$IAA_SHARE_DIR" "$iaa_dp_stamp" "$IAA_SHARE_DIR"
 }
 
 # =====================================================================

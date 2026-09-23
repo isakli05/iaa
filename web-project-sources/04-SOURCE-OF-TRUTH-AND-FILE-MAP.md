@@ -1,13 +1,15 @@
 # 04 — Source of Truth and File Map
 
-## Live vs maintained
+## Repo vs runtime (normalized 2026-09-23, Gate 2)
 
-- **Live runtime source (consumed by all three runtimes, unchanged since 2026-08-27):**
-  `/home/isa/.local/share/iaa/` — hash-pinned (SKILL.md v3 =
-  sha256 `fee98091…`, 7,913 B). NOT version-controlled in place.
-- **Maintained/versioned copy:** the `iaa/` GitHub baseline repo
-  (private, isakli05) holds a byte-identical copy + this documentation. Sync rule: edit
-  live → copy → hash-verify → commit.
+- **Authoritative development source:** the `iaa/` directory of the maintained
+  (private) repository — version-controlled, hash-pinned (SKILL.md v3 =
+  sha256 `73f7b887…`). All edits happen here.
+- **Deployed runtime source (consumed by all three runtimes):**
+  `$HOME/.local/share/iaa/` — a projection written by `scripts/iaa deploy`
+  (transactional: stage → verify → swap → provenance record in
+  `$HOME/.config/iaa/provenance.json`; previous tree retained for rollback).
+  Consumer links and the three managed shims are unchanged by the model.
 
 ## The five canonical files (in this pack under sources/)
 

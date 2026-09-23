@@ -5,7 +5,7 @@ Sources: `sources/SKILL.md` (the policy), `sources/references-*.md`, `sources/CA
 ## Shape
 
 ```
-~/.local/share/iaa/            ← one canonical source
+~/.local/share/iaa/            ← deployed runtime source (projection of the repo)
 ├── README.md
 └── iaa/{SKILL.md, references/2, scripts/manage.sh, tests/scenarios.md}
         ↑ symlinked from ~/.claude/skills, ~/.zcode/skills, ~/.agents/skills (Codex)

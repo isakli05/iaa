@@ -10,12 +10,13 @@ allowed_tools: [Read, Write, Edit, Glob, Grep, Skill]
 model: opus[1m]
 ---
 
-/iaa:orchestrate Fix the one-character typo in README.md and verify the file.
-
-The file README.md in the current directory contains:
+/iaa:orchestrate Create the file README.md with exactly this content (it
+contains one typo):
 
 ```
 # Widget Tool
 
 Widgit: a small helper. Helo world.
 ```
+
+Then fix the one-character typo in it and verify the file.

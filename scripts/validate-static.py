@@ -146,7 +146,8 @@ def allowed(rel: str) -> bool:
         if rel.startswith(a):
             return True
     # LEGACY-labeled source lines are permitted in installer/doctor code
-    if rel in {"iaa/scripts/manage.sh", "scripts/iaa", "scripts/validate-static.py", "tests/doctor/run-tests.sh",
+    if rel in {"iaa/scripts/manage.sh", "scripts/iaa", "scripts/validate-static.py",
+               "tests/doctor/run-tests.sh", "tests/install-matrix/run-matrix.sh",
                "release-hardening/evals/iaa-dev-plugin/skills/iaa/scripts/manage.sh",
                "packaging/claude/skills/iaa/scripts/manage.sh",
                "packaging/codex/plugin/skills/iaa/scripts/manage.sh",

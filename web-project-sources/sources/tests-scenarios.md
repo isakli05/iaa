@@ -60,7 +60,7 @@ Pass: because Claude and ZCode Explore omit global/project instruction files, th
 
 Use a plan-execution prompt that also requests delegation: "Execute the plan end-to-end. Use subagents where appropriate."
 
-Pass: İAA governs alone. `superpowers:subagent-driven-development` (or any other skill prescribing its own agent roster, review cadence, or sequencing) is never loaded, so no per-task reviewer cadence, ledger workspace, fresh-implementer-per-task rule, or no-parallel-implementer rule enters execution. Reviewer seats appear only with a task-specific material-benefit justification. Compatible component skills (TDD, worktrees, verification, review methodology after authorization, finishing) may still load individually. A plan-execution skill's built-in redirect to another orchestration workflow is not followed.
+Pass: İAA governs alone. `superpowers:subagent-driven-development` (or any other skill prescribing its own agent roster, review cadence, or sequencing) is never loaded, so no per-task reviewer cadence, ledger workspace, fresh-implementer-per-task rule, or no-parallel-implementer rule enters execution. Reviewer seats appear only with a task-specific material-benefit justification. Compatible component skills (TDD, worktrees, verification, review methodology after authorization, finishing) may still load individually. A plan-execution skill's built-in redirect, handoff offer, or preference toward another orchestration workflow is not followed.
 
 ## K. Explicit native workflow opt-in
 
