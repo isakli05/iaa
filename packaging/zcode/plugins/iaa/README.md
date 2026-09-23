@@ -1,6 +1,6 @@
 # İAA — İştirak-i A‘mâl-i Ajanîye (ZCode plugin)
 
-Version: 0.1.0-rc.1
+Version: 0.1.0
 
 A **delegation-decision policy** for agent CLIs: one skill that decides *whether,
 when, and how* to delegate work to subagents — adaptively, per task — with a

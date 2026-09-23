@@ -1,6 +1,6 @@
 # İAA — İştirak-i A‘mâl-i Ajanîye (ZCode plugin)
 
-Version: 0.1.0-rc.1 · Namespace: `iaa`
+Version: 0.1.0 · Namespace: `iaa`
 
 A **delegation-decision policy** for agent CLIs, packaged as a ZCode plugin
 (`.zcode-plugin/plugin.json`). Full documentation: the
