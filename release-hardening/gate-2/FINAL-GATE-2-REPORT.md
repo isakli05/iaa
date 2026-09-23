@@ -40,7 +40,11 @@ gates in CI). No hand-edited semantic copies exist; drift fails CI.
 
 ## Q4. Is the git repository now the authoritative development source?
 
-Yes — implemented and cut over (§6 / 04-source-of-truth-normalization.md):
+Yes — implemented and **cut over on the real machine** at Gate-2 completion
+(commit `c59e6f7` deployed; `manage.sh verify` green; doctor 0 problems;
+previous live tree retained at `~/.local/share/iaa.iaa-previous-…` with the
+one-command rollback printed by deploy). Details: §6 /
+04-source-of-truth-normalization.md:
 `scripts/iaa deploy` (stage → byte-verify → swap → provenance.json → rollback
 retained) is the only writer of `~/.local/share/iaa`; consumer links unchanged;
 `iaa doctor` verifies live-tree hashes against provenance or the checkout; the
@@ -244,9 +248,11 @@ publication-safety audited; private RC assembled.
 
 ## Q24. Is a PRIVATE release candidate ready?
 
-**YES** — `v0.1.0-rc.1` tag + deterministic archives (`scripts/build-release.sh`
-→ dist/*.tar.gz + SHA256SUMS, reproducible from the commit). Not published
-anywhere. ⏳ pending: final commit + campaigns green.
+**YES** — tag `v0.1.0-rc.1` (annotated, on commit `c59e6f7`) + deterministic
+archives (`scripts/build-release.sh` → 4 tarballs + SHA256SUMS; rebuild verified
+**byte-identical**). Reproduction: checkout `v0.1.0-rc.1` →
+`scripts/build-release.sh`. Not published anywhere. Both validation campaigns
+green before tagging.
 
 ## Q25. Is the repository ready to become PUBLIC?
 
@@ -273,8 +279,10 @@ owner review; then (and only then) visibility change + marketplace submissions.
    incident".
 2. Latent Gate-1 companion-script bugs found and fixed when first truly
    executed (`local a=$1 b=$a` under `set -u`; REPO_ROOT off-by-one;
-   fixture-commit no-op) — the script had been formalized but not executed
-   end-to-end before.
+   fixture-commit no-op; case-sensitive SDD grep vs Python booleans — this one
+   initially mislabeled run K as FAIL while the transcript showed the correct
+   behavior; verdicts recomputed from saved evidence) — the script had been
+   formalized but never executed end-to-end before this Gate.
 3. A `git add -A` briefly committed transient eval staging under
    `packaging/claude/evals/`; untracked + gitignored; race with the parity
    rebuild closed by a skip-when-staged guard.
