@@ -5,7 +5,7 @@
 skill that decides *whether, when, and how* to delegate work to subagents —
 adaptively, per task — for **Claude Code, OpenAI Codex CLI, and ZCode**.
 
-Version `0.1.0` · policy revision v3 · [Compatibility matrix](docs/COMPATIBILITY.md)
+Version `0.1.1` · policy revision v3 · [Compatibility matrix](docs/COMPATIBILITY.md)
 · [Installation](docs/INSTALLATION.md) · [`iaa doctor`](#iaa-doctor)
 
 ## The problem it solves
@@ -94,7 +94,9 @@ cadence). No superiority is claimed beyond the cited evidence.
 
 - **Claude Code plugin:** explicit **`/iaa:orchestrate`**, or automatic
   description-based trigger (`iaa:iaa`). [Contract](docs/INVOCATION.md).
-- **Codex / ZCode:** `$iaa` or implicit description-based invocation.
+- **Codex / ZCode:** `$iaa` or implicit description-based invocation; on the
+  ZCode plugin form the explicit entry point is the **`/orchestrate`** Command
+  (flat name — ZCode does not prefix plugin commands).
 - **Per-task opt-out:** "Do not delegate or spawn subagents for this task."
 
 ## Install / update / uninstall
@@ -127,8 +129,8 @@ anything and never exits non-zero merely because an untested framework exists.
 One authoritative behavioral core (`iaa/` in this repository) is projected
 byte-exactly into three runtime packages (Claude plugin / Codex / ZCode) by a
 deterministic build script; drift fails CI. Public package version
-(`0.1.0`, SemVer, first public release) and behavioral/policy revision
-(`v3`, [lineage](docs/POLICY-LINEAGE.md)) are separate axes. Evidence:
+(`0.1.1`, SemVer; `0.1.0` was the first public release) and behavioral/policy
+revision (`v3`, [lineage](docs/POLICY-LINEAGE.md)) are separate axes. Evidence:
 [gate-2/03-package-architecture.md](release-hardening/gate-2/03-package-architecture.md).
 
 ## Tested versions (2026-09-23)
@@ -172,7 +174,7 @@ the former name by design.
 
 ## Repository status
 
-Public · release `0.1.0` (first public release; SemVer).
+Public · release `0.1.1` (SemVer; first public release was `0.1.0`).
 License: [MIT](LICENSE) — see also [NOTICE](NOTICE) for
 acknowledgements. Nothing in this repository phones home.
 

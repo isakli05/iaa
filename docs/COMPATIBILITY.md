@@ -19,7 +19,7 @@ reasoning" — never "installation succeeds".
 | ZCode | 3.11.2 — skills-dir behavioral baseline (TESTED evidence); auto-updated to 3.14.3 on 2026-09-23 (plugin-form GUI observation only — no model-call evidence at 3.14.3; post-release/zcode-official/) |
 | Superpowers plugin | 6.4.1 |
 | Model (all behavioral evidence) | GLM-5.3 via z.ai provider profile (recorded by the harness as `opus[1m]`) |
-| İAA | package 0.1.0, policy revision v3 |
+| İAA | package 0.1.1, policy revision v3 |
 
 ## Combinations
 
@@ -31,7 +31,7 @@ reasoning" — never "installation succeeds".
 | Explicit SDD request while İAA installed | **TESTED** | run K both eras: SDD governs full cadence, İAA never loads |
 | İAA Claude **plugin** package (skill + `/iaa:orchestrate`) | **PARTIALLY TESTED** | live install + explicit invocation + trigger/anti-overdelegation evals (2026-09-23); SDD-contest under plugin-mode specifically not re-run on the real machine (channel carries byte-identical skill+shim; see gate-2/05 §6) |
 | İAA Codex plugin form | **TESTED** | full lifecycle validated locally (0.156.0, Gate 2); live authenticated session discovers `iaa:iaa` from the plugin cache and explicit `$iaa` invocation loads the core (2026-09-23, Gate 3, gate-3/04); behavioral delegation evidence carried by the byte-identical core via the skills-dir form (campaigns + E9) |
-| İAA ZCode plugin form | **STRUCTURALLY COMPATIBLE** | official validator passes; skills-dir form is the historically used ZCode integration. 2026-09-23 GUI run at 3.14.3 (post-release/zcode-official/): local-marketplace install succeeded with byte-verified 0.1.0 content, but the one-skill contract was NOT met (`orchestrate` exposed as a second skill — ZCode documents `disable-model-invocation` for Command frontmatter, not Skills) and `$iaa` was not behaviorally testable (ZCode provider connection failure: Node autoSelectFamily × dead local IPv6 egress — confirmed at the embedded-runtime level, matching upstream zai-org/feedback#699; unrelated to İAA and not a Z.ai backend failure). Remote raw-URL marketplace source is unsupported for relative plugin sources (local path/clone only). Adapter + remote-source fixes proposed for 0.1.1 |
+| İAA ZCode plugin form | **STRUCTURALLY COMPATIBLE** | official validator passes; skills-dir form is the historically used ZCode integration. 2026-09-23 GUI run at 3.14.3 on the 0.1.0 package (post-release/zcode-official/): local-marketplace install succeeded with byte-verified content, but the one-skill contract was NOT met (`orchestrate` exposed as a second skill — ZCode documents `disable-model-invocation` for Command frontmatter, not Skills) and `$iaa` was not behaviorally testable (ZCode provider connection failure: Node autoSelectFamily × dead local IPv6 egress — confirmed at the embedded-runtime level, matching upstream zai-org/feedback#699; unrelated to İAA and not a Z.ai backend failure). Remote raw-URL marketplace source is unsupported for relative plugin sources (local path/clone only). 0.1.1 implements the corrections (`orchestrate` as a Command, `url/zip/sha256/path` remote marketplace, README_CN); validation record: `release-hardening/0.1.1/` |
 | Former-MAO (LEGACY) installation → İAA migration | **TESTED** | identity migration 2026-09-23 on the real machine + unit tests T3/T13 |
 | Claude native subagents (Explore/Plan/general-purpose) | **TESTED** | all Claude runs use them (mechanism, not authority) |
 | Codex native MultiAgentV2 (`spawn_agent`, `fork_turns` none/all/"N") | **TESTED** | 2026-08 campaigns + E9 numeric probe 2026-09-23 |

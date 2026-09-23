@@ -61,9 +61,19 @@ form (all campaign evidence). Choose one form per runtime.
 ## ZCode
 
 - `$iaa` explicit, or description-based per-turn injection (≤250 chars).
-- Plugin form: the bundled skills register the same way; the `orchestrate`
-  entry skill is present as the explicit analog (invocable as `$orchestrate`
-  where ZCode exposes skill names).
+- Plugin form (0.1.1+): the bundled `iaa` skill is the **only**
+  model-discoverable skill in the package. The explicit entry point is the
+  **`/orchestrate` Command** (`commands/orchestrate.md`, manifest
+  `"commands": "commands"`): ZCode resolves plugin commands to a flat `/name`
+  with no plugin prefix (client code `getCommandName` joins the path relative
+  to the declared commands root; official `android-emulator` → `/android-dev`
+  et al. ship this way). The command body delegates to the same bundled `iaa`
+  skill — it is an entry point, not a second implementation.
+- 0.1.0 form (historical): the entry point shipped as `skills/orchestrate/
+  SKILL.md`, which ZCode exposed as a second auto-discoverable **skill** —
+  its documented Skill frontmatter carries only `name`+`description`, so
+  `disable-model-invocation` could not apply there (documented for Command
+  frontmatter). Corrected in 0.1.1 (post-release/zcode-official/ F4).
 
 ## What invocation never means
 

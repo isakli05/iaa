@@ -62,8 +62,26 @@ from the explicit script step.
 
 ## ZCode
 
-Plugin form (GUI): add the marketplace (local path or repo), install `iaa`,
-enable it, then Settings → Skills → Refresh. The optional AGENTS.md block:
+Plugin form (GUI, 0.1.1+): in **Settings → Plugin management → Discover → +**,
+add the stable remote marketplace URL
+
+```
+https://raw.githubusercontent.com/isakli05/iaa/main/packaging/zcode/marketplace.remote.json
+```
+
+then install `iaa` and enable it. The remote entry uses the official verified
+archive form (`url` + `zip` + `sha256` + `path`) pinned to the versioned
+`iaa-<version>-plugin.zip` release asset. For local testing (or a cloned
+repository) add the `packaging/zcode` directory itself as a local-path
+marketplace instead — that form carries the relative-source `marketplace.json`
+contributed to `zai-org/zcode-plugins`.
+
+Known 0.1.0 limitation (fixed in 0.1.1): the 0.1.0 remote marketplace URL
+served the relative-source `marketplace.json`, which cannot resolve as a
+standalone remote document — use the 0.1.1+ `marketplace.remote.json` URL
+above, or a local path / repository clone.
+
+The optional AGENTS.md block:
 `sh /path/to/iaa-repo/scripts/iaa integrate --runtime zcode --mode plugin`.
 Personal-skill form: the same `manage.sh install` (creates
 `~/.zcode/skills/iaa`).
