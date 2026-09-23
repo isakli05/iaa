@@ -1,0 +1,169 @@
+diff --git a/VERSION b/VERSION
+index 3738566..6e8bf73 100644
+--- a/VERSION
++++ b/VERSION
+@@ -1 +1 @@
+-0.1.0-rc.1
++0.1.0
+diff --git a/packaging/claude/.claude-plugin/plugin.json b/packaging/claude/.claude-plugin/plugin.json
+index 6132772..aa15a9c 100644
+--- a/packaging/claude/.claude-plugin/plugin.json
++++ b/packaging/claude/.claude-plugin/plugin.json
+@@ -1,7 +1,7 @@
+ {
+   "name": "iaa",
+   "displayName": "İAA — İştirak-i A‘mâl-i Ajanîye",
+-  "version": "0.1.0-rc.1",
++  "version": "0.1.0",
+   "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work. Sole orchestration authority in its mode.",
+   "author": {
+     "name": "isakli05",
+diff --git a/packaging/claude/PROVENANCE b/packaging/claude/PROVENANCE
+index 3642f26..701e184 100644
+--- a/packaging/claude/PROVENANCE
++++ b/packaging/claude/PROVENANCE
+@@ -1,4 +1,4 @@
+ İAA generated projection — DO NOT EDIT BY HAND
+ source-of-truth: iaa/ (repository root)
+-version: 0.1.0-rc.1
++version: 0.1.0
+ generated-by: scripts/build-packages.sh
+diff --git a/packaging/claude/README.md b/packaging/claude/README.md
+index 50ac464..1c787f4 100644
+--- a/packaging/claude/README.md
++++ b/packaging/claude/README.md
+@@ -1,6 +1,6 @@
+ # İAA — İştirak-i A‘mâl-i Ajanîye (Claude Code plugin)
+ 
+-Version: 0.1.0-rc.1 · Namespace: `iaa` · Explicit invocation: `/iaa:orchestrate`
++Version: 0.1.0 · Namespace: `iaa` · Explicit invocation: `/iaa:orchestrate`
+ 
+ A **delegation-decision policy** for Claude Code: one skill that decides *whether,
+ when, and how* to delegate work to subagents — adaptively, per task — with a
+diff --git a/packaging/claude/skills/iaa/PROVENANCE b/packaging/claude/skills/iaa/PROVENANCE
+index 3642f26..701e184 100644
+--- a/packaging/claude/skills/iaa/PROVENANCE
++++ b/packaging/claude/skills/iaa/PROVENANCE
+@@ -1,4 +1,4 @@
+ İAA generated projection — DO NOT EDIT BY HAND
+ source-of-truth: iaa/ (repository root)
+-version: 0.1.0-rc.1
++version: 0.1.0
+ generated-by: scripts/build-packages.sh
+diff --git a/packaging/codex/.agents/plugins/marketplace.json b/packaging/codex/.agents/plugins/marketplace.json
+index 6b92194..718c5df 100644
+--- a/packaging/codex/.agents/plugins/marketplace.json
++++ b/packaging/codex/.agents/plugins/marketplace.json
+@@ -10,7 +10,7 @@
+       "name": "iaa",
+       "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+       "source": "./plugin",
+-      "version": "0.1.0-rc.1",
++      "version": "0.1.0",
+       "category": "productivity",
+       "tags": [
+         "orchestration",
+diff --git a/packaging/codex/README.md b/packaging/codex/README.md
+index d910ad4..25c54b2 100644
+--- a/packaging/codex/README.md
++++ b/packaging/codex/README.md
+@@ -1,6 +1,6 @@
+ # İAA — İştirak-i A‘mâl-i Ajanîye (Codex package)
+ 
+-Version: 0.1.0-rc.1 · Namespace: `iaa`
++Version: 0.1.0 · Namespace: `iaa`
+ 
+ A **delegation-decision policy** for agent CLIs, packaged for OpenAI Codex CLI.
+ Full documentation: the [İAA repository](https://github.com/isakli05/iaa).
+diff --git a/packaging/codex/plugin/.codex-plugin/plugin.json b/packaging/codex/plugin/.codex-plugin/plugin.json
+index 0338f1f..e8e0e2a 100644
+--- a/packaging/codex/plugin/.codex-plugin/plugin.json
++++ b/packaging/codex/plugin/.codex-plugin/plugin.json
+@@ -1,7 +1,7 @@
+ {
+   "name": "iaa",
+   "description": "İAA delegation-decision policy: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work. Sole orchestration authority in its mode.",
+-  "version": "0.1.0-rc.1",
++  "version": "0.1.0",
+   "author": {
+     "name": "isakli05",
+     "url": "https://github.com/isakli05/iaa"
+diff --git a/packaging/codex/plugin/skills/iaa/PROVENANCE b/packaging/codex/plugin/skills/iaa/PROVENANCE
+index 3642f26..701e184 100644
+--- a/packaging/codex/plugin/skills/iaa/PROVENANCE
++++ b/packaging/codex/plugin/skills/iaa/PROVENANCE
+@@ -1,4 +1,4 @@
+ İAA generated projection — DO NOT EDIT BY HAND
+ source-of-truth: iaa/ (repository root)
+-version: 0.1.0-rc.1
++version: 0.1.0
+ generated-by: scripts/build-packages.sh
+diff --git a/packaging/zcode/README.md b/packaging/zcode/README.md
+index d3f0d44..f9cae5c 100644
+--- a/packaging/zcode/README.md
++++ b/packaging/zcode/README.md
+@@ -1,6 +1,6 @@
+ # İAA — İştirak-i A‘mâl-i Ajanîye (ZCode plugin)
+ 
+-Version: 0.1.0-rc.1 · Namespace: `iaa`
++Version: 0.1.0 · Namespace: `iaa`
+ 
+ A **delegation-decision policy** for agent CLIs, packaged as a ZCode plugin
+ (`.zcode-plugin/plugin.json`). Full documentation: the
+diff --git a/packaging/zcode/marketplace.json b/packaging/zcode/marketplace.json
+index fe1808e..a48110d 100644
+--- a/packaging/zcode/marketplace.json
++++ b/packaging/zcode/marketplace.json
+@@ -18,7 +18,7 @@
+         "zh-CN": "面向代理 CLI 的委派决策策略：决定是否、何时以及如何将工作委派给子代理——自适应、逐席位论证，并为小型工作提供零代理回退。"
+       },
+       "source": "./plugins/iaa",
+-      "version": "0.1.0-rc.1",
++      "version": "0.1.0",
+       "category": "productivity",
+       "tags": ["orchestration", "delegation", "subagents", "policy"]
+     }
+diff --git a/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json b/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json
+index b8d07c8..09bffb3 100644
+--- a/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json
++++ b/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "iaa",
+-  "version": "0.1.0-rc.1",
++  "version": "0.1.0",
+   "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+   "description_i18n": {
+     "en": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+diff --git a/packaging/zcode/plugins/iaa/README.md b/packaging/zcode/plugins/iaa/README.md
+index 0d6662e..c23426e 100644
+--- a/packaging/zcode/plugins/iaa/README.md
++++ b/packaging/zcode/plugins/iaa/README.md
+@@ -1,6 +1,6 @@
+ # İAA — İştirak-i A‘mâl-i Ajanîye (ZCode plugin)
+ 
+-Version: 0.1.0-rc.1
++Version: 0.1.0
+ 
+ A **delegation-decision policy** for agent CLIs: one skill that decides *whether,
+ when, and how* to delegate work to subagents — adaptively, per task — with a
+diff --git a/packaging/zcode/plugins/iaa/skills/iaa/PROVENANCE b/packaging/zcode/plugins/iaa/skills/iaa/PROVENANCE
+index 3642f26..701e184 100644
+--- a/packaging/zcode/plugins/iaa/skills/iaa/PROVENANCE
++++ b/packaging/zcode/plugins/iaa/skills/iaa/PROVENANCE
+@@ -1,4 +1,4 @@
+ İAA generated projection — DO NOT EDIT BY HAND
+ source-of-truth: iaa/ (repository root)
+-version: 0.1.0-rc.1
++version: 0.1.0
+ generated-by: scripts/build-packages.sh
+diff --git a/release-hardening/evals/iaa-dev-plugin/skills/iaa/PROVENANCE b/release-hardening/evals/iaa-dev-plugin/skills/iaa/PROVENANCE
+index 3642f26..701e184 100644
+--- a/release-hardening/evals/iaa-dev-plugin/skills/iaa/PROVENANCE
++++ b/release-hardening/evals/iaa-dev-plugin/skills/iaa/PROVENANCE
+@@ -1,4 +1,4 @@
+ İAA generated projection — DO NOT EDIT BY HAND
+ source-of-truth: iaa/ (repository root)
+-version: 0.1.0-rc.1
++version: 0.1.0
+ generated-by: scripts/build-packages.sh
