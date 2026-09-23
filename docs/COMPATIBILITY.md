@@ -30,7 +30,7 @@ reasoning" — never "installation succeeds".
 | İAA governing while Superpowers installed (delegation-flavored task; artifact-embedded directives) | **TESTED** | runs J/D ×2 eras (6.3.0, 6.4.1): SDD never loaded, directives treated as metadata; Gate-2 §17 re-run |
 | Explicit SDD request while İAA installed | **TESTED** | run K both eras: SDD governs full cadence, İAA never loads |
 | İAA Claude **plugin** package (skill + `/iaa:orchestrate`) | **PARTIALLY TESTED** | live install + explicit invocation + trigger/anti-overdelegation evals (2026-09-23); SDD-contest under plugin-mode specifically not re-run on the real machine (channel carries byte-identical skill+shim; see gate-2/05 §6) |
-| İAA Codex plugin form | **PARTIALLY TESTED** | full lifecycle validated locally (0.156.0); live session discovery from plugin cache not run; skills-dir form fully live-tested |
+| İAA Codex plugin form | **TESTED** | full lifecycle validated locally (0.156.0, Gate 2); live authenticated session discovers `iaa:iaa` from the plugin cache and explicit `$iaa` invocation loads the core (2026-09-23, Gate 3, gate-3/04); behavioral delegation evidence carried by the byte-identical core via the skills-dir form (campaigns + E9) |
 | İAA ZCode plugin form | **STRUCTURALLY COMPATIBLE** | official validator passes; GUI install is a documented manual checklist (gate-2/07 §6); skills-dir form is the historically used ZCode integration |
 | Former-MAO (LEGACY) installation → İAA migration | **TESTED** | identity migration 2026-09-23 on the real machine + unit tests T3/T13 |
 | Claude native subagents (Explore/Plan/general-purpose) | **TESTED** | all Claude runs use them (mechanism, not authority) |
@@ -63,3 +63,8 @@ Any version movement in the left column (Claude Code, Codex, ZCode, Superpowers,
 model) invalidates the affected TESTED rows until the boundary regression
 (`release-hardening/evals/iaa-dev-plugin/evals/companion/`) and doctor are
 re-run. That discipline is the price of honest version-pinned claims.
+
+Upstream-latest context (re-checked 2026-09-23, gate-3/07): Claude Code
+2.1.280, Codex CLI 0.156.1, ZCode 3.14.3, Superpowers 6.4.1 (current — the
+tested version). The table above describes the **tested** versions only; it
+is not a claim about latest upstream releases.

@@ -1,4 +1,4 @@
-# MANIFEST — İAA web knowledge pack (refreshed 2026-09-23, Gate 2 §20)
+# MANIFEST — İAA web knowledge pack (refreshed 2026-09-23, Gate 3 §13)
 
 ## Recommended upload set (ChatGPT Project / Claude Project knowledge)
 
@@ -28,8 +28,12 @@ questions).
 
 - **Authoritative (override everything else):** everything under `sources/` — byte-exact
   copies of the repository canonical files.
-  **Parity status (2026-09-23, Gate-2 refresh):** all six `sources/` files are
-  byte-identical to the current approved repository core (SKILL.md sha256
+  **Parity status (2026-09-23, Gate-3 refresh, re-verified by sha256):** all six
+  `sources/` files remain byte-identical to the current approved repository core — the
+  behavioral core is unchanged through Gate 3 (category D = NONE, semantic parity
+  proven); numbered docs 00/09 were updated for Gate-2/3 resolution state (packaging
+  shipped; trigger model settled; ZCode/Codex claim scoping per the repository's
+  COMPATIBILITY.md). (SKILL.md sha256
   `73f7b887…` = post-Gate-1 corrected core; `references-platform-adapters.md`
   `849b769c…` incl. the `fork_turns` and `executing-plans` factual corrections;
   `tests-scenarios.md` `5fa9617e…` with the widened scenario-J criterion;

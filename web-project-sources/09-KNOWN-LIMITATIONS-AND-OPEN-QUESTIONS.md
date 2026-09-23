@@ -37,10 +37,16 @@
 - Should the public build add mechanism-grade enforcement (SessionStart context-append
   hook, Codex allow_implicit_invocation tuning) — and can that be done without violating
   İAA's own non-invasiveness principle?
-- Plugin packaging for all three stores (all now have official plugin systems; ZCode even
+- ~~Plugin packaging for all three stores (all now have official plugin systems; ZCode even
   accepts Claude manifests): does the load-bearing CLAUDE.md/AGENTS.md shim survive
-  plugin-form distribution, or does distribution stay script-based?
+  plugin-form distribution, or does distribution stay script-based?~~ **RESOLVED (Gate 2,
+  2026-09-23):** packages built for all three runtimes from one byte-exact core;
+  plugin-form distribution ships + an explicit, reversible integration step installs the
+  instruction-channel block (plugins cannot write CLAUDE.md/AGENTS.md — structural).
 - How should İAA behave toward GSD's hook guards and Claude Agent Teams (both untested,
   both structurally different: mechanism-grade / multi-instance)?
-- Trigger model for public: keep hybrid (status quo), go explicit-only, or runtime-tuned?
+- ~~Trigger model for public: keep hybrid (status quo), go explicit-only, or runtime-tuned?~~
+  **RESOLVED (Gate 2, 2026-09-23):** status quo hybrid retained on measurement —
+  0/13 false positives, 0/5 false negatives on obvious positives, explicit entry 3/3,
+  yields 6/6 (68-session characterization).
 - Should authorized nested delegation ever be a first-class path, or stay discouraged?

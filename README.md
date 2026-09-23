@@ -6,7 +6,7 @@ skill that decides *whether, when, and how* to delegate work to subagents —
 adaptively, per task — for **Claude Code, OpenAI Codex CLI, and ZCode**.
 
 Version `0.1.0-rc.1` · policy revision v3 · [Compatibility matrix](docs/COMPATIBILITY.md)
-· [Installation](docs/INSTALLATION.md) · [`iaa doctor`](release-hardening/gate-2/08-iaa-doctor.md)
+· [Installation](docs/INSTALLATION.md) · [`iaa doctor`](#iaa-doctor)
 
 ## The problem it solves
 
@@ -136,8 +136,10 @@ deterministic build script; drift fails CI. Public package version
 Claude Code 2.1.274 · Codex CLI 0.156.0 · ZCode 3.11.2 (adapter anchored to
 3.7.7 behavior) · Superpowers 6.4.1 · model: GLM-5.3 (z.ai profile; recorded by
 the harness as `opus[1m]`). Boundary behaviors re-verified against Superpowers
-6.4.1 (2026-09-23). GSD/BMAD/Agent Teams: not tested together — honestly
-marked UNVERIFIED in the [matrix](docs/COMPATIBILITY.md).
+6.4.1 (2026-09-23). Claims are version-pinned: they describe these versions,
+not "latest"; upstream moved on after testing (see the
+[matrix](docs/COMPATIBILITY.md) for the re-verification discipline). GSD/BMAD/
+Agent Teams: not tested together — honestly marked UNVERIFIED in the matrix.
 
 ## Security and trust
 
@@ -171,8 +173,10 @@ the former name by design.
 ## Repository status
 
 **Private** (release candidate `0.1.0-rc.1`, not yet published anywhere).
-License: TBD before public release (owner decision recorded in the Gate-2
-report). Nothing in this repository phones home.
+License: TBD — an MIT + NOTICE decision package is prepared for owner
+approval (see `release-hardening/gate-3/01-license-review.md`); nothing is
+installed at the repository root until approved. Nothing in this repository
+phones home.
 
 ---
 

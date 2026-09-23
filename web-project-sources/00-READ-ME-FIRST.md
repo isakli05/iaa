@@ -1,7 +1,8 @@
 # 00 — READ ME FIRST (İAA knowledge pack)
 
-This pack describes **İAA — İştirak-i A‘mâl-i Ajanîye** exactly as it exists on the owner's
-machine on **2026-09-22** — a frozen, audited baseline. It exists so a fresh model with no
+This pack describes **İAA — İştirak-i A‘mâl-i Ajanîye** exactly as it exists in the
+maintained repository on **2026-09-23** (post-identity-migration, Gate 1/2/3
+release-hardened; private release candidate `0.1.0-rc.1`). It exists so a fresh model with no
 prior context can understand İAA accurately.
 
 **How to treat this pack:**
@@ -22,7 +23,8 @@ prior context can understand İAA accurately.
 - **Native workflow mode** — a user-explicitly-named alternative workflow (e.g. Superpowers
   SDD) that then governs itself; İAA stands down.
 - **SDD** — `superpowers:subagent-driven-development`, a fixed-cadence orchestration skill
-  from the installed Superpowers plugin (6.3.0 locally; 6.4.1 upstream).
+  from the installed Superpowers plugin (6.4.1 locally and upstream — boundary
+  re-verified against it 2026-09-23).
 - **Shim** — a marker-delimited managed block İAA's installer writes into each runtime's
   global instruction file (CLAUDE.md / AGENTS.md).
 - **The three evidence trees** — read-only local directories holding the 2026-08-27 test
