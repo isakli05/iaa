@@ -1,0 +1,13 @@
+20e62a57d67080f5c672baaf2648c6b0d5e820744b576d8cd3914ef6d7778121  ./marketplace.json
+90f99a00d5c3b3de9b9366b6faa52ff552234fc09433eccca95192a465d4d3ed  ./plugins/iaa/LICENSE
+92b1893334d2623b6444b70114202612a81b9a3a1ddc81102514c1efb8f10cc1  ./plugins/iaa/NOTICE
+e4780bda608363c3b96095f0ce4740ace4555713c0879f72cbe5a12f06063659  ./plugins/iaa/README.md
+a3c08f37815dc8948761f387a99945d2f5fc8de7d68134fc1a8181da046435d4  ./plugins/iaa/skills/iaa/PROVENANCE
+23184f0d3d861fc77dfab113c5a594f890492c2e9e7f6059d7cdb1fc3e258632  ./plugins/iaa/skills/iaa/references/delegation-contract.md
+849b769cf4846fede9bf624b4c36a86ee921c586c3030c0589c06c61abec82d2  ./plugins/iaa/skills/iaa/references/platform-adapters.md
+21964702e3c581c721657dd6b2581aec57cbe3c853da5c86be112531dd0ccf8e  ./plugins/iaa/skills/iaa/scripts/manage.sh
+73f7b8870a578cba5bf702c38353112c66e6c410504d89d23fb96b14930b9eba  ./plugins/iaa/skills/iaa/SKILL.md
+5fa9617ed9eabef69ffc348d03f210fab9a2099def08c7d2ca5d9de724c705cf  ./plugins/iaa/skills/iaa/tests/scenarios.md
+1c90a26624957372ba1e4f85d88f732ee6abcc3e38d9ca5fb3f6e931b58cec99  ./plugins/iaa/skills/orchestrate/SKILL.md
+c3e35ea50c4aec3f8c18b82f522783fc1bc4a95d430eb8b418fdca017ae358fd  ./plugins/iaa/.zcode-plugin/plugin.json
+78100290555455d6919c190fd5b3b5a367540c623a50b04038c191f0dc9f0b59  ./README.md
