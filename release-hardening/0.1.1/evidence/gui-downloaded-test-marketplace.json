@@ -1,0 +1,37 @@
+{
+  "name": "iaa",
+  "description": "İAA — İştirak-i A‘mâl-i Ajanîye: a delegation-decision policy for agent CLIs",
+  "description_i18n": {
+    "en": "İAA — İştirak-i A‘mâl-i Ajanîye: a delegation-decision policy for agent CLIs",
+    "zh-CN": "İAA——面向代理 CLI 的委派决策策略"
+  },
+  "owner": {
+    "name": "isakli05",
+    "url": "https://github.com/isakli05"
+  },
+  "plugins": [
+    {
+      "name": "iaa",
+      "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+      "description_i18n": {
+        "en": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
+        "zh-CN": "面向代理 CLI 的委派决策策略：决定是否、何时以及如何将工作委派给子代理——自适应、逐席位论证，并为小型工作提供零代理回退。"
+      },
+      "source": {
+        "source": "url",
+        "type": "zip",
+        "url": "http://127.0.0.1:8397/iaa-0.1.1-plugin.zip",
+        "sha256": "621bdd1ffd24f40c736019e8b4d0961bc3dbda26b553ae72a425ea625e061e2c",
+        "path": "iaa"
+      },
+      "version": "0.1.1",
+      "category": "productivity",
+      "tags": [
+        "orchestration",
+        "delegation",
+        "subagents",
+        "policy"
+      ]
+    }
+  ]
+}
