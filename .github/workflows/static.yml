@@ -1,0 +1,60 @@
+name: static
+
+# Layer A — no-model CI for every pull request.
+on:
+  pull_request:
+  push:
+    branches: [main, "release-hardening/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shell syntax (all POSIX scripts)
+        run: |
+          find scripts iaa/scripts tests -name '*.sh' -o -name 'iaa' -type f | while read -r f; do
+            sh -n "$f"
+          done
+          sh -n scripts/iaa
+          sh -n iaa/scripts/manage.sh
+
+      - name: One-core parity, manifests, version + identity consistency
+        run: scripts/check-parity.sh
+
+      - name: Static validation (frontmatter, doc links, ASCII paths, secret scan, identity scopes)
+        run: python3 scripts/validate-static.py
+
+      - name: Deterministic package generation
+        run: |
+          scripts/build-packages.sh
+          git diff --exit-code -- packaging .claude-plugin/marketplace.json
+
+      - name: iaa doctor + legacy migration unit tests
+        run: tests/doctor/run-tests.sh
+
+      - name: Claude plugin validation (when the CLI is available)
+        run: |
+          if command -v claude >/dev/null 2>&1; then
+            claude plugin validate packaging/claude --strict
+          else
+            echo "claude CLI not available on this runner; structural parity already enforced above."
+          fi
+
+      - name: ZCode official validator (when network fetch is allowed)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if command -v gh >/dev/null 2>&1 && gh api repos/zai-org/zcode-plugins/contents/scripts/validate.py --jq .content 2>/dev/null | base64 -d > /tmp/zvalidate.py; then
+            rm -rf /tmp/zcheck && mkdir -p /tmp/zcheck/scripts /tmp/zcheck/plugins
+            cp -a packaging/zcode/plugins/iaa /tmp/zcheck/plugins/
+            cp packaging/zcode/marketplace.json /tmp/zcheck/
+            cp /tmp/zvalidate.py /tmp/zcheck/scripts/validate.py
+            python3 /tmp/zcheck/scripts/validate.py
+          else
+            echo "official validator fetch unavailable; layout checks covered by parity step."
+          fi

@@ -1,0 +1,50 @@
+name: model-evals
+
+# Layer B — real-model plugin evals. NEVER on push: cost-controlled cadence
+# (manual dispatch, release gates, or the weekly schedule).
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "case name glob (default: all)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "23 4 * * 1" # weekly, Mondays ~04:23 UTC (off the :00 mark)
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require eval credentials
+        env:
+          EVAL_CREDENTIALS: ${{ secrets.CLAUDE_EVAL_CREDENTIALS }}
+        run: |
+          if [ -z "$EVAL_CREDENTIALS" ]; then
+            echo "CLAUDE_EVAL_CREDENTIALS secret not set — model evals cannot run." >&2
+            exit 1
+          fi
+          mkdir -p "$HOME/.claude"
+          printf '%s' "$EVAL_CREDENTIALS" > "$HOME/.claude/.credentials.json"
+
+      - name: Run the gate2 trigger suite against packaging/claude
+        timeout-minutes: 120
+        env:
+          CASES: ${{ github.event.inputs.cases }}
+        run: |
+          ARGS=""
+          if [ -n "$CASES" ] && [ "$CASES" != "*" ]; then
+            ARGS="--case $CASES"
+          fi
+          release-hardening/evals/gate2/run-gate2-trigger-suite.sh "$RUNNER_TEMP/eval-results" $ARGS
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: ${{ runner.temp }}/eval-results/

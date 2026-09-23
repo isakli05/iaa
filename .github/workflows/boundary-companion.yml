@@ -1,0 +1,45 @@
+name: boundary-companion
+
+# Layer C — REAL-MACHINE coexistence regression (İAA + live Superpowers).
+# Cannot run on GitHub-hosted runners: it needs the actual machine
+# configuration (shim + personal skill + Superpowers installed) and a
+# provider-authenticated `claude`/cc-zai binary; it also spends real money
+# (~$3–12 per case). Runs only on a self-hosted runner labeled
+# `iaa-boundary`, by explicit dispatch. Everything else uses layers A/B.
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "cases to run (j, k, d — space separated; default all three)"
+        required: false
+        default: "j k d"
+
+permissions:
+  contents: read
+
+jobs:
+  companion:
+    runs-on: [self-hosted, iaa-boundary]
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-flight (Superpowers installed and enabled; İAA verified)
+        run: |
+          jq -r '.plugins | keys[]' "$HOME/.claude/plugins/installed_plugins.json" | grep -x 'superpowers@claude-plugins-official' \
+            || { echo "Superpowers not installed on this runner" >&2; exit 1; }
+          sh "$HOME/.local/share/iaa/iaa/scripts/manage.sh" verify
+          scripts/iaa doctor
+
+      - name: Boundary companion (transcript-asserted)
+        env:
+          CASES: ${{ github.event.inputs.cases }}
+        run: |
+          release-hardening/evals/iaa-dev-plugin/evals/companion/run-boundary-companion.sh \
+            "$RUNNER_TEMP/boundary-evidence" $CASES
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: boundary-evidence
+          path: ${{ runner.temp }}/boundary-evidence/

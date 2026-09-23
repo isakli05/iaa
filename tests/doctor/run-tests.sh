@@ -170,5 +170,26 @@ IAA_HOME="$H12" "$IAA" doctor > "$WORK/t12.out" 2>&1 && bad "doctor should exit 
 grep -q 'hash-drift:live-tree' "$WORK/t12.out" || bad "drift not reported"
 ok "hash drift detected"
 
+# ---------------------------------------------------------------- T13 legacy migration executes
+say 'T13: manage.sh install migrates LEGACY state transactionally'
+H13=$(fresh_home 13)
+mkdir -p "$H13/.local/share/iaa" "$H13/.config/ai-agent-orchestration" \
+         "$H13/.claude/skills" "$H13/.zcode/skills" "$H13/.codex"
+cp -a "$REPO_ROOT/iaa" "$H13/.local/share/iaa/iaa"
+printf 'preserve-user-text\n' > "$H13/.claude/CLAUDE.md"
+printf '<!-- BEGIN managed: multi-agent-orchestration -->\nlegacy block\n<!-- END managed: multi-agent-orchestration -->\n' >> "$H13/.claude/CLAUDE.md"
+printf 'managed-absent\n' > "$H13/.config/ai-agent-orchestration/claude-depth.state"
+ln -s "$H13/.local/share/iaa/iaa" "$H13/.claude/skills/multi-agent-orchestration"
+ORCHESTRATION_HOME="$H13" sh "$H13/.local/share/iaa/iaa/scripts/manage.sh" install > "$WORK/t13.out" 2>&1 || bad "legacy-migrating install failed"
+grep -q 'preserve-user-text' "$H13/.claude/CLAUDE.md" || bad "user prose lost"
+[ "$(grep -c 'managed: iaa' "$H13/.claude/CLAUDE.md")" = "2" ] || bad "current marker pair missing"
+grep -q 'managed: multi-agent-orchestration' "$H13/.claude/CLAUDE.md" && bad "legacy marker still present"
+[ -e "$H13/.claude/skills/multi-agent-orchestration" ] && bad "legacy link not unlinked"
+[ -e "$H13/.claude/skills/iaa" ] || [ -L "$H13/.claude/skills/iaa" ] || bad "current link missing"
+[ "$(cat "$H13/.config/iaa/claude-depth.state" 2>/dev/null)" = "managed-absent" ] || bad "legacy state not adopted"
+ls "$H13/.claude/CLAUDE.md".iaa-backup-* >/dev/null 2>&1 || bad "no backup created before marker change"
+IAA_HOME="$H13" "$IAA" doctor > "$WORK/t13b.out" 2>&1 || bad "doctor should be clean after migration"
+ok "legacy migration: markers replaced, links swapped, state adopted, backup kept"
+
 printf '\nALL %s DOCTOR TESTS PASSED\n' "$PASS"
 rm -rf -- "$WORK"

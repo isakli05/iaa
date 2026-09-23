@@ -21,11 +21,11 @@ nothing else. Invoke with `$iaa` or implicitly; check state with `iaa doctor`.
 
 ## Optional: plugin form (local marketplace)
 
-A Codex plugin (`plugin/` + `marketplace/` in this package) is assembled for
-evaluation; it bundles the same byte-identical skill:
+A Codex plugin (`plugin/` + a local marketplace catalog in `.agents/plugins/`) is
+assembled for evaluation; it bundles the same byte-identical skill:
 
 ```sh
-codex plugin marketplace add <path-to>/packaging/codex/marketplace
+codex plugin marketplace add <path-to>/packaging/codex
 codex plugin add iaa@iaa
 codex plugin list          # verify
 codex plugin remove iaa    # uninstall

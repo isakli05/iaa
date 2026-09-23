@@ -33,12 +33,12 @@ check_projection() { # $1 skill dir, $2 label
 
 check_projection "$REPO_ROOT/packaging/claude/skills/iaa" "packaging/claude"
 check_projection "$REPO_ROOT/packaging/codex/plugin/skills/iaa" "packaging/codex"
-check_projection "$REPO_ROOT/packaging/zcode/plugin/skills/iaa" "packaging/zcode"
+check_projection "$REPO_ROOT/packaging/zcode/plugins/iaa/skills/iaa" "packaging/zcode"
 check_projection "$REPO_ROOT/release-hardening/evals/iaa-dev-plugin/skills/iaa" "dev-plugin"
 
 # 2. shared orchestrate entry identical across runtimes --------------------------
 cmp -s "$REPO_ROOT/packaging/claude/skills/orchestrate/SKILL.md" \
-       "$REPO_ROOT/packaging/zcode/plugin/skills/orchestrate/SKILL.md" \
+       "$REPO_ROOT/packaging/zcode/plugins/iaa/skills/orchestrate/SKILL.md" \
   || fail "orchestrate entry skill differs between claude and zcode packages"
 
 # 3. manifests: name == iaa, version == VERSION ----------------------------------
@@ -53,12 +53,12 @@ check_manifest() { # $1 json path
 }
 check_manifest "$REPO_ROOT/packaging/claude/.claude-plugin/plugin.json"
 check_manifest "$REPO_ROOT/packaging/codex/plugin/.codex-plugin/plugin.json"
-check_manifest "$REPO_ROOT/packaging/zcode/plugin/.zcode-plugin/plugin.json"
-check_manifest "$REPO_ROOT/packaging/codex/marketplace/.agents/plugins/marketplace.json"
-check_manifest "$REPO_ROOT/packaging/zcode/marketplace/marketplace.json"
-iaa_mn_cv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/codex/marketplace/.agents/plugins/marketplace.json")
+check_manifest "$REPO_ROOT/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json"
+check_manifest "$REPO_ROOT/packaging/codex/.agents/plugins/marketplace.json"
+check_manifest "$REPO_ROOT/packaging/zcode/marketplace.json"
+iaa_mn_cv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/codex/.agents/plugins/marketplace.json")
 [ "$iaa_mn_cv" = "$VERSION" ] || fail "codex marketplace entry version != VERSION"
-iaa_mn_zv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/marketplace/marketplace.json")
+iaa_mn_zv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/marketplace.json")
 [ "$iaa_mn_zv" = "$VERSION" ] || fail "zcode marketplace entry version != VERSION"
 note "OK manifests: name=iaa, version=$VERSION everywhere"
 

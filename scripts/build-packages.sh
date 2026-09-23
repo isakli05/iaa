@@ -55,23 +55,28 @@ if [ "${1:-build}" != "--version-only" ]; then
   stamp "$TEMPLATES/PROVENANCE" "$CLAUDE_PKG/PROVENANCE"
 
   # ---- Codex package -------------------------------------------------------
+  # Marketplace root IS the package root (mirrors the official codex-warp /
+  # openai-plugins layout): .agents/plugins/marketplace.json + ./plugin source.
   CODEX_PKG="$REPO_ROOT/packaging/codex"
   rm -rf -- "$CODEX_PKG"
-  mkdir -p -- "$CODEX_PKG/plugin/.codex-plugin" "$CODEX_PKG/marketplace/.agents/plugins"
+  mkdir -p -- "$CODEX_PKG/plugin/.codex-plugin" "$CODEX_PKG/.agents/plugins"
   stamp "$TEMPLATES/codex-plugin.json" "$CODEX_PKG/plugin/.codex-plugin/plugin.json"
   copy_core "$CODEX_PKG/plugin/skills/iaa"
-  stamp "$TEMPLATES/codex-marketplace.json" "$CODEX_PKG/marketplace/.agents/plugins/marketplace.json"
+  stamp "$TEMPLATES/codex-marketplace.json" "$CODEX_PKG/.agents/plugins/marketplace.json"
   stamp "$TEMPLATES/codex-README.md" "$CODEX_PKG/README.md"
 
   # ---- ZCode package -------------------------------------------------------
+  # Official layout (zai-org/zcode-plugins): marketplace.json at the package
+  # root + plugins/<name>/ with .zcode-plugin/plugin.json; source ./plugins/iaa.
   ZCODE_PKG="$REPO_ROOT/packaging/zcode"
   rm -rf -- "$ZCODE_PKG"
-  mkdir -p -- "$ZCODE_PKG/plugin/.zcode-plugin" "$ZCODE_PKG/marketplace"
-  stamp "$TEMPLATES/zcode-plugin.json" "$ZCODE_PKG/plugin/.zcode-plugin/plugin.json"
-  copy_core "$ZCODE_PKG/plugin/skills/iaa"
-  mkdir -p -- "$ZCODE_PKG/plugin/skills/orchestrate"
-  cp -- "$TEMPLATES/orchestrate-SKILL.md" "$ZCODE_PKG/plugin/skills/orchestrate/SKILL.md"
-  stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace/marketplace.json"
+  mkdir -p -- "$ZCODE_PKG/plugins/iaa/.zcode-plugin"
+  stamp "$TEMPLATES/zcode-plugin.json" "$ZCODE_PKG/plugins/iaa/.zcode-plugin/plugin.json"
+  copy_core "$ZCODE_PKG/plugins/iaa/skills/iaa"
+  mkdir -p -- "$ZCODE_PKG/plugins/iaa/skills/orchestrate"
+  cp -- "$TEMPLATES/orchestrate-SKILL.md" "$ZCODE_PKG/plugins/iaa/skills/orchestrate/SKILL.md"
+  stamp "$TEMPLATES/zcode-plugin-README.md" "$ZCODE_PKG/plugins/iaa/README.md"
+  stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace.json"
   stamp "$TEMPLATES/zcode-README.md" "$ZCODE_PKG/README.md"
 
   # ---- Gate-1 dev plugin skill copy (joins the parity umbrella) ------------
