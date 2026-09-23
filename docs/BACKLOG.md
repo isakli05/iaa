@@ -105,6 +105,16 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   release step); release-time verification of the actual artifact sha is
   kept; only documentation claims implying cross-zlib byte-for-byte
   reproducibility are qualified; dated evidence is not rewritten.
+- **Implementation (2026-09-24, branch `fix/bl-016-archive-content-parity`):**
+  release-pin record `packaging/release-pins/0.1.1.json` (authored from the
+  downloaded published asset, content cross-checked against a fresh build) +
+  `scripts/release-pin.py` (content comparator + release-only record writer) +
+  pin-from-record stamping in `scripts/build-packages.sh` + content-parity
+  §3b in `scripts/check-parity.sh` + offline unit tests
+  (`tests/release-pin/run-tests.sh`, one new `static` step) — commit
+  `58fb76c`; current-facing determinism wording qualified in the follow-up
+  docs commit. Stays `OPEN` until the GitHub-runner result (PR run, then a
+  `main` push) is observed.
 - **Why it matters:** CI is red on every push to `main` (noise hides real
   failures); the cross-environment reproducibility implied by
   "deterministic build" evidence holds only per zlib implementation (the

@@ -12,10 +12,16 @@ official zai-org/zcode-plugins scripts/build_dist.py zip discipline exactly:
   - fixed entry timestamp (2026-01-01 00:00:00, same constant as upstream)
   - uniform 0644 external attributes, deflate compression
 
-Two builds from the same tree are byte-identical; the sha256 therefore only
-changes when plugin content changes. Byte parity with the official builder is
-enforced by the release checks (staged-contribution run of upstream
-build_dist.py must produce the identical archive).
+Two builds from the same tree are byte-identical within one zlib
+implementation; the sha256 therefore only changes when plugin content
+changes — except across zlib implementations, where DEFLATE output itself
+differs (IAA-BL-016: stock zlib vs zlib-ng compress identical content to
+different bytes). The cross-environment invariant is archive CONTENT, which
+CI compares against the published-artifact release-pin record
+(scripts/release-pin.py). Byte parity with the official builder is enforced
+by the release checks (staged-contribution run of upstream build_dist.py
+must produce the identical archive; that evidence and the release raw-sha
+check are same-environment).
 
 Usage: scripts/build-plugin-zip.py [plugin_dir] [out.zip]
 Prints the sha256 of the written archive on stdout (progress on stderr), so

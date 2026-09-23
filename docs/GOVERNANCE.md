@@ -135,7 +135,11 @@ Discipline:
 - Two version axes stay separate: package `VERSION` (SemVer, which artifact)
   and policy revision (which semantics) — [POLICY-LINEAGE.md](POLICY-LINEAGE.md).
 - One byte-exact core projects into every package; parity is CI-enforced
-  (`scripts/check-parity.sh`), and release artifacts are deterministic builds.
+  (`scripts/check-parity.sh`). Release artifacts are deterministic builds
+  within one zlib implementation — compressed archive bytes are
+  zlib-implementation-dependent (IAA-BL-016), so CI verifies archive-content
+  parity against the published-artifact record and the release-time check
+  verifies the raw sha.
 - Irreversible/publication actions (tag, release, upstream PR, public post)
   require explicit owner authorization; merges to `main` are fast-forward-only
   by convention, preserving candidate history.

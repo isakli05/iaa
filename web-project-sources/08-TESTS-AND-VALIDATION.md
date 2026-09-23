@@ -48,9 +48,12 @@ the validation stack and the release discipline the repository holds itself to.
   unchanged by hash (six core files, sha256-pinned; `git diff` between tags
   over `iaa/` + `scripts/iaa` empty for 0.1.0→0.1.1). Any D ≠ NONE requires
   the policy-revision bump + invariant justification first.
-- **Deterministic packaging.** Release artifacts are reproducible builds
-  (two-run byte-identical proofs; the ZCode `plugin.zip` is byte-identical to
-  the upstream official builder's output).
+- **Deterministic packaging.** Release artifacts are content-deterministic
+  builds; two-run byte-identical proofs and the ZCode `plugin.zip`'s byte
+  parity with the upstream official builder's output hold within one zlib
+  implementation (both evidence runs were same-environment). Compressed
+  archive bytes are zlib-implementation-dependent; CI verifies
+  archive-content parity against the published-artifact record (IAA-BL-016).
 - **Publication safety.** Irreversible actions (tag, release, upstream PR,
   public posts) require explicit owner authorization; release assets are
   re-downloaded and sha-verified after upload; immutable tags are never

@@ -23,9 +23,13 @@ daemon. Plugin-level documentation: `plugins/iaa/README.md` (+ `README_CN.md`).
 - **`marketplace.remote.json` — public remote form.** The single entry uses the
   official verified-archive source `{"source":"url","type":"zip","url":…,
   "sha256":…,"path":"iaa"}` pointing at the versioned, immutable
-  `iaa-__VERSION__-plugin.zip` GitHub release asset. Its `sha256` is generated
-  by the deterministic zip builder (`scripts/build-plugin-zip.py`) and enforced
-  by `scripts/check-parity.sh`. This is the document to add in
+  `iaa-__VERSION__-plugin.zip` GitHub release asset. Its `sha256` is the sha
+  of the published release asset, recorded in the release-pin record
+  (`packaging/release-pins/`) and written only by an explicit release step;
+  CI (`scripts/check-parity.sh`) enforces that the pin matches the record and
+  that a fresh build's archive content matches the published artifact
+  (compressed bytes are zlib-implementation-dependent — IAA-BL-016). This is
+  the document to add in
   ZCode → Discover when installing remotely.
 
 ## Install (remote marketplace — GUI)
@@ -80,8 +84,10 @@ Use ONE form: either the plugin or the skills-dir install
 
 - [ ] `marketplace.json` and `marketplace.remote.json` entries match the plugin
       manifest (name/version/description)
-- [ ] `marketplace.remote.json` `sha256` == sha256 of the built/released
-      `iaa-__VERSION__-plugin.zip` (enforced by `scripts/check-parity.sh`)
+- [ ] `marketplace.remote.json` `sha256` == the release-pin record's sha256
+      (the published asset), and a fresh build is content-identical to the
+      record (enforced by `scripts/check-parity.sh`; the raw-sha check runs
+      at release time via `scripts/build-release.sh`)
 - [ ] Install via the remote marketplace (url/zip source) succeeds in the GUI
 - [ ] Install via a local-path marketplace succeeds in the GUI
 - [ ] New session: exactly one İAA skill; `/orchestrate` exposed as a Command
