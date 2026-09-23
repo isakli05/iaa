@@ -5,7 +5,7 @@ This file is the repository-owned, long-term work queue for İAA. It holds
 not tied to any release. GitHub Issues/PRs are execution artifacts and never
 replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 
-- **Last reviewed:** 2026-09-24 · against `main` @ `479cea7` (package 0.1.1, policy v3)
+- **Last reviewed:** 2026-09-24 · against `main` @ `af5c7f4` (package 0.1.1, policy v3)
 - **Current state of the product** lives in [README.md](../README.md) and
   [COMPATIBILITY.md](COMPATIBILITY.md), not here. This file is intent, not state.
 
@@ -64,7 +64,9 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Links:** https://github.com/zai-org/zcode-plugins/pull/42
 
 ### IAA-BL-016 — Static CI red on main: plugin.zip sha not reproducible on GitHub runners
-- **Status:** `OPEN` · **Category:** maintenance / CI (category-A infrastructure; no semantic impact)
+- **Status:** `OPEN` — direction decided (owner, 2026-09-24): **A** now; **B** split
+  out as IAA-BL-017 (future releases only); **C** (pinned build container) not
+  implemented · **Category:** maintenance / CI (category-A infrastructure; no semantic impact)
 - **Problem / motivation:** the `static` workflow fails on every `main` push since
   the 0.1.1 merge (runs 35915378608, 35917592138):
   `check-parity: FAIL: marketplace.remote.json sha256 (621bdd1f…) != freshly
@@ -76,6 +78,33 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   bytes. Fresh-checkout reproduction on the owner machine **passes**
   (worktree of the same commit), proving content parity — only the compressed
   bytes differ per environment.
+- **Independent corroboration (2026-09-24):** at `main` @ `af5c7f4`, a stock-zlib
+  1.3 environment reproduces the runner result exactly (fresh build
+  `856df553…` vs pin `621bdd1f…`); the published v0.1.1 asset re-downloads to
+  `621bdd1f…` (pin intact); unzipped comparison of the published vs a fresh
+  stock-zlib build: 12/12 entries identical in names, uncompressed bytes,
+  CRC32, timestamps, external attributes and compression method — only
+  compressed bytes differ.
+- **Additional findings (2026-09-24):**
+  1. Parity is step 2 of `static`, so every later step (static validation,
+     deterministic package generation, doctor tests, ZCode validator) has been
+     skipped on `main` since the 0.1.1 merge; locally validate-static OK and
+     13/13 doctor tests PASS; `static` also runs on `pull_request`, so every
+     PR is red.
+  2. Hazard: the failure message recommends `scripts/build-packages.sh`, which
+     in a stock-zlib environment rewrites the pin to `856df553…` (reproduced
+     in a scratch copy); committing that would make `main`'s
+     `marketplace.remote.json` — the documented ZCode remote-install URL
+     ([INSTALLATION.md](INSTALLATION.md)) — disagree with the published asset,
+     and ZCode's client-side sha gate would reject every remote install from
+     `main`.
+- **Decision (owner, 2026-09-24) — scope A:** preserve the published v0.1.1
+  artifact and its sha256 pin unchanged; CI verifies archive-content parity
+  instead of cross-zlib byte identity; ordinary package regeneration can no
+  longer rewrite the published pin (the pin is written only by an explicit
+  release step); release-time verification of the actual artifact sha is
+  kept; only documentation claims implying cross-zlib byte-for-byte
+  reproducibility are qualified; dated evidence is not rewritten.
 - **Why it matters:** CI is red on every push to `main` (noise hides real
   failures); the cross-environment reproducibility implied by
   "deterministic build" evidence holds only per zlib implementation (the
@@ -84,16 +113,16 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Impact boundary:** none on published 0.1.1 artifacts — the pin equals the
   published release asset and ZCode's client-side sha gate verified it in GUI
   acceptance; this is purely a CI-side reproduction check.
-- **Dependencies / blockers:** none; fix direction is an owner decision
-  (candidates: build release artifacts in a stock-zlib/CI environment; make
-  the CI regeneration check compare archive *content* rather than raw sha
-  while keeping the raw-sha pin for distribution; or a pinned build container).
-- **Acceptance criteria:** `static` green on a `main` push again; the chosen
-  direction recorded here; determinism wording in evidence docs qualified if
-  needed.
+- **Dependencies / blockers:** none.
+- **Acceptance criteria:** `static` green on GitHub runners for this change
+  (PR run, then a `main` push); a regeneration in any zlib environment
+  leaves packaging/ and the pin byte-unchanged; a real content change fails
+  CI with a message that does not recommend regenerating the pin; release-
+  time raw-sha verification intact; current-facing determinism wording
+  qualified; `git diff` over iaa/ and scripts/iaa empty (D = NONE).
 - **Links:** run 35917592138 (failure log); `scripts/build-plugin-zip.py`
   (fixed-timestamp builder — content-deterministic, zlib-sensitive);
-  `scripts/check-parity.sh` (remote marketplace pin check).
+  `scripts/check-parity.sh` (remote marketplace pin check); IAA-BL-017.
 
 ## NEXT
 
@@ -285,6 +314,25 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   KNOWN-LIMITATIONS #5; retired open-question list in the web pack (09).
 - **Reopen condition:** a concrete owner use case; pairs with the scenario-F
   positive run (IAA-BL-003). Current tested stance: discouraged, explicit-only.
+
+### IAA-BL-017 — CI as the canonical release-build environment (from a future release)
+- **Status:** `DEFERRED` (owner-accepted requirement, 2026-09-24; reopen trigger:
+  preparation of the first package release after 0.1.1) · **Category:** release process
+- **Problem / motivation:** release artifacts built on the owner machine
+  (zlib-ng) are byte-reproducible only in that environment (IAA-BL-016); the
+  released bytes depend on who builds them.
+- **Evidence:** IAA-BL-016 root cause and 2026-09-24 corroboration.
+- **Why it matters:** producing release artifacts in one controlled environment
+  (CI) lets anyone re-derive the pinned sha, restoring a cross-environment
+  byte-level claim for future artifacts.
+- **Constraints (owner, binding):** v0.1.1 is never modified, replaced, or
+  republished for this; a pinned build container (option C) is out of scope;
+  the IAA-BL-016 content-parity check and release-time sha verification remain.
+- **Dependencies / blockers:** IAA-BL-016 closed.
+- **Acceptance criteria:** before the next release is cut, CI-as-release-builder
+  is evaluated and the chosen procedure recorded here; if adopted, that
+  release's artifacts are built by CI, the pin equals the CI-built archive, and
+  the uploaded asset re-downloads to the same sha.
 
 ## SETTLED — recorded decisions (do not re-propose without new evidence)
 
