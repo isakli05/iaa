@@ -1,57 +1,79 @@
-# MANIFEST — İAA web knowledge pack (refreshed 2026-09-23, Gate 3 §13)
+# MANIFEST — İAA Claude Project knowledge upload
 
-License note: the İAA repository is MIT-licensed (owner-approved 2026-09-23;
-see the repository `LICENSE` + `NOTICE`). This pack carries excerpts of that
-repository for personal knowledge-base use.
+**Pack refreshed:** 2026-09-24 · against `main` @ `479cea7` (İAA 0.1.1,
+policy v3). Live `main` supersedes this pack wherever they differ.
 
-## Recommended upload set (ChatGPT Project / Claude Project knowledge)
+Model: **uploaded context = orientation; GitHub = current operational truth.**
+Because the repository (`isakli05/iaa`) is connected to the project, nothing
+large or fetchable-on-demand belongs in the upload set — no source snapshots,
+no reports, no compatibility tables.
 
-Upload in this order:
+A ready-to-upload copy of every file below, in order, is exported at
+`.claude-web-project-upload/` (not committed) with `UPLOAD-MANIFEST.txt`.
 
-1. `00-READ-ME-FIRST.md` — orientation + terminology (read first)
-2. `01-IAA-PROJECT-BRIEF.md`
-3. `sources/SKILL.md` ← **AUTHORITATIVE** (the actual policy)
-4. `sources/references-delegation-contract.md` ← authoritative
-5. `sources/references-platform-adapters.md` ← authoritative
-6. `02-CURRENT-ARCHITECTURE.md` — explanatory
-7. `03-BEHAVIORAL-CONTRACT.md` — explanatory (verification-labeled)
-8. `05-IAA-SDD-BOUNDARY.md` — explanatory
-9. `06-INTEGRATIONS-CLAUDE-CODE-CODEX-ZCODE.md` — explanatory
-10. `07-HISTORY-AND-EVIDENCE.md` — historical
-11. `08-TESTS-AND-VALIDATION.md` — explanatory + execution record
-12. `09-KNOWN-LIMITATIONS-AND-OPEN-QUESTIONS.md` — explanatory
-13. `04-SOURCE-OF-TRUTH-AND-FILE-MAP.md` — reference
-14. `10-COMPARISON-RESEARCH-BRIEF.md` — task definition (only when doing the comparison)
+## REQUIRED (upload first, in this order)
 
-Optional (deeper context, larger): `sources/CANONICAL-README.md` (authoritative install-era
-doc, 16 KB), `sources/tests-scenarios.md` (authoritative scenario contract),
-`sources/scripts-manage.sh` (authoritative installer — needed only for install-mechanics
-questions).
+1. **`CLAUDE-PROJECT-INSTRUCTIONS.md`** — how the assistant must behave in
+   this project (authority, evidence, authorization rules). *Stable.*
+2. **`00-READ-ME-FIRST.md`** — operating guide: authority hierarchy,
+   current-vs-historical rules, reading order. *Stable.*
+3. **`01-IAA-PROJECT-BRIEF.md`** — charter: identity, purpose, non-goals,
+   long-term direction; the anti-feature-creep anchor. *Stable.*
+4. **`11-CURRENT-STATE.md`** — the ONLY volatile file: version, tested
+   matrix, open external work, backlog snapshot; tells every other file's
+   staleness apart from real drift. *Volatile — refresh per IAA-BL-012.*
+5. **`12-GOVERNANCE-AND-BACKLOG.md`** — decision lifecycle, evaluation
+   question, backlog semantics, the what-next / new-idea workflows. *Stable.*
 
-## Authority classes
+## RECOMMENDED (upload next)
 
-- **Authoritative (override everything else):** everything under `sources/` — byte-exact
-  copies of the repository canonical files.
-  **Parity status (2026-09-23, Gate-3 refresh, re-verified by sha256):** all six
-  `sources/` files remain byte-identical to the current approved repository core — the
-  behavioral core is unchanged through Gate 3 (category D = NONE, semantic parity
-  proven); numbered docs 00/09 were updated for Gate-2/3 resolution state (packaging
-  shipped; trigger model settled; ZCode/Codex claim scoping per the repository's
-  COMPATIBILITY.md). (SKILL.md sha256
-  `73f7b887…` = post-Gate-1 corrected core; `references-platform-adapters.md`
-  `849b769c…` incl. the `fork_turns` and `executing-plans` factual corrections;
-  `tests-scenarios.md` `5fa9617e…` with the widened scenario-J criterion;
-  `scripts-manage.sh` `21964702…` with LEGACY migration guards). The pre-Gate-1
-  snapshot drift noted on 2026-09-23 is closed. Re-verify with `sha256sum`
-  against the repository before any future upload.
-- **Explanatory summaries:** 01–06, 08–09 — audit-written; every claim sourced; if a
-  summary conflicts with a source file, the source file wins.
-- **Historical:** 07 — describes past states; explicitly labels what is no longer active.
-- **Task definition:** 10 — instructions for future work; contains no findings.
-- **Must not override canonical source:** all numbered docs; especially anything quoting
-  historical policy wording (v0/v1) in 05/07 — current = v3 only.
+6. **`02-CURRENT-ARCHITECTURE.md`** — repo/package + policy architecture and
+   invariant pointers. *Stable.*
+7. **`03-BEHAVIORAL-CONTRACT.md`** — condensed C1–C41 contract with
+   verification labels. *Stable.*
+8. **`05-IAA-SDD-BOUNDARY.md`** — the boundary rules + contrast table the
+   product was built against. *Stable.*
+9. **`06-INTEGRATIONS-CLAUDE-CODE-CODEX-ZCODE.md`** — mechanism map per
+   runtime, both distribution forms. *Stable.*
+10. **`07-HISTORY-AND-EVIDENCE.md`** — full timeline + evidence location +
+    quality caveats; needed to interpret historical documents correctly.
+    *Stable (timeline ends 2026-09-23; later events in 11).*
+11. **`08-TESTS-AND-VALIDATION.md`** — validation stack + release principles
+    (version-pinned claims, D=NONE parity, publication safety). *Stable.*
+12. **`09-KNOWN-LIMITATIONS-AND-OPEN-QUESTIONS.md`** — current limitations
+    with resolutions marked; open questions mapped to backlog IDs. *Stable.*
 
-## Not in this pack (by design)
+## OPTIONAL (deep context)
 
-Raw campaign transcripts/runs/repos (local-only), machine secrets (none present),
-the audit working files (in the repo's audit/ dir), unrelated machine state.
+13. **`10-COMPARISON-RESEARCH-BRIEF.md`** — research landscape: comparison
+    outcomes, adoption verdicts, JEV candidate, competitor-research policy.
+    *Stable (dated 2026-09-22 record + standing policy).*
+14. **`04-SOURCE-OF-TRUTH-AND-FILE-MAP.md`** — repository map by authority
+    class + glossary. *Stable.*
+
+## DO NOT UPLOAD (fetch live from GitHub instead)
+
+- **`sources/*`** (all six snapshots + `sources/README.md`) — byte-exact core
+  copies kept for provenance only; with GitHub connected they are a redundant
+  second authority waiting to go stale. Fetch `iaa/SKILL.md` etc. live.
+- **`MANIFEST.md`** (this file) — owner instructions, not assistant context.
+- **`CLAUDE-PROJECT-SETUP.md`** — one-time project-creation material (project
+  name, evergreen goal text, first prompt).
+
+## Repository to connect
+
+```text
+isakli05/iaa
+```
+
+Live canonical anchors the assistant should use on `main`: `VERSION`,
+`README.md`, `iaa/` (core), `docs/GOVERNANCE.md`, `docs/BACKLOG.md`,
+`docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`, `docs/SOURCE-OF-TRUTH.md`.
+
+## Refresh discipline
+
+After each release, policy-revision change, or major upstream event
+(standing backlog item IAA-BL-012): refresh **only** `11-CURRENT-STATE.md`
+(and this manifest if the file set changed), re-verify `sources/` parity if
+the core changed, then re-upload the refreshed files. Never scatter version
+values into the stable files.

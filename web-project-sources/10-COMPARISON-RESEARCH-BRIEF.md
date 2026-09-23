@@ -1,70 +1,72 @@
-# 10 — Comparison Research Brief (task definition — the comparison itself is NOT performed here)
+# 10 — Research Landscape
 
-## Objective
+The comparison originally briefed here was **completed 2026-09-22**
+(`comparison/FINAL-COMPARISON-REPORT.md`, six evidence streams). This file now
+records the landscape as standing context: what the comparison established,
+what remains open, and the policy for future competitor research.
 
-Compare **current İAA** (as described by this pack; sources/ is authoritative) against the
-**current** versions of the systems below, and identify which İAA strengths are genuinely
-differentiated and which capabilities İAA lacks. No pre-judged conclusions; İAA's own
-evidence is about İAA, and competitor claims must come from *their* current primary docs.
+## Comparison outcomes (2026-09-22; version-locked evidence)
 
-## Systems to compare (with current-state anchors found 2026-09-22)
+**Genuinely differentiated (evidence-cited):**
+1. Per-seat materiality justification (no compared system has it at any
+   granularity).
+2. Orchestration-authority arbitration: mode exclusivity + sole-authority
+   declaration + by-name yield — the arbitration layer is unoccupied
+   elsewhere.
+3. Artifact trust boundary, adversarially tested (nobody else addresses the
+   embedded-directive channel; Superpowers is its source).
+4. Anti-overdelegation as *the* objective, with published behavioral evidence
+   and the sanctioned zero-agent fallback.
 
-1. **Superpowers / SDD** — obra/superpowers, v6.4.1 (installed copy in İAA's evidence: 6.3.0;
-   SDD contract unchanged in shape at 6.4.1). 15 skills; SessionStart bootstrap hook;
-   fresh-implementer-per-task, never-skip reviews, no parallel implementers, `.superpowers/sdd`
-   ledger; writing-plans embeds REQUIRED SUB-SKILL.
-2. **GSD Core / Open GSD** — github.com/open-gsd/gsd-core, npm @opengsd/gsd-core 1.14.0
-   (originally gsd-build/get-shit-done, archived 2026-06-26). Phase loop
-   (Discuss→Plan→Execute→Verify→Ship), `.planning/` persistent state, 60+ /gsd-* commands,
-   ~30 fixed agent roles, wave-parallel executors, **PreToolUse/PostToolUse hook guards**
-   (workflow/worktree/agent-isolation/secret guards) — mechanism-grade enforcement.
-3. **Claude Code native subagents + Agent Teams + plugins/skills primitives** — built-in
-   Explore/Plan/general-purpose; nesting default 3; Agent Teams experimental flag-gated;
-   skills/plugins/agents/hooks mechanisms (see research summary in repo research/01).
-4. **Codex native multi-agent (MultiAgentV2)** — spawn/send/followup/wait/interrupt/list,
-   fork_turns isolation, custom roles; İAA's own pre-install audit (ADR-0000) documented it.
-5. **ZCode native subagents** — Explore/general-purpose, no nesting, custom beta, v3.14
-   dynamic workflows.
-6. **BMAD-Method** (and any other major method found during research: e.g. Agent-os,
-   parallel-agent patterns) — research current state; not installed locally.
-7. **Anthropic's own guidance on subagents/delegation** (docs) as the vendor-baseline view.
+**Eroded (converged into vendor guidance / shared):** benefit-gated
+delegation as a bare idea; multi-runtime reach (İAA 3 runtimes vs 16–47);
+deterministic topology execution (others mechanize what İAA reasons in prose);
+mixed primary+delegated execution.
 
-## Dimensions to compare (each system × each dimension, evidence-cited)
+**Adoption verdicts (§17, recorded — do not re-litigate without new
+evidence):** KEEP the core policy set; the ADOPT items (host eval harness,
+`iaa doctor`, tri-store packaging) were executed in Gates 1–3; EXPERIMENT
+class (persistent state/resume) only ever behind evidence; DO NOT ADOPT:
+framework ledgers, fixed rosters/cadences, hook guards over foreign tools,
+mesh/peer topologies as default, engine-ization of topology, per-runtime
+semantic forks, GSD-ization (enforcement-grade İAA).
 
-1. **Orchestration philosophy** — adaptive policy vs fixed workflow vs mechanism-only.
-2. **Delegation trigger** — when delegation starts; who decides; benefit test?
-3. **Topology selection** — how agent count/shape is derived; per-task vs per-workflow.
-4. **Adaptive vs fixed workflow** — can the process itself vary per task?
-5. **Agent-count policy** — anti-overdelegation rules; smallest-useful-number principles.
-6. **Parallelism** — independent-lane parallel execution; safety conditions.
-7. **Dependency handling** — waves, ordering, shared-contract settlement.
-8. **Ownership** — write-set exclusivity, shared-surface ownership.
-9. **Context isolation** — fresh-context briefs vs history inheritance; context offloading.
-10. **Reviewer policy** — mandatory vs materiality-justified; review-of-review; fixer policy.
-11. **Validation** — final validation ownership; evidence vs self-report.
-12. **Failure recovery** — child failure/interruption semantics.
-13. **Artifact trust boundary** — can artifacts/repo text switch controllers? (İAA's specific
-    hardening; check whether others even address prompt-injection of workflow directives.)
-14. **User-intent precedence** — explicit selection semantics; mode exclusivity; opt-outs.
-15. **Portability** — runtimes supported; one-policy-many-runtimes vs per-runtime forks.
-16. **Runtime coupling** — hooks/enforcement grade: prose / bootstrap-injection / guard-hooks /
-    platform caps. (İAA: prose + one env cap. GSD: guard hooks. SDD: bootstrap injection.)
-17. **Observability** — ledgers, rulings, transcripts, cost accounting.
-18. **Persistent state** — none (İAA) vs `.superpowers/sdd/` vs `.planning/`.
-19. **Cost/token discipline** — measured costs, context budgets, model tiering policy.
-20. **Extensibility** — customizing seats/roles without forking policy meaning.
-21. **Limitations honesty** — what each system documents about its own failure modes.
+**De-risked by source analysis:** GSD's PreToolUse guards do not gate foreign
+dispatches (agent-isolation guard scopes to `gsd-executor`). **Still dark:**
+GSD/BMAD trigger contests, Agent Teams auto-formation, Codex Ultra
+proactive-delegation template interaction, non-SDD yield paths.
 
-## Rules for a trustworthy comparison
+## JEV — candidate, not a dependency
 
-- Use **current** primary sources for competitors (repos/docs at their latest release), and
-  this pack (sources/ + verification labels) for İAA. Note version skew (e.g. installed
-  Superpowers 6.3.0 vs upstream 6.4.1; local ZCode 3.7.7 vs current 3.14.3).
-- Separate: PROVEN behavior vs DOCUMENTED intent vs marketing — for every system.
-- Behavioral evidence (İAA's campaigns) is not directly comparable to others' documented
-  contracts; where a competitor has no behavioral evidence, say so rather than assuming.
-- Cost numbers are only comparable within the same harness/model/seed (İAA's are; nothing
-  equivalent exists publicly for others — do not fabricate parity).
-- Output should end in: (a) genuinely differentiated İAA strengths, with the reason each
-  competitor lacks it today; (b) capabilities İAA lacks that others have; (c) neutral
-  differences (trade-offs, not better/worse); (d) what tests would falsify each claim.
+JEV (TypeSafe) is recorded — never implemented — as an OPTIONAL typed
+decision-backend experiment for the materiality/seat/topology gates, under
+binding constraints (Gate-3 Q26): İAA retains orchestration authority; the
+primary LLM retains understanding + final integration; native mode stays
+baseline/fallback; benchmark native-vs-JEV first (metrics: unnecessary
+delegation, missed useful delegation, topology quality, decision
+latency/cost, calibration, fallback); privacy/API-key/network review before
+adoption. Tracked as IAA-BL-006.
+
+## Competitor research policy
+
+- Use **current primary sources** for other systems (their repos/docs at
+  pinned versions), the same version-locking discipline İAA applies to
+  itself; note version skew explicitly.
+- Separate PROVEN behavior / DOCUMENTED intent / marketing — for every
+  system, including İAA. Behavioral evidence (İAA's campaigns) is not
+  comparable to others' documented contracts; say so rather than fabricating
+  parity.
+- No superiority claims beyond cited evidence; neutral differences are
+  trade-offs, not rankings. Cost numbers compare only within the same
+  harness/model/seed.
+- Re-open the landscape only on a trigger: a major competitor release, a new
+  orchestration primitive in a supported runtime, or an owner request — then
+  as a fresh dated comparison, never by editing the 2026-09-22 record.
+
+## Unresolved questions → backlog
+
+Model-family coverage (IAA-BL-007) · deterministic topology aids (IAA-BL-008)
+· Agent Teams characterization (IAA-BL-009) · non-SDD yield (IAA-BL-005) ·
+JEV benchmark (IAA-BL-006).
+
+**Stable file** — dated; the live queue is `docs/BACKLOG.md` on GitHub.

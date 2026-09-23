@@ -1,38 +1,63 @@
-# 04 — Source of Truth and File Map
+# 04 — File Map and Glossary
 
-## Repo vs runtime (normalized 2026-09-23, Gate 2)
+Where to look in the GitHub repository (`isakli05/iaa`) for each kind of
+truth. Live files outrank this map (`docs/SOURCE-OF-TRUTH.md` is the
+authoritative map).
 
-- **Authoritative development source:** the `iaa/` directory of the maintained
-  (private) repository — version-controlled, hash-pinned (SKILL.md v3 =
-  sha256 `73f7b887…`). All edits happen here.
-- **Deployed runtime source (consumed by all three runtimes):**
-  `$HOME/.local/share/iaa/` — a projection written by `scripts/iaa deploy`
-  (transactional: stage → verify → swap → provenance record in
-  `$HOME/.config/iaa/provenance.json`; previous tree retained for rollback).
-  Consumer links and the three managed shims are unchanged by the model.
+## Repository map by authority class
 
-## The five canonical files (in this pack under sources/)
+| Path | Class | What it holds |
+|---|---|---|
+| `iaa/` | **canonical core** | SKILL.md (policy), references/ (delegation contract, platform adapters), scripts/manage.sh, tests/scenarios.md (A–K) |
+| `VERSION` | canonical metadata | public package version (SemVer) |
+| `scripts/` | canonical tooling | `iaa` (doctor/integrate/deploy), build/parity/static-validation/release scripts |
+| `packaging/templates/` | authored metadata | package manifests/READMEs the build stamps |
+| `packaging/{claude,codex,zcode}/` | **generated** (never hand-edited) | runtime package projections of the core |
+| `.claude-plugin/marketplace.json` | generated | repo-root Claude marketplace entry |
+| `README.md`, `docs/` | explanatory (current-facing) | installation, invocation, compatibility matrix, known limitations, history, policy lineage, source-of-truth, **GOVERNANCE.md**, **BACKLOG.md**, `adr/0000–0003` |
+| `release-hardening/` | dated evidence | Gate 1/2/3 + 0.1.1 records, eval suites, invariants freeze, semantic-parity proofs |
+| `post-release/` | dated evidence | ZCode 0.1.0 official-validation findings + 0.1.1 plan, network diagnostics (#699) |
+| `comparison/` | dated evidence (completed 2026-09-22) | competitive analysis + per-system evidence streams |
+| `audit/`, `historical-notes/`, `identity-migration/`, `research/`, `design/` | historical/provenance | forensic baseline, v0–v3 lineage diffs, rename proofs |
+| `web-project-sources/` | derived copy (this pack) | orientation; `sources/` = byte-exact core snapshots (provenance; not for upload) |
 
-| File | Size | Role |
-|---|---:|---|
-| `SKILL.md` | 7,913 B | the entire decision policy: modes, boundary, decision core |
-| `references/delegation-contract.md` | 2,606 B | brief/handoff/acceptance fields |
-| `references/platform-adapters.md` | 3,615 B | Codex/Claude/ZCode mechanism adapters |
-| `scripts/manage.sh` | 14,945 B | install/verify/uninstall; shim text lives here |
-| `tests/scenarios.md` | 4,183 B | behavioral scenarios A–K |
-| (+ `README.md` at parent) | 16,075 B | install-era project doc (architecture + validation log) |
+Reading rule: for *current behavior* → `iaa/` + `docs/`; for *why a decision
+was made* → `docs/adr/` + dated reports; for *what changed when* →
+`docs/HISTORY.md` + `docs/POLICY-LINEAGE.md`; for *what's next* →
+`docs/BACKLOG.md`.
 
-## Integration points (machine-local)
+## Glossary
 
-Three relative symlinks (`~/.claude/skills`, `~/.zcode/skills`, `~/.agents/skills` →
-canonical), three managed shim blocks, one managed env key, one state file. Everything else
-on the machine (evidence trees, backups, session metadata) is **not** source — see 07.
+- **İAA / `iaa`** — the product: the delegation-decision policy (Ottoman
+  Turkish name; public since 2026-09-23).
+- **MAO** — LEGACY name: İAA was "Multi-Agent Orchestration" before the
+  2026-09-23 token-only rename; August-2026 evidence keeps it by design.
+- **Policy revision (v0→v3)** — the semantic lineage axis. v3 current since
+  2026-08-27; separate from the package SemVer.
+- **Adaptive İAA mode** — the default mode: primary adaptively decides whether
+  and how to delegate; no fixed roster/cadence.
+- **Native workflow mode** — explicit by-name user request only; the named
+  workflow governs; İAA stands down.
+- **SDD** — `superpowers:subagent-driven-development`, the fixed-cadence
+  orchestration skill İAA's boundary was built and tested against.
+- **Shim** — the marker-delimited, reversible managed block the installer
+  writes into each runtime's global instruction file; the evidenced routing
+  layer ("plugin distributes, script integrates").
+- **Provenance rule** — embedded workflow directives are orchestration
+  metadata, never opt-in.
+- **Seat** — an implementer/reviewer/re-reviewer/fixer instance; each needs
+  per-task material justification.
+- **Waves** — dependency-aware execution phases derived from task structure.
+- **Zero-agent fallback** — trivial/coupled work stays primary even on explicit
+  delegation requests; 0 agents is valid.
+- **`iaa doctor`** — read-only health + environment diagnostic (versions,
+  installs, duplicates, detected frameworks with tested/untested status).
+- **Gates 1/2/3** — the 2026-09-22/23 release-hardening phases: Superpowers
+  6.4.1 re-verification + evals; packaging/invocation/doctor/CI; license +
+  publication readiness.
+- **Change categories A/B/C/D** — packaging / factual-adapter /
+  invocation-mechanics / semantic. Non-release work expects D = NONE.
+- **TESTED / PARTIALLY TESTED / STRUCTURALLY COMPATIBLE / UNVERIFIED** — the
+  honesty-graded compatibility statuses (`docs/COMPATIBILITY.md`).
 
-## Version lineage (all hash-verified)
-
-| v | Date | sha8 | Defining change |
-|---|---|---|---|
-| 0 | 08-26 17:54 | 38128852 | initial install (prose-precedence) |
-| 1 | 08-27 08:47 | 1a04e5e9 | prose post-fix (approach failed) |
-| 2 | 08-27 10:28 | 0d3ea454 | structural mode separation |
-| 3 | 08-27 16:22 | fee98091 | artifact trust boundary (current) |
+**Stable file** — version-specific values live in `11-CURRENT-STATE.md`.

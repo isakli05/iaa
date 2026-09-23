@@ -1,39 +1,62 @@
-# 08 — Tests and Validation
+# 08 — Validation and Release Principles
 
-## What exists
+Authoritative docs on GitHub: `docs/TESTING-AND-VALIDATION.md`,
+`docs/COMPATIBILITY.md`, `docs/GOVERNANCE.md` §5–6. This file condenses both
+the validation stack and the release discipline the repository holds itself to.
 
-- **Static:** `manage.sh verify` (links/markers/depth/description-length against the live
-  tree; passes 2026-09-22) and Codex's `quick_validate.py` (skill format; used by every
-  campaign).
-- **Behavioral scenario contract:** `tests/scenarios.md` A–K — manual LLM-behavioral
-  scenarios for a disposable repo, with the rule "observe actual agent/tool activity; do
-  not rely only on the model's self-report."
-- **Campaign evidence (2026-08-27):** the executed proof set (see 07).
-- **Analyzer:** `analyze_run.py` — extracts skill invocations + agent spawns from session
-  transcripts; this is how "SDD never loaded" and "0 nested spawns" were verified as facts
-  rather than claims.
+## The validation stack (built across campaigns + Gates 1–3)
 
-## Scenario execution record
+1. **Static CI (layer A)** — `scripts/validate-static.py`: SKILL/command
+   frontmatter (incl. the 250-byte ZCode description budget), docs link
+   checks, ASCII paths, secret scan, former-name scope check; plus
+   `scripts/check-parity.sh` (byte-parity of every core projection and the
+   remote marketplace sha pin) and unit/matrix tests (`tests/doctor/`,
+   `tests/install-matrix/`).
+2. **Model evals (layer B)** — `claude plugin eval` suites: trigger-positive,
+   anti-overdelegation, ambiguous-delegation, explicit-entry zero-agent,
+   SDD-yield cases (`release-hardening/evals/`).
+3. **Behavioral companion (layer C)** — scenario contract A–K
+   (`iaa/tests/scenarios.md`) executed in disposable repos with
+   transcript-based verification (`tests/tools/analyze_run.py`); boundary
+   regression (scenario J: SDD never loads in İAA mode) re-run after every
+   Superpowers upgrade.
+4. **GUI acceptance (ZCode)** — owner-executed desktop checklist with
+   filesystem byte corroboration (`release-hardening/0.1.1/`).
+5. **`iaa doctor`** — read-only environment diagnostic; never mutates, never
+   fails merely because an untested framework exists.
 
-| Scenario | Executed? | Result |
-|---|---|---|
-| A trivial / B independent exploration / C overlapping write / D explicit request / E implicit benefit | YES (install-time, Codex) | pass (A needed one policy tightening first: no manufactured reviewer for trivial edits) |
-| F nested-delegation boundary | rejection side incidentally proven (0 nested spawns in every run); authorized-nesting path never exercised | partial |
-| G conflicting fan-out skill | superseded — the real SDD collision was tested far harder (campaigns 1–3) | covered |
-| H failed/interrupted child | never executed | gap |
-| I Explore constraint propagation | happens in practice (briefs contain restated constraints); not a controlled test | partial |
-| J mode separation (default) | YES ×4 + adversarial (archfix A1/A2, boundary B/D) | pass |
-| K explicit native opt-in | YES ×2 (archfix B, boundary C) | pass |
+## Scenario execution record (summary)
 
-## Documented-only behaviors (claimed, not test-proven)
+- A–E (trivial/exploration/overlapping-write/explicit/implicit): executed at
+  install (Codex), passed after one policy tightening.
+- J (mode separation) / K (native opt-in): executed across campaigns, eras,
+  and Gate re-runs — J additionally with the adversarial plan fixture; K with
+  full 11–15-agent SDD cadences.
+- F/H/I: never run as controlled scenarios — DOCUMENTED-only gaps
+  (backlog IAA-BL-003); F's rejection side incidentally proven everywhere.
+- G: superseded — the real SDD collision was tested far harder.
 
-Failed-child recovery (H) as a controlled scenario; authorized nested delegation; the
-provenance rule for non-plan artifact channels; ZCode live behavior post-campaigns; Codex
-behavior post-campaigns; any model family other than glm-5.3 (+ install-time GPT-5.6-sol
-for the native audit).
+## Release principles (binding)
 
-## Re-run recipe (current machine, safe)
+- **Version-pinned claims.** Every compatibility claim names exact tested
+  versions; "latest" is a different claim. Upstream movement invalidates
+  affected TESTED rows until regression re-runs (standing item IAA-BL-011).
+- **Behavioral vs structural evidence.** Installs/validators prove structure;
+  only transcripts/evals prove behavior. Structurally compatible is never
+  reported as tested.
+- **Semantic parity, category D = NONE.** Non-semantic work proves the core
+  unchanged by hash (six core files, sha256-pinned; `git diff` between tags
+  over `iaa/` + `scripts/iaa` empty for 0.1.0→0.1.1). Any D ≠ NONE requires
+  the policy-revision bump + invariant justification first.
+- **Deterministic packaging.** Release artifacts are reproducible builds
+  (two-run byte-identical proofs; the ZCode `plugin.zip` is byte-identical to
+  the upstream official builder's output).
+- **Publication safety.** Irreversible actions (tag, release, upstream PR,
+  public posts) require explicit owner authorization; release assets are
+  re-downloaded and sha-verified after upload; immutable tags are never
+  touched.
+- **Evidence before assertion.** No invented test evidence; gaps stay labeled
+  until closed.
 
-manage.sh verify + quick_validate.py anytime. Scenario J: disposable repo + plan fixture →
-"Execute the plan… Use subagents where appropriate." → analyze_run.py over the transcript →
-assert SDD never invoked. Run after every Superpowers update (documented upgrade-check).
+**Stable file** — current validation status values live in
+`11-CURRENT-STATE.md`.

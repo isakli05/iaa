@@ -1,52 +1,79 @@
 # 09 — Known Limitations and Open Questions
 
-## Limitations (evidence-backed; full list in repo docs/KNOWN-LIMITATIONS.md)
+Live authority: `docs/KNOWN-LIMITATIONS.md` on GitHub (frozen baseline with
+Gate-2 status notes). This file condenses the current state of each item —
+several once-open items are resolved and are marked so, not silently dropped.
+
+## Limitations (evidence-backed, current)
 
 **Authority model**
-1. Boundary is instruction-following, not harness-enforced; a future model could mis-route
-   (made visible + regression-testable, not impossible). Claude Code doctrine: prose is "a
-   request, not a guarantee."
-2. One-directional: İAA knows Superpowers; Superpowers doesn't know İAA. Upstream changes
-   re-open the contest until the documented upgrade-check runs. (Upstream is now 6.4.1 vs
-   installed 6.3.0 — check pending.)
-3. Codex nesting guard is policy-only (config max_depth ignored by MultiAgentV2).
-4. Provenance rule proven for plans only; other artifact channels share wording, untested.
+1. **Instruction-following, not harness enforcement.** Mode routing and the
+   provenance rule are policy; skill selection is model-driven and fallible
+   (official doctrine). Made a *single visible routing violation* by the fix,
+   detectable by scenario J — not impossible.
+2. **One-directional boundary.** İAA knows Superpowers; Superpowers doesn't
+   know İAA. Upstream changes re-open the contest until the upgrade-check
+   runs (standing item IAA-BL-010; 6.4.1 check completed in Gate 1).
+3. **Codex nesting guard is policy-only** (config `max_depth` ignored by
+   MultiAgentV2); Claude is harness-enforced, ZCode platform-impossible.
+4. **Provenance rule proven for plan artifacts only**; other channels share
+   the wording, unexercised (→ IAA-BL-004).
 
-**Coverage**
-5. Scenarios F/H/I never run as controlled tests; authorized nesting never exercised.
-6. Codex/ZCode not behaviorally re-tested post-campaigns; ZCode needs desktop UI.
-7. Single model family evidence (glm-5.3 on Claude; GPT-5.6-sol only for the pre-install
-   native audit).
-8. verify() checks description ≤1024 B but the operative ZCode constraint is ~250 chars.
+**Coverage / validation**
+5. Scenarios F, H, I never executed as controlled tests; authorized-nesting
+   positive path never exercised (→ IAA-BL-003, IAA-BL-015).
+6. ZCode needs the desktop UI for live checks (no headless CLI); Codex/ZCode
+   not behaviorally re-tested after the Aug-27 campaigns until the Gate-2/3
+   legs (Codex plugin-form live discovery + E9 probe 2026-09-23; ZCode
+   skills-dir historical production use; ZCode plugin form GUI-accepted at
+   0.1.1/3.14.3).
+7. **Single-model evidence** (GLM-5.3 profile; install-time GPT-5.6-sol only
+   for the pre-install audit) — no other family sampled (→ IAA-BL-007).
+8. ~~verify() 1024-B check vs ZCode ~250-char budget~~ **RESOLVED (Gate 2):**
+   the packaging layer enforces the 250-byte budget in CI.
 
-**Packaging**
-9. Un-namespaced user-scope skill name — shadowing possible if another same-named skill
-   appears (public-distribution problem; design exists, not implemented).
-10. No version field in the skill; lineage tracked by hash + repo only.
-11. Installer assumes one user/one machine (fake-home tested, but not a multi-user design).
-12. Live tree not version-controlled in place (repo copy + sync procedure instead).
+**Packaging / distribution**
+9. ~~Un-namespaced skill shadowing (public-distribution problem)~~
+   **RESOLVED (Gate 2/3):** public distribution ships namespaced plugin
+   packages; duplicate installs are a doctor-flagged error; the instruction
+   shim installs via the explicit reversible integration step.
+10. Skill carries no version field ~~(hash+repo lineage only)~~ — packages
+    now stamp `VERSION` into manifests and carry PROVENANCE files; lineage
+    semantics still tracked by policy revision.
+11. Installer assumes one user / one machine (fake-home tested; not a
+    multi-user design) — still true, by scope decision.
+12. ~~Live tree not version-controlled in place~~ **RESOLVED (Gate 2):** the
+    repository `iaa/` is authoritative; the live tree is a deploy projection
+    (`scripts/iaa deploy`), and direct edits to it are detectable drift.
 
-**Environment**
-13. ZCode carries stale Superpowers 6.2.0 with a broken internal symlink (upstream artifact).
-14. Install-session transcript lost (actions reconstructed; see 07).
+**Environment facts (constraints, not defects)**
+13. ZCode 3.14.x provider bug (zai-org/feedback#699): model requests fail
+    ETIMEDOUT on IPv4-only networks; documented temporary single-IPv4
+    `api.z.ai` hosts workaround, TLS-verified and fully reversible — required
+    again in the 0.1.1 GUI window; upstream fix pending (→ IAA-BL-002).
 
-## Open questions (for the comparison/design phase — deliberately unanswered here)
+## Open questions (remaining; all tracked in docs/BACKLOG.md)
 
-- Is İAA's adaptive-materiality model genuinely differentiated vs SDD/GSD/BMAD/native
-  primitives, or do others now cover it? (→ 10-COMPARISON-RESEARCH-BRIEF.md)
-- Should the public build add mechanism-grade enforcement (SessionStart context-append
-  hook, Codex allow_implicit_invocation tuning) — and can that be done without violating
-  İAA's own non-invasiveness principle?
-- ~~Plugin packaging for all three stores (all now have official plugin systems; ZCode even
-  accepts Claude manifests): does the load-bearing CLAUDE.md/AGENTS.md shim survive
-  plugin-form distribution, or does distribution stay script-based?~~ **RESOLVED (Gate 2,
-  2026-09-23):** packages built for all three runtimes from one byte-exact core;
-  plugin-form distribution ships + an explicit, reversible integration step installs the
-  instruction-channel block (plugins cannot write CLAUDE.md/AGENTS.md — structural).
-- How should İAA behave toward GSD's hook guards and Claude Agent Teams (both untested,
-  both structurally different: mechanism-grade / multi-instance)?
-- ~~Trigger model for public: keep hybrid (status quo), go explicit-only, or runtime-tuned?~~
-  **RESOLVED (Gate 2, 2026-09-23):** status quo hybrid retained on measurement —
-  0/13 false positives, 0/5 false negatives on obvious positives, explicit entry 3/3,
-  yields 6/6 (68-session characterization).
-- Should authorized nested delegation ever be a first-class path, or stay discouraged?
+- Should İAA ever add mechanism-grade self-controls (e.g. a read-only
+  reporting hook) — and can that avoid violating non-invasiveness?
+  (Constrained by governance; comparison §14: the deficit is instrumentation,
+  not enforcement.)
+- How does İAA behave toward GSD's trigger surface and Agent Teams if a user
+  enables them? (UNVERIFIED; characterization candidates IAA-BL-005/009.)
+- Should authorized nested delegation ever be first-class, or stay
+  discouraged? (IAA-BL-015.)
+- Can a typed decision backend (JEV) improve decision reliability without
+  becoming a dependency? (Research candidate IAA-BL-006; benchmark first.)
+
+## Resolved questions (recorded; do not reopen without new evidence)
+
+- ~~Comparison vs SDD/GSD/BMAD/native~~ — done 2026-09-22: four
+  differentiators confirmed, no counter-finding (`comparison/`).
+- ~~Plugin packaging for all three stores vs script distribution~~ — resolved
+  Gate 2: both; "plugin distributes, script integrates."
+- ~~Trigger model (hybrid vs explicit-only)~~ — resolved Gate 2 on
+  measurement: hybrid retained (68-session characterization: 0/13 false
+  positives, 6/6 yields, explicit entry 3/3).
+
+**Stable file** — current statuses live on GitHub; volatile values in
+`11-CURRENT-STATE.md`.

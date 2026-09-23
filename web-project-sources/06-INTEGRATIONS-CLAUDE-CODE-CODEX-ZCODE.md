@@ -1,31 +1,37 @@
 # 06 — Integrations: Claude Code, Codex, ZCode
 
-All three integrations are identical in *meaning*, different only in *mechanism*. Installed
-2026-08-26; verified live 2026-09-22.
+All three integrations are identical in *meaning*, different only in
+*mechanism*. Two distribution forms exist since Gate 2: **skills-dir**
+(symlink + managed shim, the historically tested form) and **plugin package**
+(marketplace-distributed; the shim still installs via the explicit integration
+step — plugins cannot write instruction files). Authoritative docs on GitHub:
+`docs/INSTALLATION.md`, `docs/INVOCATION.md`, `docs/COMPATIBILITY.md`.
+
+## Mechanism map (stable)
 
 | | Claude Code | Codex CLI | ZCode |
 |---|---|---|---|
-| Instruction surface | `~/.claude/CLAUDE.md` (managed block) | `~/.codex/AGENTS.md` (managed block) | `~/.zcode/AGENTS.md` (managed block) |
-| Skill surface | `~/.claude/skills/…` symlink | `~/.agents/skills/…` symlink (official Codex user-skills dir) | `~/.zcode/skills/…` symlink (official Symlink import mode) |
-| Invocation | description-matched + `/iaa` (plugin form: `/iaa:orchestrate` explicit entry, `iaa:iaa` skill) | implicit + `$iaa` | per-turn description injection (≤250 chars) + `$iaa` |
-| Extra integration | spawn-depth=1 env key (managed) | none (pre-existing `[agents]` config + reviewer.toml untouched) | none |
-| Adapter advice (PA) | Explore/Plan/general-purpose; pre-dispatch mode check; restate constraints to Explore/Plan | explorer/worker/default; fork_turns none preferred; steering; nesting policy-only | Explore (restate rules — no AGENTS.md injection) / general-purpose; nesting impossible |
+| Instruction surface | `~/.claude/CLAUDE.md` managed block | `~/.codex/AGENTS.md` managed block | `~/.zcode/AGENTS.md` managed block |
+| Skills-dir surface | `~/.claude/skills/iaa` symlink | `~/.agents/skills/iaa` symlink (official user-skills dir) | `~/.zcode/skills/iaa` symlink |
+| Explicit invocation | `/iaa` (skills-dir) · **`/iaa:orchestrate`** (plugin) | `$iaa` | `$iaa` (skills-dir) · **`/orchestrate`** Command (plugin; ZCode commands are flat, unprefixed) |
+| Auto-trigger | description-matched skill `iaa` (both forms) | implicit description-based | per-turn description injection (≤250 chars) |
+| Extra integration | spawn-depth=1 env key (managed) | none (pre-existing `[agents]` config untouched) | none |
+| Adapter notes | Explore/Plan don't inherit CLAUDE.md → restate constraints in briefs; pre-dispatch mode check | explorer/worker/default; fresh-context spawns preferred; nesting policy-only | Explore lacks AGENTS.md injection → restate; nesting platform-impossible |
 
-## Facts verified against current official docs (2026-09-22)
+## Facts that matter for reasoning about the integrations
 
-- Codex user skills dir **is** `~/.agents/skills` (early docs said `~/.codex/skills`; that
-  dir now holds only Codex-managed system skills) — İAA's symlink is correctly placed.
-- ZCode: description hard limit 1024 chars, per-turn injection ~250 chars (İAA's
-  description is 245–249 chars by design); subagents cannot spawn subagents (matches İAA's
-  adapter); since ZCode 3.7.1 subagents inject AGENTS.md (except built-in Explore) — matches
-  İAA's adapter text written at install time against 3.7.7.
-- Claude Code: non-fork subagents inherit CLAUDE.md (the shim reaches workers); built-in
-  Explore/Plan don't (hence the restate-constraints rule); default nesting depth is 3,
-  locally capped to 1 by İAA's managed env key.
+- The **entry points are adapters, not second implementations**: the
+  `orchestrate` skill/command bodies are ~5-line pointers that delegate to the
+  byte-identical bundled `iaa` skill (parity-enforced).
+- Explicit invocation never mandates agents: a trivial task given to
+  `/iaa:orchestrate` still gets the zero-agent fallback (validated, Gate 2).
+- Exactly **one form per runtime** — installing both skills-dir and plugin
+  forms of İAA is a duplicate-install error (`iaa doctor` flags it).
+- Per-task opt-out phrase: "Do not delegate or spawn subagents for this task."
+- ZCode's ~250-char description injection budget is CI-enforced at the
+  packaging layer.
 
-## Version context
-
-Installed against: Claude 2.1.246, Codex 0.149.1, ZCode 3.7.7. Current at audit: Claude
-2.1.274, Codex 0.155.1, ZCode 3.14.3. Integrations still valid per current docs; ZCode
-local install is notably old. Codex/ZCode were not behaviorally re-tested after the
-2026-08-27 campaigns (Claude-specific demonstrated risk; ZCode needs its desktop UI).
+**Stable file** — current tested runtime versions, package versions, and
+per-form claim statuses live in `11-CURRENT-STATE.md` and GitHub
+`docs/COMPATIBILITY.md` (both honesty-graded: TESTED / PARTIALLY TESTED /
+STRUCTURALLY COMPATIBLE / UNVERIFIED).

@@ -1,47 +1,60 @@
-# 07 — History and Evidence
+# 07 — History and Evidence (provenance guide)
 
-## Timeline (all 2026, Istanbul; hash- and report-verified)
+Timeline is hash- and report-verified; every event cites its record in the
+repository. Deep versions: `docs/HISTORY.md`, `docs/POLICY-LINEAGE.md`,
+`docs/adr/0000–0003`. İAA was **MAO / Multi-Agent Orchestration** during the
+August 2026 evidence campaigns; renamed 2026-09-23 before any public release
+(token-only rename, semantics proven unchanged — `identity-migration/`). MAO
+in an evidence file means the same product, earlier name.
+
+## Timeline (2026, all dates evidence-recorded)
 
 | When | Event |
 |---|---|
-| 08-26 early | Live audit of Codex native multi-agent (MultiAgentV2 tools, fork semantics, roles) — design research before installing anything |
-| 08-26 17:39–17:54 | **v0 install** for 3 runtimes (manage.sh; backups; symlinks; shims; depth key). Codex smoke A–E passes (after tightening: no manufactured reviewer on trivial tasks) |
-| 08-27 00:55–06:28 | **Campaign 1 — collision smoke test**: İAA vs co-loaded SDD, 6-task seed repo, glm-5.3. İAA keeps topology authority; SDD's review cadence + no-parallel rule leak; ~2.5× cost. PARTIAL PASS |
-| 08-27 07:39–08:47 | **Campaign 1b — prose post-fix (v1)**: 4 attempts; identical wording, opposite outcomes across samples ⇒ prose precedence unreliable. PARTIAL PASS; stop the arms race |
-| 08-27 10:24–15:22 | **Campaign 2 — structural archfix (v2)**: two-mode separation at skill-selection; shim routing sentence; scenarios J/K. Tests: SDD never loads in İAA mode (3/3); native opt-in intact (15 agents). PASS |
-| 08-27 16:22–21:20 | **Campaign 3 — artifact boundary (v3)**: provenance rule. Authentic adversarial plan fixture; incl. strengthened "MUST use SDD" variant. PASS |
-| 08-27 21:20 → | source frozen (v3 unchanged since) |
-| 09-06 | **Production use**: LCO fifth-audit program under İAA adaptive mode (3 parallel read-only investigators → primary plan → primary sequential TDD), documented in isakli05/llm_council_orchestrator |
-| 09-22 | This baseline audit + private GitHub baseline |
+| 08-26 early | Live audit of Codex native multi-agent — design research before installing anything (ADR-0000) |
+| 08-26 17:39–17:54 | **v0 install** for 3 runtimes; Codex smoke A–E passes after one tightening (no manufactured reviewer on trivial tasks) |
+| 08-27 00:55–06:28 | **Campaign 1 — collision smoke test**: İAA vs co-loaded SDD. İAA kept topology authority; SDD cadence leaked; ~2.5× cost. PARTIAL PASS (ADR-0001) |
+| 08-27 07:39–08:47 | **Campaign 1b — prose post-fix (v1)**: identical wording, opposite outcomes across samples ⇒ prose precedence unreliable. PARTIAL PASS |
+| 08-27 10:24–15:22 | **Campaign 2 — structural archfix (v2)**: two-mode separation at skill selection; scenarios J/K. PASS (ADR-0002) |
+| 08-27 16:22–21:20 | **Campaign 3 — artifact boundary (v3)**: provenance rule; authentic + adversarial plan fixtures. PASS (ADR-0003) |
+| 08-27 21:20 → | policy frozen: v3 unchanged since (hash-pinned lineage) |
+| 09-06 | Production use: LCO fifth-audit program under Adaptive İAA mode (documented in the LCO repo) |
+| 09-22 | Forensic baseline audit → migration into this repository (private baseline) |
+| 09-22 | Competitive comparison vs SDD/GSD/BMAD/native systems: 4 differentiators confirmed, no counter-finding (`comparison/FINAL-COMPARISON-REPORT.md`) |
+| 09-22/23 | **Gate 1**: Superpowers 6.4.1 upgrade check + eval foundation |
+| 09-23 | **Identity migration** MAO→İAA (token-only; byte-equivalence proof) |
+| 09-23 | **Gate 2**: packaging (3 plugin forms), `/iaa:orchestrate` + `/orchestrate` invocation, `iaa doctor`, static CI, trigger characterization (68 sessions: 0/13 false positives, 6/6 yields) |
+| 09-23 | **Gate 3**: MIT + NOTICE license, publication readiness |
+| 09-23 | **İAA 0.1.0 — first public release** |
+| 09-23 | ZCode official validation of 0.1.0: found one-skill-contract failure + raw-URL marketplace resolution failure; 0.1.1 corrective plan (`post-release/zcode-official/`) |
+| 09-23 | **İAA 0.1.1 published**: ZCode packaging fix (Command instead of second skill, remote sha256-pinned marketplace), tag + GitHub release, deterministic artifacts, GUI acceptance at ZCode 3.14.3 (one skill, one command, zero-agent runs, clean disable/uninstall) |
+| 09-23 | **Upstream PR opened**: zai-org/zcode-plugins#42 (`feat(iaa): add adaptive delegation policy plugin`) |
 
-## The two 2026-08-27 evidence trees (what the task brief asked about) — and a third
+## Where the evidence lives now
 
-1. `~/mao-sdd-archfix-20260827/` — campaign 2 evidence: before/after snapshots +
-   exact diffs (the only surviving pre-git lineage), 4 test runs (repos/transcripts/runs),
-   FINAL-REPORT (PASS). Pure evidence; every source change in it is hash-proven present in
-   current canonical.
-2. `~/mao-sdd-artifact-boundary-20260827/` — campaign 3 evidence: snapshots +
-   additions-only diffs, the authentic generated adversarial plan (438 lines, real
-   "REQUIRED SUB-SKILL" header), session-a plan generation + tests B/C/D, FINAL-REPORT
-   (PASS). Pure evidence.
-3. `~/collision-smoke-test-evidence/` (+ report + zip at home root) — the brief
-   didn't name this one: campaigns 1 + 1b (taskcli seed repo with git history, 12 session
-   transcripts, 4 post-fix attempts, policy snapshots v0/v1). PARTIAL PASS ×2 — the
-   *failure* evidence that justifies the current design.
+- **In the repository (public):** condensed ADRs 0000–0003; lineage diffs +
+  v0/v1 policy snapshots (`historical-notes/v0-v3-lineage/`); the sanitized
+  adversarial plan fixture (`tests/fixtures/generated-PLAN.md`); the
+  transcript analyzer (`tests/tools/analyze_run.py`); Gate/comparison/release
+  reports (`release-hardening/`, `comparison/`, `post-release/`,
+  `audit/`, `identity-migration/`); eval suites + results
+  (`release-hardening/evals/`).
+- **Machine-local only (not published, by disposition policy):** raw campaign
+  transcripts/runs/repos, cost dumps, instruction-file backups, session dirs
+  (`docs/HISTORICAL-EVIDENCE-DISPOSITION.md`). The authoritative source is the
+  repository `iaa/`; the live `~/.local/share/iaa` tree is a deploy projection
+  of it (normalized Gate 2 — earlier "edit the live tree" procedure retired).
 
-**Disposition:** trees stay byte-identical in place (local-only; transcripts/costs/model
-data not for publication). Into the maintained repo went only: condensed ADRs, the lineage
-diffs + v0/v1 snapshots, the sanitized plan fixture, and the transcript analyzer tool.
-They are *not* runtime content and never were: canonical runtime source is and always was
-`~/.local/share/iaa/` alone.
+## Evidence quality notes (permanent)
 
-## Evidence quality notes
+- Behavioral tests observed actual tool-call events (transcript-extracted),
+  never model self-report.
+- Honesty caveats are preserved, not laundered: adversarial test D had a
+  disclosed priming risk; reviewer-count variance across samples is labeled
+  legitimate materiality variance; the install-session transcript was not
+  preserved (actions reconstructed from the installer + backups).
+- All behavioral evidence is single-model (GLM-5.3 profile on Claude Code);
+  no other family sampled (IAA-BL-007).
 
-- Behavioral tests observed actual tool-call events (transcript-extracted), not model
-  self-report; an analyzer script (now `tests/tools/analyze_run.py`) did the extraction.
-- Cost/model: glm-5.3[1m] via GLM provider on Claude Code 2.1.246; seed commit ff735a6
-  reused across campaigns for comparability.
-- Known honesty caveats preserved: test D (adversarial) had a priming risk (disclosed);
-  reviewer-count variance across samples is called legitimate materiality variance, not
-  success/failure; install-session transcript was not preserved (actions reconstructed
-  from manage.sh + backups).
+**Stable file** — post-0.1.1 events and open external work live in
+`11-CURRENT-STATE.md`.
