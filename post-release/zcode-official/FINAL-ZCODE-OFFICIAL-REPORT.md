@@ -7,10 +7,13 @@ or released** (STOP per owner instruction J).
 
 ## Direct answers
 
-1. **What exact ZCode version was behaviorally tested?** ZCode Desktop
-   **3.14.3** (AppImage `3.14.3.7762`). The pre-flight 3.11.2 pin was
-   invalidated by an in-window AppImage replacement (mtime 20:23 local;
-   detail in VALIDATION-REPORT F1).
+1. **What exact ZCode version was behaviorally tested?** Two tiers:
+   skills-dir behavioral baseline = **3.11.2** (historical TESTED
+   evidence); plugin-form GUI observation = **3.14.3** (AppImage
+   `3.14.3.7762` — install/component behavior observed, `$iaa` model-call
+   validation NOT COMPLETED). The pre-flight 3.11.2 pin was invalidated by
+   an in-window AppImage replacement (mtime 20:23 local; detail in
+   VALIDATION-REPORT F1).
 2. **Did the GUI plugin install succeed?** YES — from the LOCAL marketplace
    path, with byte-verified 0.1.0 content (F3). The raw-URL channel FAILED
    (F2).
@@ -137,12 +140,33 @@ are unaffected).
 ## Owner next steps
 
 1. Decide/approve the 0.1.1 patch release (this plan or amended).
-2. Optionally fix the machine's IPv6 egress (or IPv4 preference) so ZCode
-   3.14.3 can reach api.z.ai — independent of İAA; also consider reporting
-   the connection behavior to ZCode via their in-app feedback (no public
-   issue tracker exists).
+2. ZCode connectivity (independent of İAA): root cause CONFIRMED at the
+   runtime level and matched upstream — see NETWORK-DIAGNOSTIC.md and
+   [zai-org/feedback#699](https://github.com/zai-org/feedback/issues/699).
+   Options: subscribe/comment on #699 (draft prepared), the #699-confirmed
+   `/etc/hosts`+relay workaround, or a transient system IPv6 disable —
+   owner decision. (`/etc/gai.conf` and `NODE_OPTIONS` are known
+   ineffective for this app.)
 3. After 0.1.1 lands: re-run the GUI validation leg and submit the upstream
    PR with real evidence.
+
+## Second-pass corrections (2026-09-23, later — commit on this branch)
+
+1. Network root cause: first-pass attribution ("broken IPv6 × ZCode
+   connection behavior", stated as fact) replaced by a controlled result —
+   **CONFIRMED at the embedded-runtime level** via single-variable A/B in
+   ZCode's own Node (default autoSelectFamily → ETIMEDOUT; disabled →
+   HTTP 200; ipv4first → no effect), corroborated by upstream #699 which
+   also confirms the in-app path and a working workaround. Not a Z.ai
+   backend failure. Full record: NETWORK-DIAGNOSTIC.md.
+2. Public tracker: the first-pass claim "no public issue tracker exists"
+   was wrong. Official channels include the `zai-org/feedback` GitHub
+   Issues (verified; 649 open). Matching issue: #699. No new issue to
+   file; confirming-comment draft prepared, not posted.
+3. Compatibility wording: evidence tiers separated — 3.11.2 = skills-dir
+   behavioral baseline (TESTED, historical); 3.14.3 = plugin-form GUI
+   observation only (install/components; `$iaa` model-call validation NOT
+   COMPLETED). Plugin form remains STRUCTURALLY COMPATIBLE (no upgrade).
 
 ---
 

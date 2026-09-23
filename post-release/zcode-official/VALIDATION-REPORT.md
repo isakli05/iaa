@@ -121,23 +121,35 @@ ZCODE PLUGIN-FORM BEHAVIORAL VALIDATION:
 
 - ZCode could not reach its model backend during the window
   ("Reconnecting"; Z.ai login failed; manual API key also failed).
-- Independent diagnosis (H) — summarized here, full detail in
-  FINAL-ZCODE-OFFICIAL-REPORT.md: both auth modes fail at the TRANSPORT
-  layer against `https://api.z.ai/api/anthropic` (74 timeouts in the log;
-  `builtin:zai-coding-plan` 40×, `zai-api` 34×; `errorPhase: connect`;
-  signing handshake `errorKind: handshake-network`), while the same
-  endpoint answers **HTTP 200 in ~1 s over IPv4 from this machine**. The
-  machine has **no global IPv6 address and no IPv6 default route**, yet DNS
-  returns AAAA — the app's Electron/Node connection stack attempts IPv6
-  without effective IPv4 fallback and times out (curl survives via
-  Happy-Eyeballs). **Attribution: local broken-IPv6 environment × ZCode
-  3.14.3 connection behavior. NOT İAA** (no network involvement; plugin
-  lifecycle itself was clean). No public issue tracker exists to match
-  (`zai-org/ZCode` has issues disabled; feedback is in-app); the symptom
-  class is publicly reported for ZCode ≥3.1.4.
-- Owner-side remediation candidates (NOT executed, owner decision):
-  IPv4 preference via `/etc/gai.conf` (`precedence ::ffff:0:0/96`),
-  disabling IPv6 system-wide, or a `NODE_OPTIONS`/launcher workaround.
+- Diagnosis (second pass, controlled): both auth modes fail at the
+  TRANSPORT layer against `https://api.z.ai/api/anthropic` (74 timeouts in
+  the log; `builtin:zai-coding-plan` 40×, `zai-api` 34×; `errorPhase:
+  connect`; signing handshake `errorKind: handshake-network`), while the
+  same endpoint answers **HTTP 200 over IPv4 from this machine**. Full
+  record: **NETWORK-DIAGNOSTIC.md**. Status: **CONFIRMED at the embedded-
+  runtime level** by a single-variable A/B inside ZCode's own Node runtime
+  (default `autoSelectFamily` → ETIMEDOUT; disabled → HTTP 200;
+  `ipv4first` → no effect, so DNS ordering is not the mechanism), and
+  **corroborated by the matching upstream issue
+  [zai-org/feedback#699](https://github.com/zai-org/feedback/issues/699)**
+  (same Node 24.14.0, same signature, same root cause — Node Happy-Eyeballs
+  250 ms attempt budget killed before a >250 ms IPv4 connect completes —
+  with an in-app-confirmed workaround). **NOT İAA** (no network
+  involvement; plugin lifecycle itself was clean) and **NOT a Z.ai backend
+  failure** (backend healthy via curl).
+- Correction of the first-pass record: the public tracker statement was
+  wrong — ZCode's official support channels include the
+  **`zai-org/feedback` GitHub issue tracker** (649 open issues; verified)
+  alongside in-app feedback; the matching issue is #699 and no new issue
+  should be filed (it would duplicate it). A confirming comment draft is
+  prepared in NETWORK-DIAGNOSTIC.md (not posted; owner approval required).
+- Remediation candidates known INEFFECTIVE for the app (do not pursue):
+  `/etc/gai.conf` IPv4 preference (DNS order is not the mechanism) and
+  `NODE_OPTIONS` (rejected by the packaged app — "Most NODE_OPTIONs are
+  not supported in packaged apps" — and stripped from the spawned agent
+  process per #699). Effective options (owner decision, none executed):
+  ZCode-side fix via #699 (runtime/undici timeout), the #699-confirmed
+  `/etc/hosts`+local-relay workaround, or transient system IPv6 disable.
 
 ## Original-state restoration (proof)
 
@@ -166,6 +178,8 @@ consistent with the backup-first lifecycle design; left in place.
 ## Evidence index (publication-safe)
 
 - `SNAPSHOT-RECORD.md` — rollback snapshot record (paths, hashes, commands)
+- `NETWORK-DIAGNOSTIC.md` — controlled IPv4/IPv6 A/B diagnostic record +
+  upstream-issue match + comment draft (second pass, 2026-09-23)
 - `evidence/gui-installed-marketplace-copy.SHA256` — 13-file manifest of
   ZCode's copy of the installed 0.1.0 marketplace/plugin content
 - Out-of-repo (private): `~/.local/state/iaa/rollback-zcode-20260923T195347+0300/`
