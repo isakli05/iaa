@@ -54,5 +54,5 @@ Routing is instruction-following; selection is model-driven and fallible
 Gate-2/3 re-runs) never mis-routed. Tripwire: scenario J + `analyze_run.py`
 after any Superpowers update (standing backlog item IAA-BL-010).
 
-**Stable file** — the installed/tested Superpowers version lives in
-`11-CURRENT-STATE.md`.
+**Stable file** — the installed/tested Superpowers version is read live from
+GitHub (`docs/COMPATIBILITY.md`).

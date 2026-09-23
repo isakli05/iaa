@@ -66,5 +66,5 @@ guarantee"). The boundary is a tested behavior with a regression tripwire
 (scenario J + `analyze_run.py`), not a mechanism guarantee. Single-model
 evidence (GLM-5.3 profile) — other families UNVERIFIED.
 
-**Stable file** — evidence-set dates and counts live on GitHub; version values
-live in `11-CURRENT-STATE.md`.
+**Stable file** — evidence-set dates and counts live on GitHub; the pack
+carries no version values.

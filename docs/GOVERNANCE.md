@@ -154,8 +154,11 @@ Conservative model (do not migrate wholesale; do not create issue noise):
 ## 8. Staleness defense (for living documents)
 
 Living documents separate **stable** content (charter, architecture, lifecycle)
-from **volatile** content (versions, open PRs, current state). Volatile values
-live in as few places as possible — in the Claude Project pack, exactly one
-deliberately volatile file carries them. Every volatile file states its refresh
-date and the repository ref it describes, and any snapshot explicitly yields to
-live `main`.
+from **volatile** content (versions, open PRs, current state). The Claude
+Project pack carries no volatile values at all: Project Knowledge is durable
+orientation only, and every current-state question is answered from the live
+repository (`VERSION`, `docs/BACKLOG.md`, `docs/COMPATIBILITY.md`,
+`docs/KNOWN-LIMITATIONS.md`, releases/tags, open PRs/issues, canonical
+source). Dated snapshots kept for provenance (e.g.
+`web-project-sources/11-CURRENT-STATE.md`) state the repository ref they
+describe, are not uploaded, and always yield to live `main`.

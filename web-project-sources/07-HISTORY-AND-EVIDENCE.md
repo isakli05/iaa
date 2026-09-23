@@ -56,5 +56,5 @@ in an evidence file means the same product, earlier name.
 - All behavioral evidence is single-model (GLM-5.3 profile on Claude Code);
   no other family sampled (IAA-BL-007).
 
-**Stable file** — post-0.1.1 events and open external work live in
-`11-CURRENT-STATE.md`.
+**Stable file** — events after this timeline and current open external work
+are read live from GitHub (`docs/BACKLOG.md`, releases/tags, PRs/issues).

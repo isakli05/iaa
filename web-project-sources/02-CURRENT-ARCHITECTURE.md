@@ -10,7 +10,7 @@ agent decides). Deep versions on GitHub: `docs/SOURCE-OF-TRUTH.md`,
 ```text
 GitHub main  (isakli05/iaa)
 └── iaa/                        THE behavioral core (all edits happen here)
-    ├── SKILL.md                policy v3 — modes, boundary, decision core
+    ├── SKILL.md                the policy — modes, boundary, decision core
     ├── references/             delegation-contract.md + platform-adapters.md
     ├── scripts/manage.sh       install / verify / uninstall (skills-dir form)
     └── tests/scenarios.md      behavioral contract, scenarios A–K
@@ -27,7 +27,7 @@ GitHub main  (isakli05/iaa)
   (`scripts/check-parity.sh`). A user must never get different İAA semantics
   from different channels.
 - **Two version axes:** package `VERSION` (SemVer — which artifact) vs policy
-  revision (which semantics; v3 since 2026-08-27). See `docs/POLICY-LINEAGE.md`.
+  revision (which semantics — live value in `docs/POLICY-LINEAGE.md`).
 - **Instruction-channel integration:** plugins cannot write user instruction
   files, so an explicit, reversible, marker-delimited "shim" step installs the
   load-on-trigger routing block — "plugin distributes, script integrates"
@@ -77,5 +77,5 @@ that list before shipping (governance rule, `docs/GOVERNANCE.md` §2).
 - **ZCode** — Explore (no AGENTS.md injection → restate) / general-purpose;
   nesting platform-impossible.
 
-**Stable file** — current versions and claim statuses live in
-`11-CURRENT-STATE.md` / GitHub `docs/COMPATIBILITY.md`.
+**Stable file** — current versions and claim statuses are read live from
+GitHub (`VERSION`, `docs/COMPATIBILITY.md`).

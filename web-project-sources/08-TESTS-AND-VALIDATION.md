@@ -58,5 +58,5 @@ the validation stack and the release discipline the repository holds itself to.
 - **Evidence before assertion.** No invented test evidence; gaps stay labeled
   until closed.
 
-**Stable file** — current validation status values live in
-`11-CURRENT-STATE.md`.
+**Stable file** — current validation statuses are read live from GitHub
+(`docs/COMPATIBILITY.md`, `docs/TESTING-AND-VALIDATION.md`).

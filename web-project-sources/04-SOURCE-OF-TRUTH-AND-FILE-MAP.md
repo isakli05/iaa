@@ -60,4 +60,4 @@ was made* → `docs/adr/` + dated reports; for *what changed when* →
 - **TESTED / PARTIALLY TESTED / STRUCTURALLY COMPATIBLE / UNVERIFIED** — the
   honesty-graded compatibility statuses (`docs/COMPATIBILITY.md`).
 
-**Stable file** — version-specific values live in `11-CURRENT-STATE.md`.
+**Stable file** — version-specific values are read live from GitHub.

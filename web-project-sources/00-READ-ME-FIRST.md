@@ -9,9 +9,13 @@ and not a substitute for the repository.
 
 - **Uploaded context (this pack) = orientation.** What İAA is, why it exists,
   its invariants, its vocabulary, how decisions are made, where truth lives.
-- **GitHub `main` (connected) = operational truth.** Current source, version,
-  compatibility claims, backlog, evidence. Fetch it before answering anything
-  version- or status-dependent.
+- **GitHub `main` (connected) = operational truth — the sole source of current
+  state.** Current source, version, compatibility claims, backlog, evidence.
+  For every question involving current state, inspect the live repository as
+  applicable: `VERSION`, `docs/BACKLOG.md`, `docs/COMPATIBILITY.md`,
+  `docs/KNOWN-LIMITATIONS.md`, current releases/tags, relevant open
+  PRs/issues, and the canonical source (`iaa/`). The pack deliberately
+  contains **no current-state snapshot** — nothing uploaded can go stale.
 
 ## Authority hierarchy (memorize this)
 
@@ -33,10 +37,12 @@ match current state: a dated report records what was true when written.
 ## How to use the connected GitHub repository
 
 Before answering status questions or proposing work: check `main`'s `VERSION`,
-`README.md`, `docs/COMPATIBILITY.md`, and `docs/BACKLOG.md`. Treat a detailed
-old report as history, not news. Fetch canonical files (`iaa/SKILL.md`,
-references, tests) live when precision matters — the pack's `sources/`
-snapshots exist for provenance and are not uploaded.
+`README.md`, `docs/BACKLOG.md`, `docs/COMPATIBILITY.md`, and
+`docs/KNOWN-LIMITATIONS.md`, plus current releases/tags and the live state of
+relevant open PRs/issues. Treat a detailed old report as history, not news.
+Fetch canonical files (`iaa/SKILL.md`, references, tests) live when precision
+matters — the pack's `sources/` snapshots exist for provenance and are not
+uploaded.
 
 ## Current vs historical — the traps
 
@@ -51,18 +57,21 @@ snapshots exist for provenance and are not uploaded.
 
 ## Staleness model
 
-Every file here carries a refresh date + repository ref. **Only
-`11-CURRENT-STATE.md` is volatile** (versions, PRs, open work). All other
-files are stable by design and must not accumulate version-specific values —
-those belong in 11 or on GitHub.
+Every file here is stable by design and carries no fast-changing values —
+no versions, PR/issue states, releases, or backlog statuses anywhere in the
+pack. Current operational state is always fetched live from GitHub, so the
+pack needs **no routine refresh or re-upload** after releases or upstream
+events. (The repository separately keeps a dated provenance snapshot,
+`11-CURRENT-STATE.md`; it is *not* part of the upload set.)
 
 ## Reading order
 
 `01` (charter) → `02` (architecture) → `03` (behavioral contract) →
-`12` (governance + backlog workflow) → `11` (current state) → then as needed:
+`12` (governance + backlog workflow) → then as needed:
 `05` (SDD boundary), `06` (integrations), `07` (history), `08`
 (validation/release principles), `09` (limitations/open questions), `10`
 (research landscape), `04` (file map/glossary).
 
-**Pack refreshed:** 2026-09-24 · against `main` @ `479cea7` (İAA 0.1.1,
-policy v3). Live `main` supersedes anything here.
+**Pack revised:** 2026-09-24 (durability revision — current-state snapshot
+removed from the upload set) · against `main` @ `b913778`. Live `main`
+supersedes anything here.

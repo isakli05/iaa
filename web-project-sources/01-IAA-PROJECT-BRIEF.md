@@ -20,7 +20,7 @@ task, including trivial ones). İAA is the narrow third position: **one policy,
 no framework** — a tested decision procedure for the primary agent and nothing
 else.
 
-## The defining rules (behavioral core, policy revision v3)
+## The defining rules (behavioral core; live revision in `docs/POLICY-LINEAGE.md`)
 
 1. **Materiality test** — delegate only when a concrete benefit (parallelism,
    bounded isolation, specialization, context offloading, independent
@@ -78,4 +78,5 @@ not through feature accumulation. Competitor ideas are adopted only under the
 recorded KEEP/ADOPT/EXPERIMENT/DO-NOT-ADOPT discipline
 (`comparison/FINAL-COMPARISON-REPORT.md` §17).
 
-**Stable file** — no version-specific values (they live in `11-CURRENT-STATE.md`).
+**Stable file** — no version-specific values in the pack; read current
+versions live from GitHub (`VERSION`, `docs/POLICY-LINEAGE.md`).

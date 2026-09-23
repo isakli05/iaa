@@ -32,6 +32,6 @@ step — plugins cannot write instruction files). Authoritative docs on GitHub:
   packaging layer.
 
 **Stable file** — current tested runtime versions, package versions, and
-per-form claim statuses live in `11-CURRENT-STATE.md` and GitHub
-`docs/COMPATIBILITY.md` (both honesty-graded: TESTED / PARTIALLY TESTED /
+per-form claim statuses are read live from GitHub (`VERSION`,
+`docs/COMPATIBILITY.md`; honesty-graded: TESTED / PARTIALLY TESTED /
 STRUCTURALLY COMPATIBLE / UNVERIFIED).

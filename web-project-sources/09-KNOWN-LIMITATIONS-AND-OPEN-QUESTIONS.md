@@ -48,9 +48,10 @@ several once-open items are resolved and are marked so, not silently dropped.
 
 **Environment facts (constraints, not defects)**
 13. ZCode 3.14.x provider bug (zai-org/feedback#699): model requests fail
-    ETIMEDOUT on IPv4-only networks; documented temporary single-IPv4
-    `api.z.ai` hosts workaround, TLS-verified and fully reversible — required
-    again in the 0.1.1 GUI window; upstream fix pending (→ IAA-BL-002).
+    ETIMEDOUT on IPv4-only networks; a documented temporary single-IPv4
+    `api.z.ai` hosts workaround exists (TLS-verified, fully reversible).
+    Upstream tracking and the İAA-side action are backlog item IAA-BL-002 —
+    check its live state before assuming the bug still applies.
 
 ## Open questions (remaining; all tracked in docs/BACKLOG.md)
 
@@ -75,5 +76,5 @@ several once-open items are resolved and are marked so, not silently dropped.
   measurement: hybrid retained (68-session characterization: 0/13 false
   positives, 6/6 yields, explicit entry 3/3).
 
-**Stable file** — current statuses live on GitHub; volatile values in
-`11-CURRENT-STATE.md`.
+**Stable file** — current statuses are read live from GitHub
+(`docs/KNOWN-LIMITATIONS.md`, `docs/BACKLOG.md`).

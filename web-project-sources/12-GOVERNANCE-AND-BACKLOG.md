@@ -25,9 +25,10 @@ idea → research candidate → experiment → accepted design → implementatio
 
 ## The backlog
 
-- **Canonical path:** `docs/BACKLOG.md` in the repository (GitHub Issues/PRs
+- **Canonical path:** `docs/BACKLOG.md` in the repository — read it live;
+  its status values are never duplicated into the pack. (GitHub Issues/PRs
   are execution artifacts; a useful Issue cross-links its `IAA-BL-###`; they
-  never replace product intent).
+  never replace product intent.)
 - **Stable IDs** `IAA-BL-001…`; statuses: OPEN / WAITING(external) / OWNER
   DECISION / PROPOSED / RESEARCH / STANDING / DEFERRED / CLOSED.
 - Completed requires repository evidence. External waits name what/whom. A
@@ -38,9 +39,12 @@ idea → research candidate → experiment → accepted design → implementatio
 
 1. Inspect GitHub `main` (HEAD, recent commits) and `VERSION`.
 2. Read `docs/BACKLOG.md`.
-3. Check the linked external state where claims depend on it (e.g. `gh pr
-   view 42 --repo zai-org/zcode-plugins`), and `docs/COMPATIBILITY.md` for
-   version-sensitive items.
+3. Read current state live wherever the item depends on it:
+   `docs/COMPATIBILITY.md` and `docs/KNOWN-LIMITATIONS.md` for
+   version-sensitive items, current releases/tags, the live state of the
+   relevant open PRs/issues (e.g. `gh pr view <n> --repo …`), and the
+   canonical source (`iaa/`) when precision matters. Current state never
+   comes from the pack — it deliberately contains no snapshot.
 4. Separate **actual blockers** from merely **pending external work** (a wait
    that blocks nothing İAA-side is not a blocker).
 5. Classify candidates: maintenance vs research vs product development vs

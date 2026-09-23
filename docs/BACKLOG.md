@@ -244,14 +244,20 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   due merely because upstream moved.
 - **Evidence:** "Re-verification discipline" in [COMPATIBILITY.md](COMPATIBILITY.md).
 
-### IAA-BL-012 — Claude Web project pack refresh
+### IAA-BL-012 — Claude Project pack hygiene (sources/ parity)
 - **Status:** `STANDING` · **Category:** maintenance
-- **Rule:** after each release, policy-revision change, or major upstream event:
-  refresh `web-project-sources/11-CURRENT-STATE.md` (the single deliberately
-  volatile pack file), re-verify `web-project-sources/sources/` parity if the
-  core changed, and re-review this backlog.
+- **Rule:** the Claude Project pack is durable by design and carries no
+  current-state snapshot — current operational state is read live from this
+  repository, and nothing is refreshed or re-uploaded after releases
+  (design change 2026-09-24; the earlier refresh-and-re-upload obligation is
+  retired). Remaining standing hygiene: re-verify
+  `web-project-sources/sources/` byte parity whenever the behavioral core
+  changes; re-review pack files only when their durable content (charter,
+  architecture, governance, history narrative) itself changes.
 - **Evidence:** staleness model in
-  [MANIFEST.md](../web-project-sources/MANIFEST.md).
+  [MANIFEST.md](../web-project-sources/MANIFEST.md);
+  `web-project-sources/11-CURRENT-STATE.md` (repo-side dated snapshot, not
+  uploaded).
 
 ## DEFERRED
 

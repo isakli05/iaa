@@ -43,26 +43,33 @@ GitHub = current operational truth.)
 Upload exactly the files listed in `MANIFEST.md` (REQUIRED → RECOMMENDED →
 OPTIONAL order). A ready-to-upload copy of the full set, in order, is
 exported locally at `.claude-web-project-upload/` with
-`UPLOAD-MANIFEST.txt`; upload that directory's contents as-is.
+`UPLOAD-MANIFEST.txt`; upload that directory's contents as-is. The set
+deliberately contains **no current-state snapshot** — with GitHub connected,
+current state is always read live.
 
 ## First prompt to send inside the new project (copy/paste)
 
 ```text
 Orient yourself: read the uploaded pack (start with CLAUDE-PROJECT-INSTRUCTIONS
-and 00-READ-ME-FIRST), then check the live repository state (VERSION,
-README, docs/BACKLOG.md, and the current state of the two external items:
-zai-org/zcode-plugins PR #42 and zai-org/feedback #699). Then answer, without
-starting any implementation: (1) what is the current state of İAA in two
-sentences; (2) what does the backlog say we should work on next, split into
+and 00-READ-ME-FIRST) — it is durable orientation only and deliberately
+contains no current-state snapshot. Then read CURRENT state live from the
+connected GitHub repository: VERSION, README.md, docs/BACKLOG.md,
+docs/COMPATIBILITY.md, docs/KNOWN-LIMITATIONS.md, the current releases/tags,
+and the live state of any open PRs/issues the backlog names. Then answer,
+without starting any implementation: (1) the current state of İAA in two
+sentences; (2) what the backlog says we should work on next, split into
 maintenance / research / product development / owner decisions; (3) which of
-those are actually blocked vs merely waiting on external parties; (4) what
-decision would you put in front of me first, with the evidence for it?
+those are actually blocked vs merely waiting on external parties; (4) the
+first decision you would put in front of me, with the evidence for it.
 ```
 
 ## After creation
 
 - Do not upload `sources/` snapshots, `MANIFEST.md`, this file, or
-  `CLAUDE-SETUP` material — GitHub serves all of that live.
-- After every release or major change, refresh the volatile pack file
-  (`11-CURRENT-STATE.md`) per the standing backlog item IAA-BL-012 — the
-  repo copy is regenerated first, then re-uploaded to the project knowledge.
+  `11-CURRENT-STATE.md` (a dated repo-side provenance record) — GitHub
+  serves all current and canonical material live.
+- The pack is durable: no post-release refresh or re-upload is required.
+  Current operational state is always read from the connected repository.
+  Update a pack file only when its durable content itself changes (charter,
+  architecture, governance, history) — never to chase versions, PRs,
+  releases, or backlog status.

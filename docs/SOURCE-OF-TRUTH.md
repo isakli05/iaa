@@ -51,7 +51,7 @@ detectable drift (`iaa doctor` reports it), not the workflow.
 | `tests/tools/analyze_run.py` | transcript→skill/spawn extractor | tooling |
 | `tests/doctor/`, `tests/install-matrix/` | Gate-2 unit + matrix tests | tooling |
 | `audit/`, `research/`, `design/`, `comparison/`, `release-hardening/`, `identity-migration/` | dated working/evidence records | audit records (not rewritten) |
-| `web-project-sources/` | Claude Project orientation pack (sources/ = byte-exact core snapshots) | derived copy (orientation only; never overrides canonical) |
+| `web-project-sources/` | Claude Project orientation pack (sources/ = byte-exact core snapshots; no current-state snapshot — live repo serves current state) | derived copy (orientation only; never overrides canonical) |
 
 ## Machine-local material deliberately NOT in this repo
 

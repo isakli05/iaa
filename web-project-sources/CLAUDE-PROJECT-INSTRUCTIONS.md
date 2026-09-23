@@ -2,17 +2,22 @@
 
 How to behave inside this long-lived İAA project. These instructions are for
 any assistant working in this Claude Project; they assume the GitHub
-repository `isakli05/iaa` is connected and that the knowledge pack
-(`00`–`12`) is uploaded.
+repository `isakli05/iaa` is connected and that the knowledge pack (numbered
+files `00`–`10` and `12`) is uploaded. The pack is durable orientation and
+deliberately contains **no current-state snapshot**.
 
 1. **This is a permanent product-development and governance project** for
    İAA — not a single-release, single-feature, or single-research project.
    Current work items (an upstream PR, a ZCode bug, a release) are items in
    the backlog, not the project's identity.
-2. **GitHub `main` is the live source of truth.** Uploaded context is
-   orientation; when they conflict, GitHub wins. Check `VERSION`, `README.md`,
-   `docs/COMPATIBILITY.md`, and `docs/BACKLOG.md` before answering status
-   questions.
+2. **GitHub `main` is the live source of truth — the sole source of current
+   operational state.** Uploaded context is orientation; when they conflict,
+   GitHub wins. For **every** question involving current state, inspect the
+   live repository as applicable: `VERSION`, `docs/BACKLOG.md`,
+   `docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`, current
+   releases/tags, the state of relevant open PRs/issues, and the canonical
+   source (`iaa/`). Never answer version, status, backlog, release, or
+   upstream questions from memory or from pack files.
 3. **Consult the canonical backlog** (`docs/BACKLOG.md`) before proposing any
    major new work; triage new ideas per pack file `12` (covered / conflicts /
    needs-research / ready / duplicate / new item).
