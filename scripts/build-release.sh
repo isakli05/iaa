@@ -6,7 +6,9 @@
 #   dist/iaa-<version>-claude-plugin.tar.gz  the Claude plugin package
 #   dist/iaa-<version>-codex.tar.gz      the Codex package (plugin + marketplace)
 #   dist/iaa-<version>-zcode.tar.gz      the ZCode plugin + marketplace
-#   dist/iaa-<version>-plugin.zip        deterministic ZCode remote-install archive
+#   dist/iaa-<version>-plugin.zip        ZCode remote-install archive (content-
+#                                         deterministic; compressed bytes depend
+#                                         on the zlib implementation, IAA-BL-016)
 #                                         (official build_dist discipline; sha256 must
 #                                         match the pin in marketplace.remote.json)
 #   dist/marketplace.remote.json         the public remote marketplace document from
@@ -67,10 +69,13 @@ repack_deterministic "$COMMIT":packaging/claude "iaa-$VERSION-claude-plugin.tar.
 repack_deterministic "$COMMIT":packaging/codex  "iaa-$VERSION-codex.tar.gz"
 repack_deterministic "$COMMIT":packaging/zcode "iaa-$VERSION-zcode.tar.gz"
 
-# Deterministic ZCode plugin.zip from the commit's plugin tree (0.1.1+), built
-# with the official build_dist discipline (scripts/build-plugin-zip.py). The
-# committed marketplace.remote.json sha256 pin must equal the built archive —
-# a stale pin aborts the release build.
+# ZCode plugin.zip from the commit's plugin tree (0.1.1+), built with the
+# official build_dist discipline (scripts/build-plugin-zip.py). The committed
+# marketplace.remote.json sha256 pin must equal the built archive's raw bytes —
+# a stale pin aborts the release build. This is the release-time byte
+# verification: it holds in the zlib environment that produced the released
+# archive (archive bytes are zlib-implementation-dependent — IAA-BL-016;
+# CI instead verifies archive-content parity via the release-pin record).
 IAA_ZIP_STAGE=$(mktemp -d)
 mkdir -p "$IAA_ZIP_STAGE/iaa"
 git archive --format=tar "$COMMIT":packaging/zcode/plugins/iaa | tar -x -C "$IAA_ZIP_STAGE/iaa"
@@ -82,6 +87,7 @@ IAA_ZIP_PINNED=$(jq -r '.plugins[0].source.sha256 // empty' dist/marketplace.rem
 if [ -z "$IAA_ZIP_PINNED" ] || [ "$IAA_ZIP_SHA" != "$IAA_ZIP_PINNED" ]; then
   printf 'build-release: marketplace.remote.json sha256 pin (%s) != built plugin.zip (%s)\n' \
       "${IAA_ZIP_PINNED:-missing}" "$IAA_ZIP_SHA" >&2
+  printf 'build-release: archive bytes depend on the zlib implementation (IAA-BL-016); this byte check must run in the environment that produced the released archive\n' >&2
   exit 1
 fi
 

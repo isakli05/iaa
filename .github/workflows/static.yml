@@ -37,6 +37,9 @@ jobs:
       - name: iaa doctor + legacy migration unit tests
         run: tests/doctor/run-tests.sh
 
+      - name: Release-pin archive-content parity unit tests
+        run: tests/release-pin/run-tests.sh
+
       - name: Claude plugin validation (when the CLI is available)
         run: |
           if command -v claude >/dev/null 2>&1; then

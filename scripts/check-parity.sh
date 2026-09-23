@@ -5,6 +5,8 @@
 #  - any packaging projection of the behavioral core is not byte-exact to iaa/
 #  - a projection lacks its PROVENANCE marker or the version disagrees
 #  - any manifest name/version disagrees with VERSION / the fixed identity
+#  - the marketplace.remote.json pin disagrees with the published-artifact
+#    release-pin record, or a fresh build's archive content differs from it
 #  - the shim text in scripts/iaa drifts from iaa/scripts/manage.sh
 #  - the tree would change if build-packages.sh were re-run (non-deterministic
 #    or hand-edited projections)
@@ -79,16 +81,23 @@ iaa_mn_zv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/mar
 [ "$iaa_mn_zv" = "$VERSION" ] || fail "zcode marketplace entry version != VERSION"
 note "OK manifests: name=iaa, version=$VERSION everywhere"
 
-# 3b. remote marketplace: sha256 pin == deterministic zip of the zcode plugin --
-iaa_rm_tmp=$(mktemp)
-iaa_rm_sha=$(python3 "$REPO_ROOT/scripts/build-plugin-zip.py" \
-    "$REPO_ROOT/packaging/zcode/plugins/iaa" "$iaa_rm_tmp" 2>/dev/null) \
-  || fail "deterministic plugin.zip build failed"
-rm -f -- "$iaa_rm_tmp"
-iaa_rm_want=$(jq -r '.plugins[0].source.sha256 // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")
-[ -n "$iaa_rm_want" ] || fail "marketplace.remote.json: missing plugins[0].source.sha256"
-[ "$iaa_rm_sha" = "$iaa_rm_want" ] \
-  || fail "marketplace.remote.json sha256 ($iaa_rm_want) != freshly built plugin.zip ($iaa_rm_sha) — regenerate via scripts/build-packages.sh"
+# 3b. remote marketplace: pin == published-artifact release-pin record; a fresh
+#     build has the same archive CONTENT as the published artifact. DEFLATE
+#     bytes are zlib-implementation-dependent (IAA-BL-016), so raw-sha equality
+#     with a fresh build is a release-time check (scripts/build-release.sh),
+#     not a CI check.
+IAA_PIN_RECORD="$REPO_ROOT/packaging/release-pins/$VERSION.json"
+[ -f "$IAA_PIN_RECORD" ] || fail "missing release-pin record $IAA_PIN_RECORD"
+iaa_rm_pin=$(jq -r '.plugins[0].source.sha256 // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")
+[ -n "$iaa_rm_pin" ] || fail "marketplace.remote.json: missing plugins[0].source.sha256"
+iaa_rm_rec=$(jq -r '.sha256 // empty' "$IAA_PIN_RECORD")
+[ -n "$iaa_rm_rec" ] || fail "$IAA_PIN_RECORD: missing sha256"
+[ "$iaa_rm_pin" = "$iaa_rm_rec" ] \
+  || fail "marketplace.remote.json sha256 ($iaa_rm_pin) != release-pin record sha256 ($iaa_rm_rec)"
+[ "$(jq -r '.version // empty' "$IAA_PIN_RECORD")" = "$VERSION" ] \
+  || fail "release-pin record version != VERSION ($VERSION)"
+[ "$(jq -r '.asset_url // empty' "$IAA_PIN_RECORD")" = "https://github.com/isakli05/iaa/releases/download/v$VERSION/iaa-$VERSION-plugin.zip" ] \
+  || fail "release-pin record asset_url is not the versioned release asset for $VERSION"
 iaa_rm_url=$(jq -r '.plugins[0].source.url // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")
 [ "$iaa_rm_url" = "https://github.com/isakli05/iaa/releases/download/v$VERSION/iaa-$VERSION-plugin.zip" ] \
   || fail "marketplace.remote.json url is not the versioned release asset for $VERSION"
@@ -96,7 +105,15 @@ iaa_rm_url=$(jq -r '.plugins[0].source.url // empty' "$REPO_ROOT/packaging/zcode
   || fail "marketplace.remote.json source.path != iaa"
 [ "$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")" = "$VERSION" ] \
   || fail "marketplace.remote.json entry version != VERSION"
-note "OK remote marketplace: url/zip/path pinned, sha256 $iaa_rm_sha"
+# archive-content parity: fresh deterministic build vs the published artifact
+iaa_rm_tmp=$(mktemp)
+python3 "$REPO_ROOT/scripts/build-plugin-zip.py" \
+    "$REPO_ROOT/packaging/zcode/plugins/iaa" "$iaa_rm_tmp" >/dev/null 2>&1 \
+  || { rm -f -- "$iaa_rm_tmp"; fail "deterministic plugin.zip build failed"; }
+python3 "$REPO_ROOT/scripts/release-pin.py" compare "$iaa_rm_tmp" "$IAA_PIN_RECORD" \
+  || { rm -f -- "$iaa_rm_tmp"; fail "plugin content does not match the published v$VERSION artifact (release-pin record); if the content change is intentional, a release step is required (IAA-BL-016)"; }
+rm -f -- "$iaa_rm_tmp"
+note "OK remote marketplace: pinned to published v$VERSION artifact; fresh build content-identical (sha256 $iaa_rm_pin)"
 
 # 4. shim text parity: scripts/iaa vs iaa/scripts/manage.sh ----------------------
 iaa_st_paragraphs() { # $1 file — prints the two routing paragraphs

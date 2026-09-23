@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""İAA release pin record tool — archive-content parity (IAA-BL-016).
+
+DEFLATE output is zlib-implementation-dependent: the same plugin tree
+compresses to different bytes under stock zlib vs zlib-ng, so a raw-sha
+comparison of a freshly built plugin.zip against the published artifact's
+pin cannot pass in every environment. What IS zlib-independent is the
+archive's *content*: entry names, uncompressed bytes (size, CRC32, sha256),
+timestamps, external attributes and compression method.
+
+This tool therefore keeps, per released version, a small authored record
+(packaging/release-pins/<version>.json — outside every directory that
+scripts/build-packages.sh regenerates) holding:
+
+  - version, canonical release-asset URL, sha256 of the published archive
+  - the ordered content manifest: per entry name, file_size, crc32, sha256
+    of the uncompressed bytes, date_time, external_attr, compress_type
+    (directory entries never occur; the builder writes none)
+
+Modes:
+
+  compare <archive.zip> <record.json>
+      Exit 0 iff the archive's content manifest equals the record's.
+      Compressed sizes / raw archive bytes are deliberately excluded.
+
+  write <archive.zip> [--out <record.json>]
+      Release-only: derive a record from a BUILT archive. Never called by
+      build-packages.sh or CI. Refuses to overwrite a record whose version
+      already has a v<version> tag (published artifacts are immutable).
+
+Stdlib only.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+MANIFEST_FIELDS = (
+    "name", "file_size", "crc32", "sha256",
+    "date_time", "external_attr", "compress_type",
+)
+
+
+def sha256_of(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def archive_manifest(zip_path: Path) -> list[dict]:
+    """Ordered content manifest of an archive (builder conventions: sorted
+    regular files, no directory entries)."""
+    out: list[dict] = []
+    with zipfile.ZipFile(zip_path) as zf:
+        for info in zf.infolist():
+            data = zf.read(info.filename)  # verifies CRC32 on read
+            out.append({
+                "name": info.filename,
+                "file_size": info.file_size,
+                "crc32": info.CRC,
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "date_time": list(info.date_time),
+                "external_attr": info.external_attr,
+                "compress_type": info.compress_type,
+            })
+    return out
+
+
+def diff_manifests(actual: list[dict], recorded: list[dict]) -> list[str]:
+    """Human-readable content differences between two manifests. Empty list
+    == content-identical. Order matters (the builder sorts entries)."""
+    diffs: list[str] = []
+    a_names = [e["name"] for e in actual]
+    r_names = [e["name"] for e in recorded]
+    for e in actual:
+        if e["name"].endswith("/"):
+            diffs.append(f"directory entry present: {e['name']} "
+                         "(builder convention forbids directory entries)")
+    if a_names != r_names:
+        for i, (a, r) in enumerate(zip(a_names, r_names)):
+            if a != r:
+                diffs.append(f"entry {i}: name {a!r} != recorded {r!r}")
+        for n in sorted(set(r_names) - set(a_names)):
+            diffs.append(f"missing entry: {n}")
+        for n in sorted(set(a_names) - set(r_names)):
+            diffs.append(f"extra entry: {n}")
+        return diffs
+    for a, r in zip(actual, recorded):
+        for k in MANIFEST_FIELDS[1:]:
+            if a[k] != r[k]:
+                diffs.append(f"{a['name']}: {k} {a[k]!r} != recorded {r[k]!r}")
+    return diffs
+
+
+def load_record(record_path: Path) -> dict:
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    if "version" not in record or "sha256" not in record or "manifest" not in record:
+        raise ValueError(f"{record_path}: not a release-pin record "
+                         "(needs version, sha256, manifest)")
+    return record
+
+
+def cmd_compare(archive: Path, record_path: Path) -> int:
+    record = load_record(record_path)
+    diffs = diff_manifests(archive_manifest(archive), record["manifest"])
+    if diffs:
+        print(f"release-pin: FAIL: archive content does not match the "
+              f"published v{record['version']} artifact "
+              f"({record_path.name}, {len(diffs)} difference(s); "
+              "compressed bytes are not compared):", file=sys.stderr)
+        for d in diffs:
+            print(f"  - {d}", file=sys.stderr)
+        return 1
+    print(f"release-pin: OK: {len(record['manifest'])} entries content-identical "
+          f"to record v{record['version']} (compressed bytes not compared)")
+    return 0
+
+
+def archive_version(archive: Path) -> str:
+    """Version from the plugin manifest inside the archive
+    (<top-level-dir>/.zcode-plugin/plugin.json)."""
+    with zipfile.ZipFile(archive) as zf:
+        first = zf.infolist()[0].filename
+        top = first.split("/")[0]
+        meta = json.loads(zf.read(f"{top}/.zcode-plugin/plugin.json"))
+    return str(meta["version"])
+
+
+def version_is_tagged(version: str) -> bool | None:
+    """True/False; None when the tag state cannot be determined (fail closed
+    at the caller: refuse to overwrite)."""
+    try:
+        res = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "tag", "-l", f"v{version}"],
+            capture_output=True, text=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return bool(res.stdout.strip())
+
+
+def cmd_write(archive: Path, out: Path | None) -> int:
+    version = archive_version(archive)
+    record = {
+        "version": version,
+        "asset_url": (f"https://github.com/isakli05/iaa/releases/download/"
+                      f"v{version}/iaa-{version}-plugin.zip"),
+        "sha256": sha256_of(archive),
+        "manifest": archive_manifest(archive),
+    }
+    target = out or (REPO_ROOT / "packaging" / "release-pins" / f"{version}.json")
+    if target.exists():
+        tagged = version_is_tagged(version)
+        if tagged or tagged is None:
+            reason = "tag exists" if tagged is not None else "tag state unknown"
+            print(f"release-pin: refusing to overwrite {target}: v{version} "
+                  f"is published ({reason}); published artifacts are immutable",
+                  file=sys.stderr)
+            return 1
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    print(f"release-pin: wrote {target} (v{version}, {len(record['manifest'])} entries)")
+    return 0
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "compare":
+        return cmd_compare(Path(args[1]), Path(args[2]))
+    if len(args) >= 2 and args[0] == "write":
+        out = None
+        rest = args[2:]
+        if len(rest) == 2 and rest[0] == "--out":
+            out = Path(rest[1])
+        elif rest:
+            print(__doc__, file=sys.stderr)
+            return 2
+        return cmd_write(Path(args[1]), out)
+    print(__doc__, file=sys.stderr)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

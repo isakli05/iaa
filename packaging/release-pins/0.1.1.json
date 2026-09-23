@@ -1,0 +1,199 @@
+{
+  "version": "0.1.1",
+  "asset_url": "https://github.com/isakli05/iaa/releases/download/v0.1.1/iaa-0.1.1-plugin.zip",
+  "sha256": "621bdd1ffd24f40c736019e8b4d0961bc3dbda26b553ae72a425ea625e061e2c",
+  "manifest": [
+    {
+      "name": "iaa/.zcode-plugin/plugin.json",
+      "file_size": 1010,
+      "crc32": 2353618231,
+      "sha256": "ff5d9d6ff18a9e6cf5b7df741afb48a16d1a2da3acf6e298c65763c8f3f94142",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/LICENSE",
+      "file_size": 1065,
+      "crc32": 4062369165,
+      "sha256": "90f99a00d5c3b3de9b9366b6faa52ff552234fc09433eccca95192a465d4d3ed",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/NOTICE",
+      "file_size": 750,
+      "crc32": 1046639737,
+      "sha256": "92b1893334d2623b6444b70114202612a81b9a3a1ddc81102514c1efb8f10cc1",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/README.md",
+      "file_size": 2266,
+      "crc32": 190588924,
+      "sha256": "de6bb12067e9dfe7b651772d688e714be65a5f5b389de7c6d674606511b58e77",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/README_CN.md",
+      "file_size": 2135,
+      "crc32": 2016567215,
+      "sha256": "1f25c98540eb34f6362a86a393fead5e49583253c721f7694925ce2e96bf688a",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/commands/orchestrate.md",
+      "file_size": 544,
+      "crc32": 3005079593,
+      "sha256": "ac656aa6bcfcb50b898338a34ece8a254eceb4a54a9eea56acd5754334300c3f",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/PROVENANCE",
+      "file_size": 145,
+      "crc32": 4146614128,
+      "sha256": "8a8020837ff3c8d0ff827ca1696f8e2e05febb18ad2061ca97a7b6fd13aa568f",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/SKILL.md",
+      "file_size": 7960,
+      "crc32": 2963763633,
+      "sha256": "73f7b8870a578cba5bf702c38353112c66e6c410504d89d23fb96b14930b9eba",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/references/delegation-contract.md",
+      "file_size": 2606,
+      "crc32": 971233761,
+      "sha256": "23184f0d3d861fc77dfab113c5a594f890492c2e9e7f6059d7cdb1fc3e258632",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/references/platform-adapters.md",
+      "file_size": 3854,
+      "crc32": 2140121807,
+      "sha256": "849b769cf4846fede9bf624b4c36a86ee921c586c3030c0589c06c61abec82d2",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/scripts/manage.sh",
+      "file_size": 18602,
+      "crc32": 2207372422,
+      "sha256": "21964702e3c581c721657dd6b2581aec57cbe3c853da5c86be112531dd0ccf8e",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    },
+    {
+      "name": "iaa/skills/iaa/tests/scenarios.md",
+      "file_size": 4219,
+      "crc32": 1733361598,
+      "sha256": "5fa9617ed9eabef69ffc348d03f210fab9a2099def08c7d2ca5d9de724c705cf",
+      "date_time": [
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "external_attr": 27525120,
+      "compress_type": 8
+    }
+  ]
+}

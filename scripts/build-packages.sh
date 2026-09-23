@@ -2,8 +2,10 @@
 # İAA package builder — regenerates every distribution projection from the
 # authoritative sources (repo iaa/ + VERSION + packaging/templates/).
 #
-# Nothing under packaging/ (outside templates/) is hand-edited; running this
-# script must leave a clean tree (scripts/check-parity.sh enforces).
+# Nothing under packaging/ (outside templates/ and release-pins/) is
+# hand-edited; running this script must leave a clean tree
+# (scripts/check-parity.sh enforces). packaging/release-pins/ holds authored
+# published-artifact records and is never written by this script.
 #
 # Usage: scripts/build-packages.sh [--version-only]
 #   --version-only  only re-stamp manifests from VERSION (no tree rebuild)
@@ -83,7 +85,7 @@ if [ "${1:-build}" != "--version-only" ]; then
   # skill (observed live at 3.14.3; post-release/zcode-official/ F4).
   # README_CN.md is mandatory for an official contribution and for parity of
   # the installable docs. marketplace.remote.json is the public remote form
-  # (url/zip/sha256/path), sha-pinned to the deterministic plugin.zip.
+  # (url/zip/sha256/path), sha-pinned to the published release artifact.
   ZCODE_PKG="$REPO_ROOT/packaging/zcode"
   rm -rf -- "$ZCODE_PKG"
   mkdir -p -- "$ZCODE_PKG/plugins/iaa/.zcode-plugin" "$ZCODE_PKG/plugins/iaa/commands"
@@ -94,14 +96,29 @@ if [ "${1:-build}" != "--version-only" ]; then
   stamp "$TEMPLATES/zcode-plugin-README_CN.md" "$ZCODE_PKG/plugins/iaa/README_CN.md"
   copy_license "$ZCODE_PKG/plugins/iaa"
   stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace.json"
-  # remote marketplace: stamp version + the sha256 of the deterministic zip of
-  # the plugin tree just assembled (byte-stable across rebuilds)
-  IAA_ZIP_SHA=$(python3 "$REPO_ROOT/scripts/build-plugin-zip.py" "$ZCODE_PKG/plugins/iaa" \
-      "$REPO_ROOT/dist/iaa-$VERSION-plugin.zip")
+  # remote marketplace: the sha256 pin is stamped FROM THE RELEASE-PIN RECORD
+  # of the published artifact (packaging/release-pins/<version>.json), never
+  # from a fresh build. DEFLATE bytes are zlib-implementation-dependent
+  # (IAA-BL-016), so ordinary regeneration must not be able to rewrite the
+  # published pin; records are written only by an explicit release step
+  # (scripts/release-pin.py write).
+  IAA_PIN_RECORD="$REPO_ROOT/packaging/release-pins/$VERSION.json"
+  [ -f "$IAA_PIN_RECORD" ] || fail "no release-pin record for v$VERSION ($IAA_PIN_RECORD); the marketplace.remote.json pin is written only by an explicit release step"
+  IAA_ZIP_SHA=$(jq -r '.sha256 // empty' "$IAA_PIN_RECORD")
+  [ -n "$IAA_ZIP_SHA" ] || fail "$IAA_PIN_RECORD: missing sha256"
   mkdir -p -- "$ZCODE_PKG"
   sed -e "s/__VERSION__/$VERSION/g" -e "s/__PLUGIN_ZIP_SHA256__/$IAA_ZIP_SHA/g" \
       -- "$TEMPLATES/zcode-marketplace-remote.json" > "$ZCODE_PKG/marketplace.remote.json"
   stamp "$TEMPLATES/zcode-README.md" "$ZCODE_PKG/README.md"
+  # content guard: the freshly built dist zip must carry the same archive
+  # CONTENT as the published artifact (compressed bytes are deliberately not
+  # compared). A mismatch means the plugin tree changed — a release step is
+  # required; the pin above is never rewritten to match.
+  python3 "$REPO_ROOT/scripts/build-plugin-zip.py" "$ZCODE_PKG/plugins/iaa" \
+      "$REPO_ROOT/dist/iaa-$VERSION-plugin.zip" >/dev/null
+  python3 "$REPO_ROOT/scripts/release-pin.py" compare \
+      "$REPO_ROOT/dist/iaa-$VERSION-plugin.zip" "$IAA_PIN_RECORD" \
+      || fail "plugin content no longer matches the published v$VERSION artifact; the pin is not rewritten; a release step is required"
 
   # ---- Gate-1 dev plugin skill copy (joins the parity umbrella) ------------
   DEVPLUGIN="$REPO_ROOT/release-hardening/evals/iaa-dev-plugin/skills/iaa"
