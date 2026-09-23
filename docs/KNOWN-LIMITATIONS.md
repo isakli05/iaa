@@ -1,4 +1,8 @@
-# Known Limitations (frozen baseline, 2026-09-22)
+# Known Limitations (frozen baseline, 2026-09-22; status notes added 2026-09-23 Gate 2)
+
+Genuine, evidence-backed limitations only. No invented improvement work.
+Items whose status changed in Gate 2 carry a **[Gate-2 update]** note; the
+original 2026-09-22 text is preserved.
 
 Genuine, evidence-backed limitations only. No invented improvement work.
 
@@ -30,7 +34,8 @@ Genuine, evidence-backed limitations only. No invented improvement work.
    2.1.246 + install-time Codex/GPT-5.6-sol; no other model families sampled.
 8. `manage.sh verify` description bound (1024 B) ≠ operative ZCode ~250-char injection limit;
    current description (245–249 B) satisfies both, but verify won't catch a future breach of
-   the tighter one.
+   the tighter one. **[Gate-2 update]** the packaging layer now enforces the tighter budget:
+   `scripts/validate-static.py` (CI) fails any core-skill description over 250 bytes.
 
 ## Packaging / distribution (current install model)
 
