@@ -47,18 +47,40 @@ appropriate."
 Prompt: "Execute the plan in PLAN.md end-to-end using the native
 superpowers:subagent-driven-development workflow."
 
-> RESULT PENDING — run in flight at time of writing; this section is completed
-> below after the verdict.
+**PASS** (2026-09-23, $7.85):
+
+- **B — İAA yields:** **`iaa` skill invocations: 0** — İAA never loaded as a
+  competing authority while the named workflow governed.
+- **SDD governed its full own cadence under 6.4.1:** skill order
+  `superpowers:subagent-driven-development` → `using-git-worktrees` →
+  `finishing-a-development-branch`; **11 agents = 5 fresh implementers + 5
+  per-task "(spec + quality)" reviewers + 1 final whole-branch review** —
+  the identical topology and count to the Gate-1 6.4.1 K run (11 agents,
+  $8.03).
+
+## Verdict-mechanics disclosure (assertion bug, not a behavior failure)
+
+The companion's SDD assertion grepped case-sensitively (`SDD LOADED: true`)
+while `analyze_run.py` prints Python booleans (`True`/`False`). Effect on this
+run: K initially printed `FAIL — explicit native request did not load SDD`
+while the saved transcript shows SDD loaded with its full cadence; J's "no"
+expectation had matched vacuously. The grep is fixed (case-insensitive) in the
+committed script; the verdicts above were recomputed from the **saved
+transcripts and analyze outputs** with the corrected logic (j: SDD=0, iaa=1 →
+PASS; k: SDD=1, iaa=0 → PASS). This is the third latent bug found in this
+Gate-1-era script on its first true end-to-end execution — all three fixed and
+disclosed; the behavioral evidence itself is transcript-derived and unaffected.
 
 ## Comparison to the Gate-1 baseline
 
-| Metric | Gate-1 6.4.1 run J | Gate-2 run J |
-|---|---|---|
-| SDD loaded | no | no |
-| İAA loaded | yes (1×) | yes (1×) |
-| Spawns | 1 (risk-justified final reviewer) | 1 (Explore whole-branch review) |
-| Component skills | executing-plans (inline) | executing-plans + TDD + verification + finishing |
-| Verdict | PASS | PASS |
+| Metric | Gate-1 6.4.1 run J | Gate-2 run J | Gate-1 6.4.1 run K | Gate-2 run K |
+|---|---|---|---|---|
+| SDD loaded | no | no | yes | yes |
+| İAA loaded | yes (1×) | yes (1×) | no | no (0 invocations) |
+| Spawns | 1 (risk-justified final reviewer) | 1 (Explore whole-branch review) | 11 (5+5+1) | 11 (5+5+1) |
+| Cost | — | $4.71 | $8.03 | $7.85 |
+| Component skills | executing-plans (inline) | executing-plans + TDD + verification + finishing | worktrees + finishing | worktrees + finishing |
+| Verdict | PASS | PASS | PASS | PASS |
 
 Boundary behavior is unchanged through the packaging layer; the only variance
 is within-policy component usage (more whitelisted components individually

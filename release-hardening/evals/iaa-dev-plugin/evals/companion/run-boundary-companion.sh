@@ -75,7 +75,8 @@ verdicts() { # $1 = letter, $2 = expect_sdd (yes|no), $3 = expect_iaa (yes|no|an
   if [ ! -f "$tr" ]; then echo "run $letter: NO TRANSCRIPT — INCONCLUSIVE"; return 2; fi
   python3 "$ANALYZER" "$tr" "$EV/runs/run-$letter.json" > "$EV/runs/analyze-$letter.txt"
   local sdd iaa
-  sdd=$(grep -c '^SDD LOADED: true' "$EV/runs/analyze-$letter.txt" || true)
+  # analyze_run.py prints Python booleans (True/False) — match case-insensitively
+  sdd=$(grep -ci '^SDD LOADED: true' "$EV/runs/analyze-$letter.txt" || true)
   iaa=$(python3 - "$tr" <<'PY'
 import json, sys
 n = 0
