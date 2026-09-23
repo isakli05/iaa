@@ -19,7 +19,7 @@ reasoning" — never "installation succeeds".
 | ZCode | 3.11.2 installed (adapter text anchored to 3.7.7 behavior) |
 | Superpowers plugin | 6.4.1 |
 | Model (all behavioral evidence) | GLM-5.3 via z.ai provider profile (recorded by the harness as `opus[1m]`) |
-| İAA | package 0.1.0-rc.1, policy revision v3 |
+| İAA | package 0.1.0, policy revision v3 |
 
 ## Combinations
 
