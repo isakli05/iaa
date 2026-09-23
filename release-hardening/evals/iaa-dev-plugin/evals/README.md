@@ -39,7 +39,8 @@ Notes:
 
 | Case | Class | What it asserts | Plugin-eval can observe directly? |
 |---|---|---|---|
-| `core/trigger-positive` | trigger | delegation-flavored request routes to the skill; ≤3 spawns for a 3-module read-only task | **yes** (Skill `tool_used` indicator + spawn-count graders) |
+| `core/trigger-positive` | trigger (A) + materiality/policy (B) | delegation-flavored request routes to the skill (A); the chosen topology is policy-compatible — 0–3 agents are ALL valid outcomes for small modules; only >3, incomplete analysis, or fabricated claims fail (B) | **yes** (Skill `tool_used` indicator + explicit-`min: 0` cap graders + synthesis rubric) |
+| `gate3/forced-benefit-delegation` (repo `release-hardening/evals/gate3/`) | forced-benefit (C) | benefit pre-established by fixture (3 substantial independent read-only files) ⇒ ≥1 delegated worker expected, ≤3 by fixture contract; trigger tracked as unscored indicator (A) | **yes** (Agent `min: 1 max: 3` + Task-alias cap + synthesis rubric; needs `--scaffold`) |
 | `core/shim-sim-trigger` | trigger (shim simulation) | same, with İAA's global shim text injected via `append_system_prompt` — a SIMULATION of the CLAUDE.md routing layer (system-prompt tier ≠ user-instruction tier) | **yes**, with the tier caveat |
 | `core/anti-overdelegation-trivial` | anti-overdelegation | trivial task + "use subagents where appropriate" ⇒ zero agent spawns (scenario A) | **yes** (`Agent`/`Task` min:0 max:0, scored in both arms) |
 | `core/ordinary-task-no-overclaim` | anti-overclaim | ordinary task, no agent wording ⇒ skill NOT invoked | **yes** (Skill min:0 max:0, scored in both arms) |

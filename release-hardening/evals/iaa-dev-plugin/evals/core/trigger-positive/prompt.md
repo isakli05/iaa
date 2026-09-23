@@ -1,8 +1,8 @@
 ---
 name: trigger-positive
 description: Positive İAA trigger — delegation-flavored request must route to the skill
-expected_outcome: A "use subagents where appropriate" request on genuinely independent read-only work loads the iaa skill and delegates within anti-overdelegation bounds.
-tags: [core, trigger]
+expected_outcome: "Class A (trigger) — the iaa skill loads. Class B (materiality/policy) — the chosen topology is policy-compatible: 0 agents (inline) or 1–3 delegated workers are ALL valid outcomes for these small modules; only over-delegation (>3), incomplete analysis, or fabricated agent claims fail."
+tags: [core, trigger, materiality]
 runs: 2
 max_turns: 40
 timeout_seconds: 600
