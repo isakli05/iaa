@@ -23,6 +23,11 @@ installation/packaging design is separately in `docs/PUBLIC-DISTRIBUTION-ARCHITE
 
 ## Manage
 
+Since Gate 2 (2026-09-23) the repository is the authoritative development
+source and `~/.local/share/iaa` its deployed projection (`scripts/iaa deploy`);
+the read-only diagnostic is `scripts/iaa doctor` (see docs/INSTALLATION.md for
+the public installation guide).
+
 ```sh
 ~/.local/share/iaa/iaa/scripts/manage.sh verify
 …/manage.sh install      # idempotent; backs up before any shim change

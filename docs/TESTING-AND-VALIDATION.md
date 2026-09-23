@@ -45,12 +45,21 @@ Re-run after every Superpowers update (upgrade-check procedure in CANONICAL-READ
 | J mode separation (default) | YES — archfix A1/A2, boundary B/D (4 samples + adversarial) | campaign trees |
 | K explicit native opt-in | YES — archfix B, boundary C | campaign trees |
 
-## Known gaps (frozen baseline; future work, not undertaken here)
+## Updates since the baseline freeze
 
-- No automated regression harness exists; scenarios are manual by design (they test model
-  behavior, not code). The fixture (`tests/fixtures/generated-PLAN.md`) and analyzer
-  (`tests/tools/analyze_run.py`) are the building blocks if one is built.
-- `manage.sh verify` uses a 1024-B description bound although the operative ZCode constraint
-  is ~250 chars (see KNOWN-LIMITATIONS).
-- Codex/ZCode not behaviorally re-tested after campaigns 2–3 (Claude-specific demonstrated
-  risk; ZCode needs desktop UI).
+- 2026-09-23 (Gate 1): `claude plugin eval` regression foundation exists
+  (`release-hardening/evals/iaa-dev-plugin/`) and the behavioral companion
+  harness formalizes the campaign method (`…/evals/companion/`).
+- 2026-09-23 (Gate 2): static CI (layer A: parity/manifests/frontmatter/secrets/
+  identity scopes + `tests/doctor/` + `tests/install-matrix/`), model evals
+  (layer B: trigger suite), and the real-machine companion (layer C) — see
+  `release-hardening/gate-2/09-ci-regression.md`. The 1024-B vs ~250 bound gap
+  is closed at the packaging layer (frontmatter validation enforces the 250-B
+  core-description budget).
+
+## Known gaps that remain (documented, deliberate)
+
+- Scenarios F/H/I controlled runs; non-plan artifact channels; GSD/BMAD
+  coexistence; non-glm model families (see KNOWN-LIMITATIONS).
+- ZCode behavioral re-validation needs the desktop UI (manual checklist
+  prepared: gate-2/07 §6).

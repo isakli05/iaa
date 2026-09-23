@@ -24,7 +24,7 @@ helper (sorted path/hash/link-target inventory) where mutation-scope matters
 | m8 | legacy migration dry-run | **PASS** | read-only detection; no new markers written (snapshot equality) |
 | m9 | legacy migration explicit execution | **PASS** | markers replaced w/ backup, user prose intact, legacy link swapped, state adopted |
 | m10 | duplicate İAA install prevention | **PASS** | plugin + personal-skill both active → doctor exit 1, `duplicate:claude` |
-| m11 | update older İAA → current | **PASS** | version-pinned cache (0.1.0-rc.1); update path = marketplace refresh + reinstall (structurally verified; two-version exercise possible only after a second version exists) |
+| m11 | update older İAA → current | **PASS** | full update cycle exercised after the matrix run: disposable marketplace carried `0.1.0-alpha.1` → installed → plugin source bumped to `0.1.0-rc.1` → `claude plugin marketplace update` → `claude plugin update iaa` → registration now `0.1.0-rc.1`, **old version retained in cache** (`plugins/cache/<mp>/iaa/0.1.0-alpha.1` + `0.1.0-rc.1`). Side finding: a Claude marketplace entry without an `owner` object fails schema validation — the repo marketplace carries one |
 | m12 | uninstall (plugin + integration) | **PASS** | plugin registration gone, managed block gone, depth state gone |
 | m13 | reinstall | **PASS** | clean reinstall + reintegrate |
 | m14 | malformed managed-marker safety | **PASS** | integrate refuses; file byte-untouched |
