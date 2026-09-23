@@ -37,14 +37,16 @@ idea → research candidate → experiment → accepted design → implementatio
 
 ## Workflow: "check the backlog and tell me what we should work on next"
 
-1. Inspect GitHub `main` (HEAD, recent commits) and `VERSION`.
+1. Read live `main` (pin the HEAD SHA, recent commits) and `VERSION` — via the
+   live-read procedure in pack file `00`, never from Project Knowledge.
 2. Read `docs/BACKLOG.md`.
 3. Read current state live wherever the item depends on it:
    `docs/COMPATIBILITY.md` and `docs/KNOWN-LIMITATIONS.md` for
    version-sensitive items, current releases/tags, the live state of the
-   relevant open PRs/issues (e.g. `gh pr view <n> --repo …`), and the
+   relevant open PRs/issues and CI (public github.com pages), and the
    canonical source (`iaa/`) when precision matters. Current state never
-   comes from the pack — it deliberately contains no snapshot.
+   comes from the pack — it deliberately contains no snapshot — nor from a
+   Project GitHub-integration snapshot.
 4. Separate **actual blockers** from merely **pending external work** (a wait
    that blocks nothing İAA-side is not a blocker).
 5. Classify candidates: maintenance vs research vs product development vs

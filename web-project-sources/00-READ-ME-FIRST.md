@@ -9,13 +9,18 @@ and not a substitute for the repository.
 
 - **Uploaded context (this pack) = orientation.** What İAA is, why it exists,
   its invariants, its vocabulary, how decisions are made, where truth lives.
-- **GitHub `main` (connected) = operational truth — the sole source of current
-  state.** Current source, version, compatibility claims, backlog, evidence.
-  For every question involving current state, inspect the live repository as
-  applicable: `VERSION`, `docs/BACKLOG.md`, `docs/COMPATIBILITY.md`,
-  `docs/KNOWN-LIMITATIONS.md`, current releases/tags, relevant open
-  PRs/issues, and the canonical source (`iaa/`). The pack deliberately
-  contains **no current-state snapshot** — nothing uploaded can go stale.
+- **Live public GitHub `main` = operational truth — the sole source of
+  current state.** The repository is public, so live public reads (procedure
+  below) are the authoritative access path for current `main`/HEAD,
+  `VERSION`, canonical files (`iaa/`), `docs/BACKLOG.md`,
+  `docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`, releases/tags,
+  PRs/issues, and CI state. The pack deliberately contains **no
+  current-state snapshot** — nothing uploaded can go stale.
+- **Project GitHub integration = optional convenience snapshot, never an
+  authority.** If the Claude Project has the repository connected, its files
+  are a copy as of the last manual "Sync now". The project does not depend
+  on it, nobody is obliged to sync it, its contents are never current merely
+  because they are present, and a live read always overrides it.
 
 ## Authority hierarchy (memorize this)
 
@@ -31,18 +36,36 @@ When sources disagree, the higher row wins:
    `identity-migration/`, `comparison/`, ADRs)
 
 If any pack file conflicts with current GitHub, **GitHub wins** — a pack file
-may simply be stale. Historical evidence, however, is never "corrected" to
+may simply be stale. "Current GitHub" means a live read of `main`; a Project
+GitHub-integration snapshot is a copy, not current GitHub, and yields to a
+live read. Historical evidence, however, is never "corrected" to
 match current state: a dated report records what was true when written.
 
-## How to use the connected GitHub repository
+## Live-read procedure (current state)
 
-Before answering status questions or proposing work: check `main`'s `VERSION`,
-`README.md`, `docs/BACKLOG.md`, `docs/COMPATIBILITY.md`, and
-`docs/KNOWN-LIMITATIONS.md`, plus current releases/tags and the live state of
-relevant open PRs/issues. Treat a detailed old report as history, not news.
-Fetch canonical files (`iaa/SKILL.md`, references, tests) live when precision
-matters — the pack's `sources/` snapshots exist for provenance and are not
-uploaded.
+Before answering status questions or proposing work, read live — public,
+no authentication needed:
+
+1. **Pin HEAD:** `git ls-remote https://github.com/isakli05/iaa refs/heads/main`
+   (add `'refs/tags/*'` for tags). Every current-state answer names this SHA.
+2. **Read files at that commit:** preferably `git clone --depth 1
+   https://github.com/isakli05/iaa` (one consistent tree); or
+   `https://raw.githubusercontent.com/isakli05/iaa/<sha>/<path>`. Read raw
+   files by SHA, not by `main` — raw `main` URLs are CDN-cached for up to
+   5 minutes. Minimum set: `VERSION`, `README.md`, `docs/BACKLOG.md`,
+   `docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`; canonical files
+   (`iaa/SKILL.md`, references, tests) when precision matters.
+3. **Releases, PRs/issues, CI:** the public github.com pages (`/releases`,
+   `/tags`, `/pull/<n>`, `/issues/<n>`, `/actions`) and the commits Atom
+   feed (`/commits/main.atom`); the unauthenticated GitHub REST API only as
+   a fallback — it is rate-limited and often exhausted on shared egress.
+   State the read time for PR/issue/CI facts.
+4. **Failure:** if live reads fail, say so and mark the current-state answer
+   UNVERIFIED. Never substitute pack content, a Project GitHub-integration
+   snapshot, or memory as current.
+
+Treat a detailed old report as history, not news. The pack's `sources/`
+snapshots exist for provenance and are not uploaded.
 
 ## Current vs historical — the traps
 
@@ -59,9 +82,9 @@ uploaded.
 
 Every file here is stable by design and carries no fast-changing values —
 no versions, PR/issue states, releases, or backlog statuses anywhere in the
-pack. Current operational state is always fetched live from GitHub, so the
-pack needs **no routine refresh or re-upload** after releases or upstream
-events. (The repository separately keeps a dated provenance snapshot,
+pack. Current operational state is always read live from public GitHub, so
+the pack needs **no routine refresh or re-upload** after releases or
+upstream events, and no Project GitHub-integration sync is ever required. (The repository separately keeps a dated provenance snapshot,
 `11-CURRENT-STATE.md`; it is *not* part of the upload set.)
 
 ## Reading order
@@ -72,6 +95,7 @@ events. (The repository separately keeps a dated provenance snapshot,
 (validation/release principles), `09` (limitations/open questions), `10`
 (research landscape), `04` (file map/glossary).
 
-**Pack revised:** 2026-09-24 (durability revision — current-state snapshot
-removed from the upload set) · against `main` @ `b913778`. Live `main`
-supersedes anything here.
+**Pack revised:** 2026-09-24 (access-model revision — live public reads are
+the current-state path; the Project GitHub integration is optional and never
+authoritative) · against `main` @ `0833081`. Live `main` supersedes anything
+here.

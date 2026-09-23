@@ -1,21 +1,25 @@
 # MANIFEST — İAA Claude Project knowledge upload
 
-**Pack revised:** 2026-09-24 (durability revision) · against `main` @
-`b913778`. Live `main` supersedes this pack wherever they differ.
+**Pack revised:** 2026-09-24 (access-model revision) · against `main` @
+`0833081`. Live `main` supersedes this pack wherever they differ.
 
 Model:
 
 - **Project Knowledge (this pack) = durable orientation** — charter,
   architecture, invariants, governance, history, research policy.
-- **Connected GitHub `main` = current operational truth** — the **sole
+- **Live public GitHub `main` = current operational truth** — the **sole
   source of current state**. Every current-state question (versions,
-  backlog status, releases/tags, PRs/issues, compatibility) is answered by
-  inspecting the live repository, never from the pack.
+  backlog status, releases/tags, PRs/issues, CI, compatibility) is answered
+  by a live public read of the repository (procedure in `00`), never from
+  the pack.
+- **Project GitHub integration = optional convenience snapshot.** Not
+  required, no sync obligation, never current merely because present;
+  a live read always overrides it.
 - The upload set therefore deliberately contains **no current-state
   snapshot** and carries no fast-changing values — nothing to refresh or
   re-upload after releases or upstream events.
-- Because the repository (`isakli05/iaa`) is connected, nothing large or
-  fetchable-on-demand belongs in the upload set — no source snapshots, no
+- Because the public repository (`isakli05/iaa`) is read live, nothing
+  large or fetchable-on-demand belongs in the upload set — no source snapshots, no
   reports, no compatibility tables.
 
 A ready-to-upload copy of every file below, in order, is exported at
@@ -64,16 +68,16 @@ A ready-to-upload copy of every file below, in order, is exported at
 
 - **`11-CURRENT-STATE.md`** — a dated repository-side provenance snapshot;
   uploading it would reintroduce the manual-staleness burden this design
-  removes. Current state comes from the connected repository, always.
+  removes. Current state comes from a live read of the repository, always.
 - **`sources/*`** (all six snapshots + `sources/README.md`) — byte-exact
-  core copies kept for provenance only; with GitHub connected they are a
-  redundant second authority waiting to go stale. Fetch `iaa/SKILL.md` etc.
+  core copies kept for provenance only; with live reads available they are
+  a redundant second authority waiting to go stale. Fetch `iaa/SKILL.md` etc.
   live.
 - **`MANIFEST.md`** (this file) — owner instructions, not assistant context.
 - **`CLAUDE-PROJECT-SETUP.md`** — one-time project-creation material (project
   name, evergreen goal text, first prompt).
 
-## Repository to connect
+## Repository (live-read target; Project GitHub integration optional)
 
 ```text
 isakli05/iaa

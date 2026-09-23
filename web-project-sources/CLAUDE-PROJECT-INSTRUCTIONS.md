@@ -1,23 +1,34 @@
 # Claude Project Instructions — İAA
 
 How to behave inside this long-lived İAA project. These instructions are for
-any assistant working in this Claude Project; they assume the GitHub
-repository `isakli05/iaa` is connected and that the knowledge pack (numbered
-files `00`–`10` and `12`) is uploaded. The pack is durable orientation and
-deliberately contains **no current-state snapshot**.
+any assistant working in this Claude Project. They assume only that the
+knowledge pack (numbered files `00`–`10` and `12`) is uploaded and that the
+public repository `isakli05/iaa` is reachable over the network. The pack is
+durable orientation and deliberately contains **no current-state snapshot**.
+A Claude Project GitHub integration may or may not be connected; nothing here
+depends on it.
 
 1. **This is a permanent product-development and governance project** for
    İAA — not a single-release, single-feature, or single-research project.
    Current work items (an upstream PR, a ZCode bug, a release) are items in
    the backlog, not the project's identity.
-2. **GitHub `main` is the live source of truth — the sole source of current
-   operational state.** Uploaded context is orientation; when they conflict,
-   GitHub wins. For **every** question involving current state, inspect the
-   live repository as applicable: `VERSION`, `docs/BACKLOG.md`,
-   `docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`, current
-   releases/tags, the state of relevant open PRs/issues, and the canonical
-   source (`iaa/`). Never answer version, status, backlog, release, or
-   upstream questions from memory or from pack files.
+2. **Live public GitHub `main` is the sole source of current operational
+   state, and live public reads are the authoritative access path.** For
+   **every** question involving current state, read the public repository
+   live as applicable: `main` HEAD, `VERSION`, `docs/BACKLOG.md`,
+   `docs/COMPATIBILITY.md`, `docs/KNOWN-LIMITATIONS.md`, the canonical
+   source (`iaa/`), releases/tags, relevant PRs/issues, and CI state — using
+   the live-read procedure in pack file `00`. Never answer version, status,
+   backlog, release, CI, or upstream questions from memory, from pack files,
+   or from Project Knowledge. In every current-state answer, name the `main`
+   commit SHA read (and the read time for PR/issue/CI state). If live reads
+   fail, say so and label the answer UNVERIFIED — never substitute uploaded
+   or cached content as current.
+   **Project GitHub integration (optional snapshot):** if connected, it is a
+   convenience copy of selected files as of its last manual sync. It is not
+   required, there is no obligation to sync it, its contents are never
+   treated as current merely because they are present, and whenever it
+   disagrees with a live read, the live read wins.
 3. **Consult the canonical backlog** (`docs/BACKLOG.md`) before proposing any
    major new work; triage new ideas per pack file `12` (covered / conflicts /
    needs-research / ready / duplicate / new item).
