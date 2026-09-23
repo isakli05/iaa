@@ -13,7 +13,7 @@ GSD/BMAD absent.
 
 | Combination | I | N | T | O | Tested? | Documented? | Safe? | Notes |
 |---|---|---|---|---|---|---|---|---|
-| İAA alone | OK | OK | OK | OK | YES (install smoke A–E; campaigns; LCO prod) | YES | YES | baseline; all three runtimes |
+| İAA alone | OK | OK | OK | OK | YES (install smoke A–E; campaigns; production use) | YES | YES | baseline; all three runtimes |
 | İAA + Superpowers installed (idle) | OK | OK | RISK (mild) | OK | YES (every campaign ran with plugin enabled + SessionStart hook active) | YES | YES | distinct names; plugin namespaced; only shared surface = description contest + bootstrap pressure |
 | İAA + SDD explicitly invoked (user names SDD) | OK | OK | OK | OK | YES (archfix B: 15 agents; boundary C: 11 agents; İAA absent both) | YES | YES | mutual exclusion by user selection |
 | İAA explicitly invoked while Superpowers installed | OK | OK | RISK→controlled | OK | YES (A1/A2, boundary B/D: SDD never loaded, 6 samples + adversarial) | YES | YES-with-caveat | residual: model could mis-route (official doctrine: selection is fallible); scenario J tripwire |

@@ -211,7 +211,7 @@ flowchart TD
 | Mode separation: SDD never loads in İAA mode | archfix tests A1, A2, C; artifact-boundary tests B, D; **6.4.1 revalidation runs J, D** (release-hardening/01) | 5 clean samples + 1 adversarial (6.3.0-era; transcripts quote the routing sentence while rejecting `executing-plans`→SDD redirect) + 2 samples on Superpowers 6.4.1 (SDD never loaded; provenance rule quoted in-run; 6.4.1 run J additionally exercised the rebuilt executing-plans as a whitelisted inline component) |
 | Native SDD opt-in still works | archfix test B (15 agents, worktree, ledger); artifact-boundary test C (11 agents); **6.4.1 revalidation run K** (release-hardening/01) | İAA never loaded in all |
 | Artifact-embedded directive ≠ opt-in | artifact-boundary B (authentic plan), D (adversarial MUST wording) | D has a priming caveat, honestly disclosed |
-| Adaptive topology (trivial stays primary; coupled stays primary; independent parallelized) | collision run 1; archfix A1/A2; artifact-boundary B; LCO production 2026-09-06 | across glm-5.3 samples + production |
+| Adaptive topology (trivial stays primary; coupled stays primary; independent parallelized) | collision run 1; archfix A1/A2; artifact-boundary B; production use 2026-09-06 | across glm-5.3 samples + production |
 | No nested spawns | all campaign runs (0 child-spawns-child in every transcript); Claude depth=1; ZCode platform-impossible | Codex: policy-only (not behaviorally re-tested post-campaigns) |
 | Disjoint write ownership | all runs (write sets extracted from child transcripts) | no concurrent same-file writers ever |
 | Primary-owned integration + final validation | all runs (full suite run by primary after merge) | — |
@@ -255,5 +255,5 @@ flowchart TD
 
 Canonical tree quiescent since 2026-08-27 16:22; consumed by Claude Code, Codex, ZCode via
 symlinks; spawn-depth=1 active in Claude settings (managed); `manage.sh verify` passes
-(re-run during this audit's Phase 10); production usage documented in the LCO project
-(2026-09-06). Cross-ref: audit/01 (footprint), audit/02 (provenance).
+(re-run during this audit's Phase 10); production use 2026-09-06 (evidence
+pointer: docs/HISTORY.md). Cross-ref: audit/01 (footprint), audit/02 (provenance).

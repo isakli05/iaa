@@ -24,7 +24,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 
 ## Primary-agent contract (points 6, 12–13, 15)
 
-- **C12** The primary owns: decomposition, dependency order, agent selection, shared contracts, scope assignment, integration, contradiction resolution, final validation, user answer. — SKILL.md:27 — PROVEN (every run; LCO production).
+- **C12** The primary owns: decomposition, dependency order, agent selection, shared contracts, scope assignment, integration, contradiction resolution, final validation, user answer. — SKILL.md:27 — PROVEN (every run; production use 2026-09-06).
 - **C13** Child reports are evidence, not truth; load-bearing claims verified against source/diffs/tests/runtime before acceptance. — SKILL.md:79, DC:45–53 — PROVEN (run 1 re-read every diff; run 2 re-ran suite 5×).
 - **C14** Final validation always runs in the primary context. — SKILL.md:79, DC:52 — PROVEN (all runs).
 - **C15** On child failure/interruption: task is not complete; preserve valid evidence; report/retry proportionately; stop redundant work; primary still validates. — SKILL.md:75, S:H — DOCUMENTED (scenario H never run).
@@ -37,7 +37,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 - **C19** Sequential delegation is the shape for coupled/clustered work (one context beats N context-rebuilds). — SKILL.md:45,63; collision run 2 D1 clustering — PROVEN.
 - **C20** Parallel delegation is the shape for independent workstreams, in one wave with disjoint ownership. — SKILL.md:39,57–63 — PROVEN (3- and 2- implementer parallel batches).
 - **C21** Specialist delegation maps to capability classes (fast explorer / general worker / deep reviewer) and built-in roles; no hardcoded model names; strongest reasoning stays primary for global synthesis. — SKILL.md:73, PA — PROVEN (role use in all runs; SDD's model tiering observed in native mode only).
-- **C22** Reviewer delegation requires task-specific material benefit (risk classes: auth/security/destructive migrations/concurrency/shared contracts/public APIs/ambiguous correctness); no manufactured reviewers; low-risk verified by primary. — SKILL.md:21, R:90 — PROVEN (0 reviewers small tasks; 2 justified reviewers in attempt 3; production LCO wave-3 primary).
+- **C22** Reviewer delegation requires task-specific material benefit (risk classes: auth/security/destructive migrations/concurrency/shared contracts/public APIs/ambiguous correctness); no manufactured reviewers; low-risk verified by primary. — SKILL.md:21, R:90 — PROVEN (0 reviewers small tasks; 2 justified reviewers in attempt 3; production wave-3 primary 2026-09-06).
 - **C23** Mixed primary+worker execution is normal (primary keeps coupled/shared work while workers take independent lanes). — SKILL.md:59–63 — PROVEN (all multi-agent runs).
 - **C24** No agents for artificial roles, one-per-file, or availability; smallest useful number. — SKILL.md:47–49 — PROVEN.
 - **C25** Authorizing one stage never preauthorizes the next (review → fixer → re-reviewer each re-justified); optional/Minor findings stay primary or deferred. — SKILL.md:21 — PROVEN (attempt-3 leak documented then structurally fixed; D3 fix wave in native mode was SDD's, not İAA's).
@@ -45,7 +45,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 ## Ownership and dependencies (points 9–10)
 
 - **C26** Non-overlapping write ownership before concurrent edits; each child has an exclusive write set; shared contracts/APIs/schemas/types/DB/central-config/abstractions are primary-owned, settled first, or single-designated-owner. — SKILL.md:55–63, DC:25 — PROVEN (zero concurrent same-file writers in any run).
-- **C27** Dependency-aware waves; skip valueless phases. — SKILL.md:65 — PROVEN (run shapes; LCO 3-wave production).
+- **C27** Dependency-aware waves; skip valueless phases. — SKILL.md:65 — PROVEN (run shapes; 3-wave production 2026-09-06).
 - **C28** Workers preserve unrelated edits and never revert others' work; told they are not alone in the workspace. — DC:25 — PROVEN (briefs recorded in transcripts).
 
 ## Conflict/integration (points 11–13)
@@ -55,7 +55,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 ## Cost and context (point 14)
 
 - **C30** Context isolation is a benefit AND a cost: prefer fresh-context spawns; inherit history (Codex `fork_turns` beyond `"none"` — `"all"` or a positive-integer-string recent-turns count; Claude fork) only when genuinely required. — PA:8,18 — PROVEN (fresh spawns standard in runs; Codex value surface schema-verified 2026-09-23, see release-hardening/02).
-- **C31** Context offloading (large logs/docs/searches/test output) is a legitimate delegation benefit. — SKILL.md:42 — PROVEN (Explore usage; LCO wave 1).
+- **C31** Context offloading (large logs/docs/searches/test output) is a legitimate delegation benefit. — SKILL.md:42 — PROVEN (Explore usage; production wave 1 2026-09-06).
 - **C32** Cost awareness is evidentiary, not enforced: measured campaign costs (İAA-mode $2.90–3.27 vs co-loaded SDD $9.57 vs native SDD $8.16–11.24) document the economic rationale; no runtime metering exists. — campaign reports — PROVEN (as measurement).
 
 ## Lifecycle and nesting (points 16, 25)
