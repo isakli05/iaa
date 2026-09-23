@@ -1,5 +1,9 @@
 # MANIFEST — İAA web knowledge pack (refreshed 2026-09-23, Gate 3 §13)
 
+License note: the İAA repository is MIT-licensed (owner-approved 2026-09-23;
+see the repository `LICENSE` + `NOTICE`). This pack carries excerpts of that
+repository for personal knowledge-base use.
+
 ## Recommended upload set (ChatGPT Project / Claude Project knowledge)
 
 Upload in this order:

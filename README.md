@@ -173,10 +173,8 @@ the former name by design.
 ## Repository status
 
 **Private** (release candidate `0.1.0-rc.1`, not yet published anywhere).
-License: TBD — an MIT + NOTICE decision package is prepared for owner
-approval (see `release-hardening/gate-3/01-license-review.md`); nothing is
-installed at the repository root until approved. Nothing in this repository
-phones home.
+License: [MIT](LICENSE) — see also [NOTICE](NOTICE) for
+acknowledgements. Nothing in this repository phones home.
 
 ---
 

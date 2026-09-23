@@ -35,6 +35,12 @@ copy_core() { # $1 destination skill dir
   stamp "$TEMPLATES/PROVENANCE" "$1/PROVENANCE"
 }
 
+# MIT notice travels with every distributed copy (owner-approved Phase A):
+# each package's plugin root carries the repository LICENSE + NOTICE verbatim.
+copy_license() { # $1 plugin root
+  cp -- "$REPO_ROOT/LICENSE" "$REPO_ROOT/NOTICE" "$1/"
+}
+
 case "${1:-build}" in
   --version-only) ;;
 esac
@@ -52,6 +58,7 @@ if [ "${1:-build}" != "--version-only" ]; then
   cp -- "$REPO_ROOT/scripts/iaa" "$CLAUDE_PKG/bin/iaa"
   chmod 0755 -- "$CLAUDE_PKG/bin/iaa"
   stamp "$TEMPLATES/claude-README.md" "$CLAUDE_PKG/README.md"
+  copy_license "$CLAUDE_PKG"
   stamp "$TEMPLATES/PROVENANCE" "$CLAUDE_PKG/PROVENANCE"
 
   # ---- Codex package -------------------------------------------------------
@@ -63,6 +70,7 @@ if [ "${1:-build}" != "--version-only" ]; then
   stamp "$TEMPLATES/codex-plugin.json" "$CODEX_PKG/plugin/.codex-plugin/plugin.json"
   copy_core "$CODEX_PKG/plugin/skills/iaa"
   stamp "$TEMPLATES/codex-marketplace.json" "$CODEX_PKG/.agents/plugins/marketplace.json"
+  copy_license "$CODEX_PKG/plugin"
   stamp "$TEMPLATES/codex-README.md" "$CODEX_PKG/README.md"
 
   # ---- ZCode package -------------------------------------------------------
@@ -76,6 +84,7 @@ if [ "${1:-build}" != "--version-only" ]; then
   mkdir -p -- "$ZCODE_PKG/plugins/iaa/skills/orchestrate"
   cp -- "$TEMPLATES/orchestrate-SKILL.md" "$ZCODE_PKG/plugins/iaa/skills/orchestrate/SKILL.md"
   stamp "$TEMPLATES/zcode-plugin-README.md" "$ZCODE_PKG/plugins/iaa/README.md"
+  copy_license "$ZCODE_PKG/plugins/iaa"
   stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace.json"
   stamp "$TEMPLATES/zcode-README.md" "$ZCODE_PKG/README.md"
 
