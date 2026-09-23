@@ -17,8 +17,14 @@
         "en": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
         "zh-CN": "面向代理 CLI 的委派决策策略：决定是否、何时以及如何将工作委派给子代理——自适应、逐席位论证，并为小型工作提供零代理回退。"
       },
-      "source": "./plugins/iaa",
-      "version": "0.1.1",
+      "source": {
+        "source": "url",
+        "type": "zip",
+        "url": "https://github.com/isakli05/iaa/releases/download/v__VERSION__/iaa-__VERSION__-plugin.zip",
+        "sha256": "__PLUGIN_ZIP_SHA256__",
+        "path": "iaa"
+      },
+      "version": "__VERSION__",
       "category": "productivity",
       "tags": ["orchestration", "delegation", "subagents", "policy"]
     }

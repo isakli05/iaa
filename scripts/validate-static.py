@@ -4,7 +4,9 @@
 Checks:
   1. SKILL.md frontmatter (name/description present; description <= 1024 spec
      limit; <= 250 ZCode injection budget for the core skill) for the core and
-     every projection, plus the orchestrate entry skill.
+     every projection, plus the Claude orchestrate entry skill; the ZCode
+     orchestrate Command (description/argument-hint; no second skill), the
+     ZCode plugin README/README_CN pair, and the no-stale-skill rule.
   2. Relative markdown links and referenced files in docs/ + README.md exist.
   3. ASCII filesystem names for paths intended to be ASCII (repo content dirs);
      Unicode display names allowed in prose and generated display fields only.
@@ -68,7 +70,31 @@ for proj in [
 ]:
     check_skill(proj / "SKILL.md", "iaa", core=True)
 check_skill(ROOT / "packaging/claude/skills/orchestrate/SKILL.md", "orchestrate", core=False)
-check_skill(ROOT / "packaging/zcode/plugins/iaa/skills/orchestrate/SKILL.md", "orchestrate", core=False)
+
+
+def check_command(path: Path) -> None:
+    """ZCode plugin Command: frontmatter description required (spec limit 1024);
+    argument-hint recommended. `skills/orchestrate` must not exist as a second
+    skill (0.1.1 adapter correction)."""
+    fm = frontmatter(path)
+    desc = fm.get("description", "")
+    if not desc:
+        fail(f"{path}: command frontmatter missing description")
+    if len(desc.encode()) > 1024:
+        fail(f"{path}: command description exceeds 1024-byte spec limit")
+    if not fm.get("argument-hint"):
+        fail(f"{path}: command frontmatter missing argument-hint")
+    if (path.parent.parent / "skills" / "orchestrate").exists():
+        fail(f"{path.parent.parent}: skills/orchestrate still present (must be a Command)")
+
+
+check_command(ROOT / "packaging/zcode/plugins/iaa/commands/orchestrate.md")
+for readme_cn in [
+    ROOT / "packaging/zcode/plugins/iaa/README_CN.md",
+    ROOT / "packaging/zcode/plugins/iaa/README.md",
+]:
+    if not readme_cn.is_file():
+        fail(f"{readme_cn}: mandatory plugin README missing")
 
 # ---------------------------------------------------------------- docs links
 def check_md_links(base: Path, files: list[Path]) -> None:

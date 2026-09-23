@@ -1,6 +1,6 @@
 # İAA — İştirak-i A‘mâl-i Ajanîye (Claude Code plugin)
 
-Version: 0.1.0 · Namespace: `iaa` · Explicit invocation: `/iaa:orchestrate`
+Version: 0.1.1 · Namespace: `iaa` · Explicit invocation: `/iaa:orchestrate`
 
 A **delegation-decision policy** for Claude Code: one skill that decides *whether,
 when, and how* to delegate work to subagents — adaptively, per task — with a

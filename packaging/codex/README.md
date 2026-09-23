@@ -1,6 +1,6 @@
 # İAA — İştirak-i A‘mâl-i Ajanîye (Codex package)
 
-Version: 0.1.0 · Namespace: `iaa`
+Version: 0.1.1 · Namespace: `iaa`
 
 A **delegation-decision policy** for agent CLIs, packaged for OpenAI Codex CLI.
 Full documentation: the [İAA repository](https://github.com/isakli05/iaa).

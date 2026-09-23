@@ -10,7 +10,7 @@
       "name": "iaa",
       "description": "Delegation-decision policy for agent CLIs: whether, when, and how to delegate work to subagents — adaptive, per-seat justified, with a zero-agent fallback for small work.",
       "source": "./plugin",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "productivity",
       "tags": [
         "orchestration",

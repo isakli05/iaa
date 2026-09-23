@@ -36,10 +36,27 @@ check_projection "$REPO_ROOT/packaging/codex/plugin/skills/iaa" "packaging/codex
 check_projection "$REPO_ROOT/packaging/zcode/plugins/iaa/skills/iaa" "packaging/zcode"
 check_projection "$REPO_ROOT/release-hardening/evals/iaa-dev-plugin/skills/iaa" "dev-plugin"
 
-# 2. shared orchestrate entry identical across runtimes --------------------------
-cmp -s "$REPO_ROOT/packaging/claude/skills/orchestrate/SKILL.md" \
-       "$REPO_ROOT/packaging/zcode/plugins/iaa/skills/orchestrate/SKILL.md" \
-  || fail "orchestrate entry skill differs between claude and zcode packages"
+# 2. orchestrate entry: claude skill == template; zcode command == template ----
+TEMPLATES="$REPO_ROOT/packaging/templates"
+cmp -s "$TEMPLATES/orchestrate-SKILL.md" "$REPO_ROOT/packaging/claude/skills/orchestrate/SKILL.md" \
+  || fail "claude orchestrate entry skill differs from template"
+cmp -s "$TEMPLATES/zcode-orchestrate-COMMAND.md" \
+       "$REPO_ROOT/packaging/zcode/plugins/iaa/commands/orchestrate.md" \
+  || fail "zcode commands/orchestrate.md differs from template"
+[ -e "$REPO_ROOT/packaging/zcode/plugins/iaa/skills/orchestrate" ] \
+  && fail "zcode package still contains skills/orchestrate (must be a Command since 0.1.1)"
+iaa_pc_zskills=$(ls -- "$REPO_ROOT/packaging/zcode/plugins/iaa/skills" | tr '\n' ' ')
+[ "$iaa_pc_zskills" = "iaa " ] || fail "zcode package skills/ must contain exactly 'iaa' (found: $iaa_pc_zskills)"
+sed "s/__VERSION__/$VERSION/g" -- "$TEMPLATES/zcode-plugin-README_CN.md" | \
+  cmp -s - "$REPO_ROOT/packaging/zcode/plugins/iaa/README_CN.md" \
+  || fail "zcode README_CN.md differs from template stamp"
+python3 - "$REPO_ROOT/packaging/zcode/plugins/iaa/.zcode-plugin/plugin.json" <<'PY' \
+  || fail "zcode plugin.json must declare commands: commands (and exactly one skills dir)"
+import json, sys
+m = json.load(open(sys.argv[1]))
+assert m.get("commands") == "commands", "missing commands declaration"
+assert m.get("skills") == "skills", "missing skills declaration"
+PY
 
 # 3. manifests: name == iaa, version == VERSION ----------------------------------
 check_manifest() { # $1 json path
@@ -61,6 +78,25 @@ iaa_mn_cv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/codex/.ag
 iaa_mn_zv=$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/marketplace.json")
 [ "$iaa_mn_zv" = "$VERSION" ] || fail "zcode marketplace entry version != VERSION"
 note "OK manifests: name=iaa, version=$VERSION everywhere"
+
+# 3b. remote marketplace: sha256 pin == deterministic zip of the zcode plugin --
+iaa_rm_tmp=$(mktemp)
+iaa_rm_sha=$(python3 "$REPO_ROOT/scripts/build-plugin-zip.py" \
+    "$REPO_ROOT/packaging/zcode/plugins/iaa" "$iaa_rm_tmp" 2>/dev/null) \
+  || fail "deterministic plugin.zip build failed"
+rm -f -- "$iaa_rm_tmp"
+iaa_rm_want=$(jq -r '.plugins[0].source.sha256 // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")
+[ -n "$iaa_rm_want" ] || fail "marketplace.remote.json: missing plugins[0].source.sha256"
+[ "$iaa_rm_sha" = "$iaa_rm_want" ] \
+  || fail "marketplace.remote.json sha256 ($iaa_rm_want) != freshly built plugin.zip ($iaa_rm_sha) — regenerate via scripts/build-packages.sh"
+iaa_rm_url=$(jq -r '.plugins[0].source.url // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")
+[ "$iaa_rm_url" = "https://github.com/isakli05/iaa/releases/download/v$VERSION/iaa-$VERSION-plugin.zip" ] \
+  || fail "marketplace.remote.json url is not the versioned release asset for $VERSION"
+[ "$(jq -r '.plugins[0].source.path // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")" = "iaa" ] \
+  || fail "marketplace.remote.json source.path != iaa"
+[ "$(jq -r '.plugins[0].version // empty' "$REPO_ROOT/packaging/zcode/marketplace.remote.json")" = "$VERSION" ] \
+  || fail "marketplace.remote.json entry version != VERSION"
+note "OK remote marketplace: url/zip/path pinned, sha256 $iaa_rm_sha"
 
 # 4. shim text parity: scripts/iaa vs iaa/scripts/manage.sh ----------------------
 iaa_st_paragraphs() { # $1 file — prints the two routing paragraphs

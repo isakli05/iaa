@@ -76,16 +76,31 @@ if [ "${1:-build}" != "--version-only" ]; then
   # ---- ZCode package -------------------------------------------------------
   # Official layout (zai-org/zcode-plugins): marketplace.json at the package
   # root + plugins/<name>/ with .zcode-plugin/plugin.json; source ./plugins/iaa.
+  # Since 0.1.1 the explicit entry point is a Command (commands/orchestrate.md,
+  # ZCode resolves plugin commands to a flat /name), NOT a second skill:
+  # ZCode's documented Skill frontmatter carries only name+description, so a
+  # skills/orchestrate entry would be exposed as a second auto-discoverable
+  # skill (observed live at 3.14.3; post-release/zcode-official/ F4).
+  # README_CN.md is mandatory for an official contribution and for parity of
+  # the installable docs. marketplace.remote.json is the public remote form
+  # (url/zip/sha256/path), sha-pinned to the deterministic plugin.zip.
   ZCODE_PKG="$REPO_ROOT/packaging/zcode"
   rm -rf -- "$ZCODE_PKG"
-  mkdir -p -- "$ZCODE_PKG/plugins/iaa/.zcode-plugin"
+  mkdir -p -- "$ZCODE_PKG/plugins/iaa/.zcode-plugin" "$ZCODE_PKG/plugins/iaa/commands"
   stamp "$TEMPLATES/zcode-plugin.json" "$ZCODE_PKG/plugins/iaa/.zcode-plugin/plugin.json"
   copy_core "$ZCODE_PKG/plugins/iaa/skills/iaa"
-  mkdir -p -- "$ZCODE_PKG/plugins/iaa/skills/orchestrate"
-  cp -- "$TEMPLATES/orchestrate-SKILL.md" "$ZCODE_PKG/plugins/iaa/skills/orchestrate/SKILL.md"
+  cp -- "$TEMPLATES/zcode-orchestrate-COMMAND.md" "$ZCODE_PKG/plugins/iaa/commands/orchestrate.md"
   stamp "$TEMPLATES/zcode-plugin-README.md" "$ZCODE_PKG/plugins/iaa/README.md"
+  stamp "$TEMPLATES/zcode-plugin-README_CN.md" "$ZCODE_PKG/plugins/iaa/README_CN.md"
   copy_license "$ZCODE_PKG/plugins/iaa"
   stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace.json"
+  # remote marketplace: stamp version + the sha256 of the deterministic zip of
+  # the plugin tree just assembled (byte-stable across rebuilds)
+  IAA_ZIP_SHA=$(python3 "$REPO_ROOT/scripts/build-plugin-zip.py" "$ZCODE_PKG/plugins/iaa" \
+      "$REPO_ROOT/dist/iaa-$VERSION-plugin.zip")
+  mkdir -p -- "$ZCODE_PKG"
+  sed -e "s/__VERSION__/$VERSION/g" -e "s/__PLUGIN_ZIP_SHA256__/$IAA_ZIP_SHA/g" \
+      -- "$TEMPLATES/zcode-marketplace-remote.json" > "$ZCODE_PKG/marketplace.remote.json"
   stamp "$TEMPLATES/zcode-README.md" "$ZCODE_PKG/README.md"
 
   # ---- Gate-1 dev plugin skill copy (joins the parity umbrella) ------------
