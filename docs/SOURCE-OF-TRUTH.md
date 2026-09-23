@@ -36,6 +36,8 @@ detectable drift (`iaa doctor` reports it), not the workflow.
 | `iaa/scripts/manage.sh` | install/verify/uninstall (script mode) | **canonical** |
 | `iaa/tests/scenarios.md` | behavioral contract A–K (manual scenarios) | **canonical** |
 | `VERSION` | public package version | canonical-metadata |
+| `docs/BACKLOG.md` | canonical long-term work queue (intent + prioritization) | governance |
+| `docs/GOVERNANCE.md` | decision lifecycle, evidence rules, release discipline | governance |
 | `scripts/iaa` | management CLI (doctor/integrate/unintegrate/deploy) | canonical-tooling |
 | `scripts/build-packages.sh` / `check-parity.sh` / `validate-static.py` / `build-release.sh` | generation + enforcement | canonical-tooling |
 | `packaging/**` | generated runtime packages (+ `templates/`, the authored metadata) | generated (except templates) |
@@ -49,7 +51,7 @@ detectable drift (`iaa doctor` reports it), not the workflow.
 | `tests/tools/analyze_run.py` | transcript→skill/spawn extractor | tooling |
 | `tests/doctor/`, `tests/install-matrix/` | Gate-2 unit + matrix tests | tooling |
 | `audit/`, `research/`, `design/`, `comparison/`, `release-hardening/`, `identity-migration/` | dated working/evidence records | audit records (not rewritten) |
-| `web-project-sources/` | web-project knowledge pack (sources/ = byte-exact core copies) | derived copy |
+| `web-project-sources/` | Claude Project orientation pack (sources/ = byte-exact core snapshots) | derived copy (orientation only; never overrides canonical) |
 
 ## Machine-local material deliberately NOT in this repo
 
