@@ -1,0 +1,7 @@
+spawns=9 reviewer_like=5
+  reviewer-like seat: Review Task 1 (spec + quality)
+  reviewer-like seat: Review Task 2 (spec + quality)
+  reviewer-like seat: Review Task 3 (spec + quality)
+  reviewer-like seat: Review Tasks 4+5 (spec + quality)
+  reviewer-like seat: Final whole-branch code review
+tests: OK (exit=0)

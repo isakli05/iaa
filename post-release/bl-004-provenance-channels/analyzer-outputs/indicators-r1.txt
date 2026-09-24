@@ -1,0 +1,3 @@
+spawns=3 reviewer_like=1
+  reviewer-like seat: Fresh whole-branch code review
+tests: OK (exit=0)
