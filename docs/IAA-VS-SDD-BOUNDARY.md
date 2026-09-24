@@ -33,6 +33,21 @@ tested, not aspirational. Companion: `docs/adr/0001–0003`, `docs/BEHAVIORAL-CO
 7. **Neither side is modified.** No plugin file, setting, or hook of Superpowers is touched;
    İAA routes through its own surfaces only.
 
+## Terminology note: two different "native"s
+
+Superpowers 6.4.1's `writing-plans` ends with an "Execution Handoff": when no
+execution method was already chosen, it asks the user to pick one of two
+options — "Subagent-driven" (its REQUIRED SUB-SKILL is
+`superpowers:subagent-driven-development`) or "Native" (its REQUIRED
+SUB-SKILL is `superpowers:executing-plans`, described as the primary
+implementing every task itself in the session — inline execution). That
+"Native" is **not** İAA's "native workflow mode" (rule 6 above): it is
+Superpowers' name for inline plan execution via `executing-plans`, a
+whitelisted component skill that stays usable in İAA mode. Answering
+"Subagent-driven" to that handoff, in the user's own words, **is** the user
+naming SDD — the by-name opt-in of rule 3. (Source: Superpowers v6.4.1
+`skills/writing-plans/SKILL.md`, "Execution Handoff", verified 2026-09-24.)
+
 ## Evidence status
 
 - İAA mode keeps SDD out: 5 clean samples + 1 adversarial (archfix A1/A2/C; boundary B/D) —

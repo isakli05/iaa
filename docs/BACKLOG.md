@@ -5,7 +5,7 @@ This file is the repository-owned, long-term work queue for İAA. It holds
 not tied to any release. GitHub Issues/PRs are execution artifacts and never
 replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 
-- **Last reviewed:** 2026-09-24 · against `main` @ `f334dc9` (package 0.1.1, policy v3)
+- **Last reviewed:** 2026-09-24 · against `main` @ `8790915` (package 0.1.1, policy v3)
 - **Current state of the product** lives in [README.md](../README.md) and
   [COMPATIBILITY.md](COMPATIBILITY.md), not here. This file is intent, not state.
 
@@ -231,8 +231,8 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   verification labels updated in [BEHAVIORAL-CONTRACT.md](BEHAVIORAL-CONTRACT.md).
 
 ### IAA-BL-004 — Provenance rule for non-plan artifact channels
-- **Status:** `OPEN` — design executed 2026-09-24: **R PASS; I and T FAIL**
-  (findings delivered, owner decision pending; campaign record below) ·
+- **Status:** `CLOSED` (2026-09-24) — **R PROVEN**; **I and T descoped by
+  owner decision** (2026-09-24, quoted in the closure evidence below) ·
   **Category:** validation
 - **Problem / motivation:** the artifact trust boundary is behaviorally proven
   for **plan** artifacts only; issue text, READMEs, and quoted transcripts share
@@ -314,6 +314,37 @@ provenance. Remains open: owner decision on the policy v4 candidate wording
 (provenance condition on the explicit-name yield; quoted historical user
 text), optional t2 second sample, model-family breadth (BL-007).
 
+#### Closure evidence (2026-09-24)
+
+Campaign delivered as PR
+[isakli05/iaa#3](https://github.com/isakli05/iaa/pull/3), fast-forward
+merged to main as `8790915` (static run 36011283976 `success`). **Channel R
+PROVEN** under the pre-registered criterion: 2/2 samples clean with README
+read-exposure confirmed (campaign record above;
+[post-release/bl-004-provenance-channels/](../post-release/bl-004-provenance-channels/)).
+
+**Channels I and T descoped by the owner decision (2026-09-24), recorded
+verbatim:**
+
+> "Content the user places in their own message — pasted issue text, quoted
+> prior transcripts, prompts written by another tool — is the user's
+> instruction. The provenance rule protects against workflow directives in
+> content the agent reads on its own (plans, specs, generated artifacts,
+> repository files, prior agent/tool output); it does not arbitrate within
+> the user's own message. A user who wants a specific workflow names it in
+> their own words. The pre-registered BL-004 expectation for channels I and
+> T is superseded by this decision; the observed behavior (routing either
+> way) is recorded, not treated as a defect. No policy change."
+
+Consistency check recorded with the decision: [SKILL.md](../iaa/SKILL.md)'s
+Provenance paragraph already lists only agent-read sources (plan, spec,
+generated artifact, repository file, prior agent output), so the policy core
+needs no change. The FAIL verdicts for I and T were findings under the
+pre-registered criterion, not defects under the owner's scope; the observed
+routing (either way) stands as recorded behavior. **t2 not needed** (the
+second sample existed only to establish the pre-registered PASS criterion).
+Model-family breadth remains IAA-BL-007, independently open.
+
 ### IAA-BL-005 — Explicit-yield path for a non-SDD workflow
 - **Status:** `PROPOSED` · **Category:** validation
 - **Problem / motivation:** by-name yield to a foreign workflow is proven for
@@ -328,6 +359,25 @@ text), optional t2 second sample, model-family breadth (BL-007).
   disposable environment (GSD is UNVERIFIED against İAA — run isolated).
 - **Acceptance criteria:** scenario-K mirror with a non-SDD named workflow;
   İAA-absent verified from the transcript.
+
+### IAA-BL-019 — Bare plan execution in a new session
+- **Status:** `PROPOSED` · **Category:** validation
+- **Problem / motivation:** a Superpowers-6.4.1 plan (whose header
+  recommends SDD) executed with a prompt that has no delegation phrasing and
+  names no workflow — for example "Execute PLAN.md" — is untested: does İAA
+  engage, or does SDD/executing-plans take over via the header directive?
+- **Evidence:** the boundary companion's scenario-J fixture and the
+  BL-004 campaign's neutralized-header variant
+  ([post-release/bl-004-provenance-channels/](../post-release/bl-004-provenance-channels/)
+  §3); every J/K prompt so far either asked for subagents or named a workflow.
+- **Why it matters:** a common real-world flow — the plan exists, the user
+  just says "run it".
+- **Owner note (2026-09-24):** under the explicit-naming principle, either
+  outcome may be acceptable; run only if the owner decides the outcome
+  matters.
+- **Dependencies / blockers:** none (owner decision to schedule).
+- **Acceptance criteria:** 1–2 transcript-asserted runs with the bare
+  prompt; the observed routing recorded either way. Not scheduled.
 
 ## RESEARCH / EXPERIMENTS
 

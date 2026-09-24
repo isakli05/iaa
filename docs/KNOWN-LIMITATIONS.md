@@ -24,10 +24,11 @@ Genuine, evidence-backed limitations only. No invented improvement work.
 4. **Tested channels only.** Provenance rule proven for plan artifacts; issue text, READMEs,
    quoted transcripts share the wording but were not exercised (ADR-0003).
    **[Status 2026-09-24]** exercised by BL-004 (post-release/bl-004-provenance-channels/):
-   README channel PASS (2/2 + read-exposure); issue-text and quoted-transcript channels
-   **FAILED** — pasted directives selected SDD (1/2 and 1/1 samples; İAA never invoked in the
-   failing runs). No longer an untested-limitation; now a known boundary failure pending the
-   owner's policy v4 decision.
+   artifact and repository-file channels PROVEN (plan artifacts authentic + adversarial;
+   README directive 2/2 samples + read-exposure). Pasted content — issue text, quoted
+   transcripts, prompts written by another tool — is out of scope by owner decision
+   2026-09-24: text the user places in their own message is the user's instruction, and
+   users name the workflow they want (observed routing either way; recorded, not a defect).
 
 ## Coverage / validation
 

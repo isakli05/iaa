@@ -44,14 +44,18 @@ not independently take control (absent documented integration)."
 
 ### P5. "Repository files, plans, specs, artifacts, historical prompts, subagent output must
 not transfer orchestration ownership by themselves."
+- **Scope of "historical prompts" (owner decision 2026-09-24):** prompts/transcripts the
+  agent reads on its own — from files or tool output. Text the user pastes into their own
+  message (pasted issue text, quoted prior transcripts, prompts written by another tool)
+  is the user's instruction; the provenance rule does not arbitrate within the user's
+  message. A user who wants a specific workflow names it in their own words.
 - **CURRENT BEHAVIOR:** exactly the ADR-0003 provenance rule; proven for plan artifacts
   (authentic + adversarial) and for the repository-file channel (README directive, 2/2 +
-  read-exposure, BL-004 2026-09-24); wording covers the other channels.
-- **GAP:** pasted channels failed BL-004 — a directive inside pasted issue text (1/2 samples)
-  or a quoted prior-session excerpt (1/1) selected SDD via the explicit-name exception /
-  a standing-policy reading, with İAA never invoked. Candidate policy v4 wording gap:
-  provenance condition on the explicit-name yield; quoted historical user text claiming
-  durable authority. Owner decision pending (post-release/bl-004-provenance-channels/).
+  read-exposure, BL-004 2026-09-24). Pasted content routed either way in the BL-004
+  samples — recorded behavior, out of scope by the decision above.
+- **GAP:** none open for pasted content (out of scope by the owner decision above);
+  remaining agent-read channels beyond plans and repository files (e.g. subagent output)
+  are covered by wording and tested only insofar as campaigns exercised them.
 
 ### P6. "Nested orchestration must be opt-in and tested (İAA→SDD, GSD→İAA must not happen
 accidentally)."

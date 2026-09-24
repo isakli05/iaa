@@ -18,7 +18,7 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 
 - **C7** User's current explicit instruction is the highest authority for mode selection. — SKILL.md:15,17 — PROVEN (tests B/C).
 - **C8** Global managed shim routing outranks skill-internal redirects (Superpowers' own bootstrap concedes user instructions outrank skills). — shim M:90; archfix report §"Key transcript evidence" — PROVEN (models quoted the shim while rejecting `executing-plans`→SDD redirect, 3 samples).
-- **C9** Workflow directives embedded in artifacts (plans/specs/generated files/repo text/prior output) are orchestration metadata, never opt-in; technical content remains authoritative. — SKILL.md:17 — PROVEN for plan artifacts (authentic + adversarial) and for the repository-file channel (README directive, 2/2 samples + read-exposure, BL-004); **FAILED for pasted channels** (issue text 1/2 samples, quoted prior-session excerpt 1/1 loaded SDD with İAA never invoked — counter-evidence, owner decision on policy v4 wording pending; post-release/bl-004-provenance-channels/).
+- **C9** Workflow directives embedded in artifacts (plans/specs/generated files/repo text/prior output) are orchestration metadata, never opt-in; technical content remains authoritative. — SKILL.md:17 — PROVEN for plan artifacts (authentic + adversarial) and for the repository-file channel (README directive, 2/2 samples + read-exposure, BL-004). Scope (owner decision 2026-09-24): content the user places in their own message — pasted issue text, quoted prior transcripts, prompts written by another tool — is the user's instruction and outside C9; observed routing either way (see IAA-BL-004).
 - **C10** Compatible Superpowers component skills remain individually usable in İAA mode (whitelist of 8; 2 seat-prescribing components only execute pre-authorized lanes). — SKILL.md:19 — PROVEN (TDD, verification, finishing, executing-plans all co-invoked in runs).
 - **C11** İAA never disables, uninstalls, patches, or configures Superpowers (or any other framework). — campaign reports ("no plugin file modified", mtime sweeps) — PROVEN.
 
@@ -79,5 +79,5 @@ no longer active). Source keys as in CURRENT-ARCHITECTURE.md (SKILL.md/DC/PA/R/S
 ## Verification matrix summary
 
 PROVEN: C1–C14, C16–C24, C26–C31, C33(rejection), C34(Claude/ZCode), C35(practice), C36–C38, C40, C41.
-DOCUMENTED-only: C15 (failed child), C33 (authorized nesting), C35 (scenario I as such), C39 (ZCode live behavior), C34 (Codex nesting). C9's non-plan channels are no longer DOCUMENTED-only: repository-file PROVEN, pasted channels FAILED with counter-evidence (BL-004, 2026-09-24).
+DOCUMENTED-only: C15 (failed child), C33 (authorized nesting), C35 (scenario I as such), C39 (ZCode live behavior), C34 (Codex nesting).
 HISTORICAL (explicitly not current): prose-precedence override of co-loaded SDD (v0/v1); post-load topology gate; SDD cadence leakage under co-loading; install-era reviewer manufacturing.

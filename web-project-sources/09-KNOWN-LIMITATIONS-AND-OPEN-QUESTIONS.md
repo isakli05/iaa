@@ -16,8 +16,10 @@ several once-open items are resolved and are marked so, not silently dropped.
    runs (standing item IAA-BL-010; 6.4.1 check completed in Gate 1).
 3. **Codex nesting guard is policy-only** (config `max_depth` ignored by
    MultiAgentV2); Claude is harness-enforced, ZCode platform-impossible.
-4. **Provenance rule proven for plan artifacts only**; other channels share
-   the wording, unexercised (→ IAA-BL-004).
+4. **Provenance rule proven for plan artifacts and repository files**;
+   content pasted into the user's own message is the user's instruction —
+   out of scope by owner decision, and users name the workflow they want
+   (IAA-BL-004 closed; observed routing either way, recorded).
 
 **Coverage / validation**
 5. Scenarios F, H, I never executed as controlled tests; authorized-nesting

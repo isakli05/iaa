@@ -19,8 +19,10 @@ doc is the live authority.
   and in Gate-2/3 re-runs.
 - Embedded artifact directives are metadata, not opt-in; technical content
   still consumed. PROVEN for plan artifacts (authentic + adversarial "MUST"
-  wording); DOCUMENTED for other channels (issues, READMEs, quoted
-  transcripts — backlog item IAA-BL-004).
+  wording) and for repository files (README directive, with read-exposure
+  checked). Content the user pastes into their own message — issue text,
+  quoted transcripts, prompts written by another tool — is the user's
+  instruction, out of scope by owner decision (IAA-BL-004 closed).
 - Per-task opt-out honored ("Do not delegate or spawn subagents for this task").
 
 ## Seats & topology — PROVEN

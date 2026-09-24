@@ -98,6 +98,10 @@ cadence). No superiority is claimed beyond the cited evidence.
   ZCode plugin form the explicit entry point is the **`/orchestrate`** Command
   (flat name — ZCode does not prefix plugin commands).
 - **Per-task opt-out:** "Do not delegate or spawn subagents for this task."
+- **Tip:** to run a specific workflow (for example
+  superpowers:subagent-driven-development), name it in your own words. İAA
+  ignores workflow directives inside plans and repository files, but text you
+  paste into your message counts as your instruction.
 
 ## Install / update / uninstall
 
@@ -155,8 +159,11 @@ Agent Teams: not tested together — honestly marked UNVERIFIED in the matrix.
 ## Limitations (selected; full list in `docs/KNOWN-LIMITATIONS.md`)
 
 - Single-model evidence (GLM-5.3 profile); no claims about other model families.
-- Codex plugin-form live discovery and ZCode GUI plugin install are prepared +
-  structurally validated but not behaviorally exercised (documented skips).
+- ZCode: the plugin form was GUI-accepted at 0.1.1 / 3.14.3
+  ([0.1.1 validation](release-hardening/0.1.1/)), and Codex plugin-form live
+  discovery was exercised in [gate 3](release-hardening/gate-3/04-codex-final-validation.md);
+  the residual is no ZCode model-call behavioral evidence at 3.14.3
+  (behavioral baseline: 3.11.2 skills-dir — [COMPATIBILITY](docs/COMPATIBILITY.md)).
 - Skill-selection is model-driven: the boundary is a tested behavior, not a
   mechanism guarantee; the regression suite and doctor exist to keep it honest.
 
