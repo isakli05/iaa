@@ -40,6 +40,9 @@ jobs:
       - name: Release-pin archive-content parity unit tests
         run: tests/release-pin/run-tests.sh
 
+      - name: Published-artifact pin check
+        run: python3 scripts/release-pin.py verify-published "packaging/release-pins/$(sed -n 1p VERSION).json"
+
       - name: Claude plugin validation (when the CLI is available)
         run: |
           if command -v claude >/dev/null 2>&1; then

@@ -182,5 +182,45 @@ fi
 ok "published version: overwrite + re-creation refused; unknown state refused; pre-release allowed"
 unset IAA_RELEASE_PIN_REMOTE
 
+# ---------------------------------------------------------------- T10 published-artifact pin check
+say 'T10: verify-published decision logic (offline: --archive + remote override)'
+# bare "remote" carrying tag v9.9.9 (the fixture record's version);
+# base.zip/record.json are the T1 fixtures
+git init -q --bare "$WORK/rem2.git"
+SEED2="$WORK/seed2"
+git init -q "$SEED2"
+git -C "$SEED2" -c user.email=tests@iaa.invalid -c user.name=iaa-tests \
+  commit -q --allow-empty --allow-empty-message -m ""
+git -C "$SEED2" tag v9.9.9
+git -C "$SEED2" push -q "$WORK/rem2.git" refs/tags/v9.9.9
+# scratch record with a deliberately wrong recorded sha (same manifest)
+jq '.sha256 = "856df55337c9d542b5a6e44af4d4ad287223c38fcdba9ef4913adf947b86df97"' \
+  "$WORK/record.json" > "$WORK/record-wrong-sha.json"
+
+# (i) published + correct pre-downloaded asset (--archive) -> pass
+IAA_RELEASE_PIN_REMOTE="$WORK/rem2.git" python3 "$PIN" verify-published \
+    "$WORK/record.json" --archive "$WORK/base.zip" >/dev/null \
+  || bad "(i) verify-published must pass for the correct published asset"
+# (ii) published + wrong recorded sha -> fail, naming both shas
+if IAA_RELEASE_PIN_REMOTE="$WORK/rem2.git" python3 "$PIN" verify-published \
+    "$WORK/record-wrong-sha.json" --archive "$WORK/base.zip" > "$WORK/vp.out" 2>&1; then
+  bad "(ii) verify-published must fail on a wrong recorded sha"
+fi
+grep -q "$SHA_BASE" "$WORK/vp.out" || bad "(ii) failure must name the downloaded asset's sha"
+grep -q '856df55337c9d542b5a6e44af4d4ad287223c38fcdba9ef4913adf947b86df97' "$WORK/vp.out" \
+  || bad "(ii) failure must name the recorded sha"
+# (iii) tag absent on the remote -> pre-release: pass with a note, no asset needed
+git init -q --bare "$WORK/rem3.git"
+IAA_RELEASE_PIN_REMOTE="$WORK/rem3.git" python3 "$PIN" verify-published \
+    "$WORK/record.json" > "$WORK/vp.out" 2>&1 \
+  || bad "(iii) unpublished version must pass with a note"
+grep -q 'not published' "$WORK/vp.out" || bad "(iii) expected a pre-release note"
+# (iv) publication state indeterminable -> fail
+if IAA_RELEASE_PIN_REMOTE="$WORK/no-such.git" python3 "$PIN" verify-published \
+    "$WORK/record.json" >/dev/null 2>&1; then
+  bad "(iv) verify-published must fail when publication state is unknown"
+fi
+ok "verify-published: pass/fail/pre-release/fail-closed all correct (offline)"
+
 printf '\nALL %s RELEASE-PIN TESTS PASSED\n' "$PASS"
 rm -rf -- "$WORK"

@@ -35,6 +35,16 @@ Modes:
       https://github.com/isakli05/iaa and can be overridden for tests via
       the IAA_RELEASE_PIN_REMOTE environment variable.
 
+  verify-published <record.json> [--archive <asset.zip>]
+      CI check of the PUBLISHED artifact against the record (networked;
+      deliberately NOT part of check-parity.sh, which stays offline). If
+      v<version> is not tagged (locally or on the remote — same
+      publication check as write), pass with a note (pre-release state).
+      Otherwise verify the actual asset: download the record's asset_url
+      (curl --retry 3 -f) — or take a pre-downloaded file via --archive —
+      and require sha256 equality AND content-manifest parity with the
+      record. Unknown publication state fails (fail closed).
+
 Stdlib only.
 """
 from __future__ import annotations
@@ -44,6 +54,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -211,6 +222,57 @@ def cmd_write(archive: Path, out: Path | None) -> int:
     return 0
 
 
+def cmd_verify_published(record_path: Path, archive: Path | None) -> int:
+    """CI check of the published artifact against the record (F2)."""
+    record = load_record(record_path)
+    version = str(record["version"])
+    remote = pin_remote()
+    try:
+        published = version_is_published(version, remote)
+    except PublicationStateUnknown as e:
+        print(f"release-pin: FAIL: cannot determine publication state for "
+              f"v{version} — {e}", file=sys.stderr)
+        return 1
+    if not published:
+        print(f"release-pin: OK: v{version} is not published (no tag v{version} "
+              f"locally or on {remote}); skipping published-artifact verification")
+        return 0
+
+    def verify_asset(asset: Path) -> int:
+        sha = sha256_of(asset)
+        if sha != record["sha256"]:
+            print(f"release-pin: FAIL: published v{version} asset sha256 "
+                  f"mismatch: downloaded {sha} != recorded {record['sha256']}",
+                  file=sys.stderr)
+            return 1
+        diffs = diff_manifests(archive_manifest(asset), record["manifest"])
+        if diffs:
+            print(f"release-pin: FAIL: published v{version} asset content "
+                  f"differs from the record ({record_path.name}):",
+                  file=sys.stderr)
+            for d in diffs:
+                print(f"  - {d}", file=sys.stderr)
+            return 1
+        print(f"release-pin: OK: published v{version} asset verified "
+              f"(sha256 {sha} + content parity with {record_path.name})")
+        return 0
+
+    if archive is not None:
+        return verify_asset(archive)
+    with tempfile.TemporaryDirectory(prefix="iaa-release-pin.") as td:
+        tmp = Path(td) / "asset.zip"
+        try:
+            subprocess.run(
+                ["curl", "--retry", "3", "-fsSL", "-o", str(tmp),
+                 str(record["asset_url"])],
+                check=True)
+        except (OSError, subprocess.CalledProcessError) as e:
+            print(f"release-pin: FAIL: failed to download "
+                  f"{record['asset_url']} — {e}", file=sys.stderr)
+            return 1
+        return verify_asset(tmp)
+
+
 def main() -> int:
     args = sys.argv[1:]
     if len(args) >= 3 and args[0] == "compare":
@@ -224,6 +286,15 @@ def main() -> int:
             print(__doc__, file=sys.stderr)
             return 2
         return cmd_write(Path(args[1]), out)
+    if len(args) >= 2 and args[0] == "verify-published":
+        archive = None
+        rest = args[2:]
+        if len(rest) == 2 and rest[0] == "--archive":
+            archive = Path(rest[1])
+        elif rest:
+            print(__doc__, file=sys.stderr)
+            return 2
+        return cmd_verify_published(Path(args[1]), archive)
     print(__doc__, file=sys.stderr)
     return 2
 
