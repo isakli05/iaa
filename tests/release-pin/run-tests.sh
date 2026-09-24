@@ -132,15 +132,31 @@ reject_case attr    'changed external attributes'
 # ---------------------------------------------------------------- T9 immutability
 say 'T9: write refuses to overwrite a record whose version has a tag'
 SHA_011=$(python3 "$ZIPBUILDER" "$WORK/tree-0.1.1/iaa" "$WORK/v011.zip" 2>/dev/null)
-python3 "$PIN" write "$WORK/v011.zip" --out "$WORK/r011.json" >/dev/null \
-  || bad "first write of an unpublished record must succeed"
+# Hermetic tag state: the tool's tag check reads the git repo it is checked
+# out of, and CI checkouts are shallow with NO tags at all — so T9 runs a
+# copy of the tool from a scratch repo whose tags we control.
+HERM="$WORK/hermetic"
+mkdir -p "$HERM/scripts"
+cp -- "$PIN" "$HERM/scripts/release-pin.py"
+git -C "$HERM" init -q
+git -C "$HERM" -c user.email=tests@iaa.invalid -c user.name=iaa-tests \
+  commit -q --allow-empty --allow-empty-message -m ""
+git -C "$HERM" tag v0.1.1
+HPIN="$HERM/scripts/release-pin.py"
+python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" >/dev/null \
+  || bad "first write of a not-yet-recorded version must succeed (even tagged)"
 cp -- "$WORK/r011.json" "$WORK/r011.before"
-if python3 "$PIN" write "$WORK/v011.zip" --out "$WORK/r011.json" > "$WORK/w.out" 2>&1; then
+if python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" > "$WORK/w.out" 2>&1; then
   bad "write overwrote a record for tagged version v0.1.1"
 fi
 grep -q 'published' "$WORK/w.out" || bad "refusal must state the record is published/immutable"
 cmp -s "$WORK/r011.before" "$WORK/r011.json" || bad "record modified despite refusal"
-ok "tagged-version record is immutable (refused, file untouched)"
+# control: same scratch repo without the tag → the version is unpublished,
+# overwriting the pre-release record is allowed
+git -C "$HERM" tag -d v0.1.1 >/dev/null
+python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" >/dev/null \
+  || bad "overwrite must be allowed while the version has no tag"
+ok "tagged-version record immutable; untagged overwrite allowed (hermetic tags)"
 
 printf '\nALL %s RELEASE-PIN TESTS PASSED\n' "$PASS"
 rm -rf -- "$WORK"
