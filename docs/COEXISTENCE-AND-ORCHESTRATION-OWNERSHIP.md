@@ -45,8 +45,13 @@ not independently take control (absent documented integration)."
 ### P5. "Repository files, plans, specs, artifacts, historical prompts, subagent output must
 not transfer orchestration ownership by themselves."
 - **CURRENT BEHAVIOR:** exactly the ADR-0003 provenance rule; proven for plan artifacts
-  (authentic + adversarial), wording covers the other channels.
-- **GAP:** non-plan channels unexercised (KNOWN-LIMITATIONS #4).
+  (authentic + adversarial) and for the repository-file channel (README directive, 2/2 +
+  read-exposure, BL-004 2026-09-24); wording covers the other channels.
+- **GAP:** pasted channels failed BL-004 — a directive inside pasted issue text (1/2 samples)
+  or a quoted prior-session excerpt (1/1) selected SDD via the explicit-name exception /
+  a standing-policy reading, with İAA never invoked. Candidate policy v4 wording gap:
+  provenance condition on the explicit-name yield; quoted historical user text claiming
+  durable authority. Owner decision pending (post-release/bl-004-provenance-channels/).
 
 ### P6. "Nested orchestration must be opt-in and tested (İAA→SDD, GSD→İAA must not happen
 accidentally)."

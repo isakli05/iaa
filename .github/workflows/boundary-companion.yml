@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       cases:
-        description: "cases to run (j, k, d — space separated; default all three)"
+        description: "cases to run (j, k, d, r/i/t with optional sample suffix like r1 — space separated; default j k d)"
         required: false
         default: "j k d"
 

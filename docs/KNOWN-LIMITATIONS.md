@@ -23,6 +23,11 @@ Genuine, evidence-backed limitations only. No invented improvement work.
    is harness-enforced (depth=1); ZCode is platform-impossible.
 4. **Tested channels only.** Provenance rule proven for plan artifacts; issue text, READMEs,
    quoted transcripts share the wording but were not exercised (ADR-0003).
+   **[Status 2026-09-24]** exercised by BL-004 (post-release/bl-004-provenance-channels/):
+   README channel PASS (2/2 + read-exposure); issue-text and quoted-transcript channels
+   **FAILED** — pasted directives selected SDD (1/2 and 1/1 samples; İAA never invoked in the
+   failing runs). No longer an untested-limitation; now a known boundary failure pending the
+   owner's policy v4 decision.
 
 ## Coverage / validation
 
