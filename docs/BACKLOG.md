@@ -5,7 +5,7 @@ This file is the repository-owned, long-term work queue for İAA. It holds
 not tied to any release. GitHub Issues/PRs are execution artifacts and never
 replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 
-- **Last reviewed:** 2026-09-24 · against `main` @ `5788363` (package 0.1.1, policy v3)
+- **Last reviewed:** 2026-09-24 · against `main` @ `e768472` (package 0.1.1, policy v3)
 - **Current state of the product** lives in [README.md](../README.md) and
   [COMPATIBILITY.md](COMPATIBILITY.md), not here. This file is intent, not state.
 
@@ -150,7 +150,8 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 ## NEXT
 
 ### IAA-BL-002 — ZCode feedback #699 confirming comment: post or drop
-- **Status:** `OWNER DECISION` · **Category:** upstream / external
+- **Status:** `CLOSED` (2026-09-24) — owner approved; confirming comment posted ·
+  **Category:** upstream / external
 - **Problem / motivation:** ZCode 3.14.x provider bug (model requests fail
   ETIMEDOUT on IPv4-only networks) is root-caused, matched upstream, and forced
   a documented `api.z.ai` hosts workaround in every İAA GUI validation window.
@@ -164,6 +165,13 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Acceptance criteria:** owner approves → the (possibly amended) draft is
   posted and the item closes with the comment link; owner declines → closes
   with the decision recorded here.
+- **Closure evidence (2026-09-24):** comment
+  https://github.com/zai-org/feedback/issues/699#issuecomment-5805676787,
+  posted from isakli05; body = the draft in
+  [NETWORK-DIAGNOSTIC.md](../post-release/zcode-official/NETWORK-DIAGNOSTIC.md)
+  (reflowed to one paragraph, text unchanged); the draft file itself still
+  reads "NOT posted" because it is dated evidence and is not edited; upstream
+  issue state at posting time: open, 4 comments prior (5 including this one).
 - **Links:** https://github.com/zai-org/feedback/issues/699
 
 ### IAA-BL-003 — Controlled scenario runs F, H, I
