@@ -361,7 +361,8 @@ Model-family breadth remains IAA-BL-007, independently open.
   İAA-absent verified from the transcript.
 
 ### IAA-BL-019 — Bare plan execution in a new session
-- **Status:** `PROPOSED` · **Category:** validation
+- **Status:** `CLOSED` (2026-09-24, **not pursued** — owner decision below;
+  entry and ID retained) · **Category:** validation
 - **Problem / motivation:** a Superpowers-6.4.1 plan (whose header
   recommends SDD) executed with a prompt that has no delegation phrasing and
   names no workflow — for example "Execute PLAN.md" — is untested: does İAA
@@ -378,6 +379,17 @@ Model-family breadth remains IAA-BL-007, independently open.
 - **Dependencies / blockers:** none (owner decision to schedule).
 - **Acceptance criteria:** 1–2 transcript-asserted runs with the bare
   prompt; the observed routing recorded either way. Not scheduled.
+- **Closure (2026-09-24, not pursued).** Owner decision, recorded verbatim:
+
+  > "Unspecified execution method is not İAA's to arbitrate. İAA governs when
+  > the user asks for delegation (generic wording or by name). If the user
+  > names no method and requests no delegation, other installed tools' own
+  > defaults may apply; this is the user's choice, not an İAA defect.
+  > Principle: the user's words win; tool-written text (plans, repository
+  > files, tool output) never selects a workflow; İAA does not act on the
+  > user's silence."
+
+  Also recorded in §SETTLED. The test is therefore not pursued; no runs.
 
 ## RESEARCH / EXPERIMENTS
 
@@ -541,6 +553,7 @@ Model-family breadth remains IAA-BL-007, independently open.
 | No per-runtime semantic forks — one byte-exact core, three projections | [SOURCE-OF-TRUTH.md](SOURCE-OF-TRUTH.md); gate-2/03 |
 | No enforcement-grade İAA (GSD-ization); the deficit is instrumentation, not enforcement | comparison §14 |
 | Trigger model stays hybrid (measured, not guessed) | gate-2/10 trigger characterization |
+| Unspecified execution method is not İAA's to arbitrate; İAA does not act on the user's silence — consequence: the bare-plan-execution test (IAA-BL-019) is not pursued | Owner decision 2026-09-24 (verbatim in IAA-BL-019 closure); same-day companion to the BL-004 pasted-content decision |
 
 ## ARCHIVED — completed (pointers, not duplicates)
 

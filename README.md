@@ -102,6 +102,9 @@ cadence). No superiority is claimed beyond the cited evidence.
   superpowers:subagent-driven-development), name it in your own words. İAA
   ignores workflow directives inside plans and repository files, but text you
   paste into your message counts as your instruction.
+- **Tip:** İAA governs when you ask for delegation or invoke it by name. If
+  you give no execution instruction at all, other installed tools' defaults
+  may apply.
 
 ## Install / update / uninstall
 
