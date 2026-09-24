@@ -130,33 +130,57 @@ reject_case timestamp 'changed entry timestamp'
 reject_case attr    'changed external attributes'
 
 # ---------------------------------------------------------------- T9 immutability
-say 'T9: write refuses to overwrite a record whose version has a tag'
+say 'T9: write refuses to write for a PUBLISHED version (remote-or-local tag)'
 SHA_011=$(python3 "$ZIPBUILDER" "$WORK/tree-0.1.1/iaa" "$WORK/v011.zip" 2>/dev/null)
-# Hermetic tag state: the tool's tag check reads the git repo it is checked
-# out of, and CI checkouts are shallow with NO tags at all — so T9 runs a
-# copy of the tool from a scratch repo whose tags we control.
+# Hermetic publication state: a local bare repo is the "remote" (via
+# IAA_RELEASE_PIN_REMOTE) and the tool runs from a tag-less scratch repo —
+# mirroring CI checkouts, where local tags prove nothing.
 HERM="$WORK/hermetic"
 mkdir -p "$HERM/scripts"
 cp -- "$PIN" "$HERM/scripts/release-pin.py"
 git -C "$HERM" init -q
 git -C "$HERM" -c user.email=tests@iaa.invalid -c user.name=iaa-tests \
   commit -q --allow-empty --allow-empty-message -m ""
-git -C "$HERM" tag v0.1.1
+REM="$WORK/rem.git"
+SEED="$WORK/seed"
+git init -q --bare "$REM"
+git init -q "$SEED"
+git -C "$SEED" -c user.email=tests@iaa.invalid -c user.name=iaa-tests \
+  commit -q --allow-empty --allow-empty-message -m ""
 HPIN="$HERM/scripts/release-pin.py"
+export IAA_RELEASE_PIN_REMOTE="$REM"
+
+# (d) remote lacks the tag → pre-release: write succeeds and creates the record
 python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" >/dev/null \
-  || bad "first write of a not-yet-recorded version must succeed (even tagged)"
+  || bad "(d) write must succeed while v0.1.1 has no tag anywhere"
+
+# publish: push v0.1.1 to the bare "remote"
+git -C "$SEED" tag v0.1.1
+git -C "$SEED" push -q "$REM" refs/tags/v0.1.1
+
+# (a) record exists, version published remotely → refuse, file unchanged
 cp -- "$WORK/r011.json" "$WORK/r011.before"
 if python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" > "$WORK/w.out" 2>&1; then
-  bad "write overwrote a record for tagged version v0.1.1"
+  bad "(a) write overwrote a record for remotely-tagged v0.1.1"
 fi
-grep -q 'published' "$WORK/w.out" || bad "refusal must state the record is published/immutable"
-cmp -s "$WORK/r011.before" "$WORK/r011.json" || bad "record modified despite refusal"
-# control: same scratch repo without the tag → the version is unpublished,
-# overwriting the pre-release record is allowed
-git -C "$HERM" tag -d v0.1.1 >/dev/null
-python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" >/dev/null \
-  || bad "overwrite must be allowed while the version has no tag"
-ok "tagged-version record immutable; untagged overwrite allowed (hermetic tags)"
+grep -q 'published' "$WORK/w.out" || bad "refusal must state the version is published"
+cmp -s "$WORK/r011.before" "$WORK/r011.json" || bad "(a) record modified despite refusal"
+
+# (b) record deleted, version still published → refuse, nothing created
+rm -f -- "$WORK/r011.json"
+if python3 "$HPIN" write "$WORK/v011.zip" --out "$WORK/r011.json" > "$WORK/w.out" 2>&1; then
+  bad "(b) write re-created a record for remotely-tagged v0.1.1"
+fi
+[ ! -e "$WORK/r011.json" ] || bad "(b) record file created despite refusal"
+
+# (c) publication state indeterminable → refuse (fail closed)
+if IAA_RELEASE_PIN_REMOTE="$WORK/no-such-repo.git" python3 "$HPIN" write "$WORK/v011.zip" \
+    --out "$WORK/r011c.json" > "$WORK/w.out" 2>&1; then
+  bad "(c) write must refuse when publication state cannot be determined"
+fi
+[ ! -e "$WORK/r011c.json" ] || bad "(c) record file created despite refusal"
+ok "published version: overwrite + re-creation refused; unknown state refused; pre-release allowed"
+unset IAA_RELEASE_PIN_REMOTE
 
 printf '\nALL %s RELEASE-PIN TESTS PASSED\n' "$PASS"
 rm -rf -- "$WORK"

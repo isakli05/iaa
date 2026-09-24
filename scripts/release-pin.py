@@ -25,8 +25,15 @@ Modes:
 
   write <archive.zip> [--out <record.json>]
       Release-only: derive a record from a BUILT archive. Never called by
-      build-packages.sh or CI. Refuses to overwrite a record whose version
-      already has a v<version> tag (published artifacts are immutable).
+      build-packages.sh or CI. Refuses to write for a PUBLISHED version —
+      v<version> tagged locally or on the canonical remote — on every write,
+      whether or not the target file exists (published artifacts are
+      immutable). Absence of local tags is never evidence of "unpublished":
+      in tag-less clones (CI checkouts, shallow clones) the remote decides.
+      Any failure to determine remote publication state (network, missing
+      git, non-zero exit) also refuses — fail closed. The remote defaults to
+      https://github.com/isakli05/iaa and can be overridden for tests via
+      the IAA_RELEASE_PIN_REMOTE environment variable.
 
 Stdlib only.
 """
@@ -34,12 +41,24 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import zipfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+DEFAULT_REMOTE = "https://github.com/isakli05/iaa"
+
+
+class PublicationStateUnknown(RuntimeError):
+    """Remote publication state could not be determined — callers fail closed."""
+
+
+def pin_remote() -> str:
+    """Canonical remote for publication checks (overridable for tests)."""
+    return os.environ.get("IAA_RELEASE_PIN_REMOTE", DEFAULT_REMOTE)
 
 MANIFEST_FIELDS = (
     "name", "file_size", "crc32", "sha256",
@@ -134,20 +153,50 @@ def archive_version(archive: Path) -> str:
     return str(meta["version"])
 
 
-def version_is_tagged(version: str) -> bool | None:
-    """True/False; None when the tag state cannot be determined (fail closed
-    at the caller: refuse to overwrite)."""
+def version_is_published(version: str, remote: str) -> bool:
+    """True iff v<version> is tagged locally or on *remote*.
+
+    A local tag is sufficient evidence (it exists in this clone). Absence of
+    local tags proves nothing — CI checkouts and shallow clones carry none —
+    so without a local tag the remote decides via `git ls-remote`. Any
+    failure to determine the remote's state raises PublicationStateUnknown;
+    callers must refuse (fail closed).
+    """
     try:
         res = subprocess.run(
             ["git", "-C", str(REPO_ROOT), "tag", "-l", f"v{version}"],
-            capture_output=True, text=True, check=True)
-    except (OSError, subprocess.CalledProcessError):
-        return None
+            capture_output=True, text=True)
+        if res.returncode == 0 and res.stdout.strip():
+            return True
+    except OSError:
+        pass  # no local evidence; the remote check below is the authority
+    try:
+        res = subprocess.run(
+            ["git", "ls-remote", "--tags", remote, f"refs/tags/v{version}"],
+            capture_output=True, text=True)
+    except OSError as e:
+        raise PublicationStateUnknown(f"cannot run git ls-remote: {e}") from e
+    if res.returncode != 0:
+        raise PublicationStateUnknown(
+            f"git ls-remote --tags {remote} refs/tags/v{version} failed "
+            f"(exit {res.returncode}): {res.stderr.strip() or 'no output'}")
     return bool(res.stdout.strip())
 
 
 def cmd_write(archive: Path, out: Path | None) -> int:
     version = archive_version(archive)
+    remote = pin_remote()
+    try:
+        published = version_is_published(version, remote)
+    except PublicationStateUnknown as e:
+        print(f"release-pin: refusing to write for v{version}: publication "
+              f"state cannot be determined — {e}", file=sys.stderr)
+        return 1
+    if published:
+        print(f"release-pin: refusing to write for v{version}: version is "
+              f"published (tag v{version} exists locally or on {remote}); "
+              "published artifacts are immutable", file=sys.stderr)
+        return 1
     record = {
         "version": version,
         "asset_url": (f"https://github.com/isakli05/iaa/releases/download/"
@@ -156,14 +205,6 @@ def cmd_write(archive: Path, out: Path | None) -> int:
         "manifest": archive_manifest(archive),
     }
     target = out or (REPO_ROOT / "packaging" / "release-pins" / f"{version}.json")
-    if target.exists():
-        tagged = version_is_tagged(version)
-        if tagged or tagged is None:
-            reason = "tag exists" if tagged is not None else "tag state unknown"
-            print(f"release-pin: refusing to overwrite {target}: v{version} "
-                  f"is published ({reason}); published artifacts are immutable",
-                  file=sys.stderr)
-            return 1
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"release-pin: wrote {target} (v{version}, {len(record['manifest'])} entries)")

@@ -49,6 +49,16 @@ esac
 
 if [ "${1:-build}" != "--version-only" ]; then
 
+  # ---- Release-pin record gate (before any generated tree is touched) -----
+  # A missing/invalid record for the pinned VERSION aborts with packaging/
+  # unchanged: the remote-marketplace sha256 pin can only be stamped from a
+  # published-artifact record (packaging/release-pins/), and records are
+  # written only by an explicit release step (scripts/release-pin.py write).
+  IAA_PIN_RECORD="$REPO_ROOT/packaging/release-pins/$VERSION.json"
+  [ -f "$IAA_PIN_RECORD" ] || fail "no release-pin record for v$VERSION ($IAA_PIN_RECORD); the marketplace.remote.json pin is written only by an explicit release step"
+  IAA_ZIP_SHA=$(jq -r '.sha256 // empty' "$IAA_PIN_RECORD")
+  [ -n "$IAA_ZIP_SHA" ] || fail "$IAA_PIN_RECORD: missing sha256"
+
   # ---- Claude plugin -------------------------------------------------------
   CLAUDE_PKG="$REPO_ROOT/packaging/claude"
   rm -rf -- "$CLAUDE_PKG"
@@ -97,15 +107,10 @@ if [ "${1:-build}" != "--version-only" ]; then
   copy_license "$ZCODE_PKG/plugins/iaa"
   stamp "$TEMPLATES/zcode-marketplace.json" "$ZCODE_PKG/marketplace.json"
   # remote marketplace: the sha256 pin is stamped FROM THE RELEASE-PIN RECORD
-  # of the published artifact (packaging/release-pins/<version>.json), never
-  # from a fresh build. DEFLATE bytes are zlib-implementation-dependent
-  # (IAA-BL-016), so ordinary regeneration must not be able to rewrite the
-  # published pin; records are written only by an explicit release step
-  # (scripts/release-pin.py write).
-  IAA_PIN_RECORD="$REPO_ROOT/packaging/release-pins/$VERSION.json"
-  [ -f "$IAA_PIN_RECORD" ] || fail "no release-pin record for v$VERSION ($IAA_PIN_RECORD); the marketplace.remote.json pin is written only by an explicit release step"
-  IAA_ZIP_SHA=$(jq -r '.sha256 // empty' "$IAA_PIN_RECORD")
-  [ -n "$IAA_ZIP_SHA" ] || fail "$IAA_PIN_RECORD: missing sha256"
+  # gated above, never from a fresh build. DEFLATE bytes are
+  # zlib-implementation-dependent (IAA-BL-016), so ordinary regeneration must
+  # not be able to rewrite the published pin; records are written only by an
+  # explicit release step (scripts/release-pin.py write).
   mkdir -p -- "$ZCODE_PKG"
   sed -e "s/__VERSION__/$VERSION/g" -e "s/__PLUGIN_ZIP_SHA256__/$IAA_ZIP_SHA/g" \
       -- "$TEMPLATES/zcode-marketplace-remote.json" > "$ZCODE_PKG/marketplace.remote.json"
