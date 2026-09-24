@@ -5,7 +5,7 @@ This file is the repository-owned, long-term work queue for İAA. It holds
 not tied to any release. GitHub Issues/PRs are execution artifacts and never
 replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 
-- **Last reviewed:** 2026-09-24 · against `main` @ `af5c7f4` (package 0.1.1, policy v3)
+- **Last reviewed:** 2026-09-24 · against `main` @ `5788363` (package 0.1.1, policy v3)
 - **Current state of the product** lives in [README.md](../README.md) and
   [COMPATIBILITY.md](COMPATIBILITY.md), not here. This file is intent, not state.
 
@@ -64,9 +64,9 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Links:** https://github.com/zai-org/zcode-plugins/pull/42
 
 ### IAA-BL-016 — Static CI red on main: plugin.zip sha not reproducible on GitHub runners
-- **Status:** `OPEN` — direction decided (owner, 2026-09-24): **A** now; **B** split
-  out as IAA-BL-017 (future releases only); **C** (pinned build container) not
-  implemented · **Category:** maintenance / CI (category-A infrastructure; no semantic impact)
+- **Status:** `CLOSED` (2026-09-24) — phase A implemented and verified; **B**
+  continues as IAA-BL-017; **C** (pinned build container) not implemented ·
+  **Category:** maintenance / CI (category-A infrastructure; no semantic impact)
 - **Problem / motivation:** the `static` workflow fails on every `main` push since
   the 0.1.1 merge (runs 35915378608, 35917592138):
   `check-parity: FAIL: marketplace.remote.json sha256 (621bdd1f…) != freshly
@@ -121,6 +121,13 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   release asset against the record in a dedicated step (`f41bf57`). Stays
   `OPEN` until the GitHub-runner result (PR run, then a `main` push) is
   observed.
+- **Closure evidence (2026-09-24):** PR
+  https://github.com/isakli05/iaa/pull/1 (fast-forward to `main` @ `5788363`);
+  PR run 35939643695 success; main push run 35941009638 success (all steps,
+  including Deterministic package generation and Published-artifact pin
+  check — first green main `static` since the 0.1.1 merge); published v0.1.1
+  asset and pin `621bdd1f…e2c` unchanged; D = NONE (no change under `iaa/`
+  or `scripts/iaa`).
 - **Why it matters:** CI is red on every push to `main` (noise hides real
   failures); the cross-environment reproducibility implied by
   "deterministic build" evidence holds only per zlib implementation (the
