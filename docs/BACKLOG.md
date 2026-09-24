@@ -148,7 +148,8 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   `scripts/check-parity.sh` (remote marketplace pin check); IAA-BL-017.
 
 ### IAA-BL-018 — KNOWN-LIMITATIONS lags Gate 2/3 (reconcile the public doc)
-- **Status:** `OPEN` · **Category:** maintenance / docs
+- **Status:** `CLOSED` (2026-09-24) — see closure evidence · **Category:**
+  maintenance / docs
 - **Problem / motivation:** [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md) lags
   Gate 2/3. Items #9, #10, and #12 were resolved in Gate 2 but carry no status
   note. #6 is partially superseded by Gate-2/3 legs. #7 records the August
@@ -176,6 +177,15 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Dependencies / blockers:** none.
 - **Acceptance criteria:** status notes added without deleting or rewording
   frozen text; every note cites repository evidence; D = NONE; static CI green.
+- **Closure evidence (2026-09-24):** reconciliation commit `30508f6`
+  (docs(limitations): reconcile KNOWN-LIMITATIONS with Gate 2/3 (IAA-BL-018) —
+  additive `[Status 2026-09-24]` notes on #6/#7/#9/#10/#12/#13, new #16, header
+  updated); static CI green on PR
+  [isakli05/iaa#2](https://github.com/isakli05/iaa/pull/2) — run 35973045115
+  `success` (static pass, GitGuardian pass); frozen 2026-09-22 text preserved
+  byte-for-byte (the diff is additions plus the authorized header-line update
+  only); every note's citation opened and checked against the cited file; D =
+  NONE (`git diff --stat origin/main -- iaa/ scripts/iaa` empty).
 
 ## NEXT
 
