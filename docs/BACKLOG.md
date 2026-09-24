@@ -113,8 +113,14 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   §3b in `scripts/check-parity.sh` + offline unit tests
   (`tests/release-pin/run-tests.sh`, one new `static` step) — commit
   `58fb76c`; current-facing determinism wording qualified in the follow-up
-  docs commit. Stays `OPEN` until the GitHub-runner result (PR run, then a
-  `main` push) is observed.
+  docs commit. Hardening after owner-side review (2026-09-24): the record
+  writer refuses writes for any version tagged locally or on the canonical
+  remote (fail-closed when remote publication state is unknown) and
+  `build-packages.sh` gates on the record before any generated tree is
+  touched (`228c62f`); CI additionally re-verifies the actually served
+  release asset against the record in a dedicated step (`f41bf57`). Stays
+  `OPEN` until the GitHub-runner result (PR run, then a `main` push) is
+  observed.
 - **Why it matters:** CI is red on every push to `main` (noise hides real
   failures); the cross-environment reproducibility implied by
   "deterministic build" evidence holds only per zlib implementation (the
@@ -342,7 +348,11 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 - **Acceptance criteria:** before the next release is cut, CI-as-release-builder
   is evaluated and the chosen procedure recorded here; if adopted, that
   release's artifacts are built by CI, the pin equals the CI-built archive, and
-  the uploaded asset re-downloads to the same sha.
+  the uploaded asset re-downloads to the same sha. The release sequence
+  (build the archive in the release environment → `scripts/release-pin.py
+  write` → `scripts/build-packages.sh` → `scripts/build-release.sh` →
+  upload → re-download sha verify) is documented in a current-facing doc
+  before the next release is cut.
 
 ## SETTLED — recorded decisions (do not re-propose without new evidence)
 
