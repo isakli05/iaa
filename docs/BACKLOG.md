@@ -526,6 +526,105 @@ Model-family breadth remains IAA-BL-007, independently open.
 - **Acceptance criteria:** one characterization run + note, or an explicit
   wont-research decision recorded.
 
+#### Pre-registered characterization design (2026-09-25; NOT executed — design
+#### only, awaits owner decisions)
+
+Modeled on the BL-004 pre-registered design. No run has started; nothing
+below has been executed. Owner decisions required before execution:
+(1) execution method, (2) fixture/form confirmation, (3) scheduling and cost
+authorization (budget below).
+
+- **Execution method.** Teammates only spawn in interactive sessions (docs,
+  2026-09-25), so a non-interactive harness cannot produce the phenomenon.
+  Options:
+  - **(a) owner-executed GUI/terminal checklist.** The owner starts each
+    interactive session personally against a prepared disposable HOME and
+    repo, following a pre-registered checklist (prompt text, flag state,
+    what to answer on permission prompts, when to stop). Highest fidelity:
+    a real interactive session with default permission behavior, no
+    automation artifacts. Cost: owner time; permission answers are
+    unscripted and must be recorded per arm.
+  - **(b) agent-driven interactive session via tmux** in a disposable HOME
+    and repo: a driver agent types the prompt into a real interactive
+    `claude` running under tmux (`IAA_HOME` pinned to the disposable HOME).
+    Repeatable in form, but tmux key-driving is timing-brittle, permission
+    prompts stall automation, and pre-seeding allowlists or running bypass
+    mode changes the permission environment (teammates inherit the lead's
+    permission mode per docs) — a fidelity deviation that must be recorded;
+    docs also note tmux limitations on some operating systems.
+  - **(c) hybrid — owner-executed runs, analyzer-verified observations
+    (recommended).** Option (a)'s run window (owner starts the interactive
+    session in a scripted-prepared disposable environment) with all
+    observations extracted afterwards from transcripts and the disposable
+    filesystem by analyzer tooling — never from the owner's or the model's
+    self-report. Rationale: the interactive window must exist either way;
+    keeping it human-executed removes (b)'s automation and
+    permission-environment deviations while keeping every observation
+    transcript-/filesystem-verified. If the owner declines manual execution,
+    (b) is the documented fallback with its deviations recorded.
+  The owner chooses.
+- **Fixture.** A small disposable repo containing two disjoint modules
+  (each own sources + own test file; no shared files) and two corresponding
+  small, self-contained changes — a task on which İAA plausibly authorizes
+  2 independent write lanes. No embedded workflow directive anywhere in the
+  fixture (BL-004 lesson): the only orchestration signals are the user
+  prompt and İAA itself. Current user instruction: the two-lane task text
+  plus the delegation-flavored sentence "Use subagents where appropriate."
+  Environment (recorded per arm): İAA **skills-dir form** (manage.sh install
+  into the disposable HOME — the historically tested form; owner may swap in
+  the plugin form); Superpowers state recorded (version, enabled/disabled —
+  expected 6.4.1 enabled, matching the tested baseline); spawn-depth setting
+  recorded (actual `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` value in the
+  disposable settings.json after install); Claude Code version pinned; the
+  flag set per arm via the disposable HOME's user `settings.json` `env`
+  (documented channel, self-documenting on disk).
+- **Arms.** Flag ON ×2 samples; flag OFF ×1 control. Only the flag value
+  differs between arms: same fixture commit, same prompt, same model.
+- **Observations** (each transcript- or filesystem-verified, never model
+  self-report):
+  - whether Agent calls carried `name` (Agent tool-input fields in the lead
+    and any teammate transcripts);
+  - whether teammates formed (`~/.claude/teams/<team>/config.json` members,
+    `~/.claude/tasks/<team>/`, per-agent inbox files);
+  - whether teammates loaded the İAA shim or skill (teammate transcripts:
+    managed-block/skill presence in context);
+  - whether teammates spawned subagents, and at what depth (Agent calls
+    inside teammate transcripts, compared against the recorded spawn-depth
+    value — this is the UNKNOWN in the 2026-09-25 evidence);
+  - inter-agent messages (inbox JSON contents: counts, senders, recipients);
+  - total spawns (Agent calls counted across all transcripts);
+  - final validation location (which session ran the final test suite);
+  - cost per arm (usage/cost records from the transcripts).
+- **Expected outcome.** None pre-asserted — this is characterization.
+  Pre-registered instead: the observations that would justify the candidate
+  adapter sentence "In İAA mode, do not pass `name` on Agent calls unless
+  the user requested a team" (would be a category-B change to
+  [platform-adapters.md](../iaa/references/platform-adapters.md); owner
+  decision; NOT part of this task). The sentence is justified only if ALL
+  hold: (1) at least one ON sample shows İAA governing (shim/skill loaded
+  in the lead) AND (2) at least one Agent call made under İAA's delegation
+  (delegation-flavored prompt, no user team request) carried `name` and
+  launched as a teammate (team config/mailbox evidence) AND (3) the OFF
+  control shows the same prompt producing ordinary subagents with no team
+  artifacts (isolating the flag as the differentiator). NOT justified
+  (record as no-adoption with evidence) if İAA-governed Agent calls never
+  carry `name`, no team forms under İAA dispatch in the ON arms, or the
+  ON/OFF difference is absent. Mixed ON samples are recorded as mixed; no
+  aggregation beyond what the samples show. Secondary (recorded, not
+  gating): whether teammate formation changed total spawns, validation
+  location, or shim loading — this feeds the characterization note either
+  way.
+- **Budget.** Stop and report if cumulative cost exceeds USD 20 (all arms
+  plus analysis).
+- **Evidence location.** `post-release/bl-009-agent-teams/`. Raw transcripts
+  stay machine-local per
+  [HISTORICAL-EVIDENCE-DISPOSITION.md](HISTORICAL-EVIDENCE-DISPOSITION.md);
+  commit analyzer outputs, sha256 of raw transcripts, fixtures, and the
+  report.
+- **Model.** Record the model in use at run time (expected: the GLM-5.3
+  profile — the single-model baseline). Model-family breadth (IAA-BL-007)
+  is explicitly out of scope, deferred by the owner.
+
 ### IAA-BL-021 — Visible delegation-decision line (policy v4 candidate)
 - **Status:** `RESEARCH` (candidate; **not adopted; no core change**) · **Category:** research / policy
 - **Idea:** before any dispatch, and when choosing zero agents on a
