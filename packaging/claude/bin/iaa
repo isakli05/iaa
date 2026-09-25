@@ -9,6 +9,7 @@
 #   IAA_HOME          effective user home (default: $HOME)
 #   CLAUDE_CONFIG_DIR Claude config dir (default: $IAA_HOME/.claude)
 #   CODEX_HOME        Codex home       (default: $IAA_HOME/.codex)
+#   IAA_CLAUDE_MANAGED_DIR Claude managed-settings dir (default: platform path)
 set -eu
 
 IAA_COMMAND=${1:-}
@@ -196,6 +197,131 @@ PY
   fi
 }
 
+doctor_agent_teams() {
+  # Resolve the EFFECTIVE Agent Teams state read-only across the observable
+  # sources, honoring documented precedence (an `env` entry in any settings
+  # file overrides a shell export; settings files rank managed >
+  # project-local > shared project > user — code.claude.com/docs/en/settings,
+  # /docs/en/agent-teams). A --settings payload or a remote/MDM-managed
+  # policy is not observable here. Detection only, never a failure;
+  # coexistence itself is UNVERIFIED (IAA-BL-009, doctor gap IAA-BL-020).
+  if [ -n "${IAA_CLAUDE_MANAGED_DIR-}" ]; then
+    iaa_at_managed_dir=$IAA_CLAUDE_MANAGED_DIR
+  else
+    case "$(uname -s)" in
+      Darwin) iaa_at_managed_dir='/Library/Application Support/ClaudeCode' ;;
+      MINGW*|MSYS*|CYGWIN*) iaa_at_managed_dir="${PROGRAMFILES:-C:\Program Files}\\ClaudeCode" ;;
+      *) iaa_at_managed_dir='/etc/claude-code' ;;
+    esac
+  fi
+  iaa_at_env=${CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS-}
+  [ -n "$iaa_at_env" ] || iaa_at_env='__ABSENT__'
+  iaa_at_result=''
+  if command -v python3 >/dev/null 2>&1; then
+    iaa_at_result=$(python3 - "$iaa_at_env" \
+      "managed settings|$iaa_at_managed_dir" \
+      "local project settings|$PWD/.claude/settings.local.json" \
+      "project settings|$PWD/.claude/settings.json" \
+      "user settings|$IAA_CLAUDE_DIR/settings.json" <<'PY' || true
+import json, os, sys
+
+env_val = sys.argv[1]
+sources = [a.split("|", 1) for a in sys.argv[2:]]
+KEY = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"
+
+
+def file_value(path):
+    """(state, value) for one settings file: absent | set | unreadable."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            d = json.load(f)
+    except FileNotFoundError:
+        return "absent", None
+    except Exception:
+        return "unreadable", None
+    if not isinstance(d, dict):
+        return "unreadable", None
+    env = d.get("env")
+    if not isinstance(env, dict) or KEY not in env:
+        return "absent", None
+    return "set", env[KEY]
+
+
+def managed_value(dirpath):
+    """managed-settings.json then managed-settings.d/*.json in alphabetical
+    order, later files overriding earlier within the tier (official merge
+    order); any existing-but-unparseable file makes the tier unreadable."""
+    files = [os.path.join(dirpath, "managed-settings.json")]
+    d_dir = os.path.join(dirpath, "managed-settings.d")
+    if os.path.isdir(d_dir):
+        files += [os.path.join(d_dir, n) for n in sorted(os.listdir(d_dir))
+                  if n.endswith(".json") and not n.startswith(".")]
+    found_any = is_set = False
+    value = None
+    for p in files:
+        if not os.path.isfile(p):
+            continue
+        state, v = file_value(p)
+        if state == "unreadable":
+            return "unreadable", None
+        found_any = True
+        if state == "set":
+            is_set, value = True, v
+    if not found_any:
+        return "absent", None
+    return ("set" if is_set else "absent"), value
+
+
+def report(state, source, extra=""):
+    print("%s|%s|%s" % (state, source, extra))
+    sys.exit(0)
+
+
+for label, path in sources:
+    if label == "managed settings":
+        state, value = managed_value(path)
+    else:
+        state, value = file_value(path)
+    if state == "unreadable":
+        report("indeterminate", "", "unreadable settings source: %s %s (invalid JSON or not an object)" % (label, path))
+    if state != "set":
+        continue
+    src = "%s %s" % (label, path)
+    if value == "1":
+        report("enabled", src)
+    if value == "0":
+        note = '; environment value "1" overridden per docs' if env_val == "1" else ""
+        report("disabled", src, note)
+    report("indeterminate", "", 'unrecognized value %r in %s %s (expected "1" or "0")' % (value, label, path))
+
+if env_val == "__ABSENT__":
+    report("absent", "")
+if env_val in ("1", "0"):
+    report("enabled" if env_val == "1" else "disabled", "environment")
+report("indeterminate", "", 'unrecognized environment value %r (expected "1" or "0")' % env_val)
+PY
+)
+  fi
+  iaa_at_status=${iaa_at_result%%|*}
+  iaa_at_rest=${iaa_at_result#*|}
+  iaa_at_src=${iaa_at_rest%%|*}
+  iaa_at_note=${iaa_at_rest#*|}
+  case "$iaa_at_status" in
+    enabled)
+      doctor_emit WARNING "framework:agent-teams" "Agent Teams enabled (source: $iaa_at_src): named subagents launch as teammates per Claude Code docs; İAA coexistence UNVERIFIED (IAA-BL-009)"
+      ;;
+    disabled)
+      doctor_emit INFO "framework:agent-teams" "Agent Teams explicitly disabled (source: $iaa_at_src$iaa_at_note) — named subagents stay ordinary subagents"
+      ;;
+    absent)
+      doctor_emit INFO "framework:agent-teams" "Agent Teams flag not set in observable sources (environment, user/project/local settings, managed settings) — off by default; --settings payloads and MDM/console-managed policies are not observable here"
+      ;;
+    *)
+      doctor_emit WARNING "framework:agent-teams" "Agent Teams state indeterminate — ${iaa_at_note:-could not resolve effective state from observable sources}"
+      ;;
+  esac
+}
+
 doctor_claude_plugins() {
   iaa_cp_inst="$IAA_CLAUDE_DIR/plugins/installed_plugins.json"
   iaa_cp_any=0
@@ -259,10 +385,8 @@ PY
   if [ "$iaa_cp_any" -eq 1 ] && { [ -e "$IAA_CLAUDE_DIR/skills/iaa" ] || [ -L "$IAA_CLAUDE_DIR/skills/iaa" ]; }; then
     doctor_emit PROBLEM "duplicate:claude" "both the iaa plugin and a personal skill at $IAA_CLAUDE_DIR/skills/iaa are active — both would load; remove one form"
   fi
-  # Agent Teams experimental flag
-  if [ -f "$IAA_CLAUDE_DIR/settings.json" ] && grep -q 'CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS' "$IAA_CLAUDE_DIR/settings.json" 2>/dev/null; then
-    doctor_emit INFO "framework:agent-teams" "Agent Teams flag present in Claude settings — coexistence UNVERIFIED"
-  fi
+  # Agent Teams experimental flag — effective state across observable sources
+  doctor_agent_teams
   # spawn depth (informational; managed value is 1)
   iaa_cp_depth=$(jq -r '.env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH // ""' "$IAA_CLAUDE_DIR/settings.json" 2>/dev/null || true)
   if [ "$iaa_cp_depth" = "1" ]; then

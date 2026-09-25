@@ -5,7 +5,7 @@ This file is the repository-owned, long-term work queue for İAA. It holds
 not tied to any release. GitHub Issues/PRs are execution artifacts and never
 replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 
-- **Last reviewed:** 2026-09-24 · against `main` @ `8790915` (package 0.1.1, policy v3)
+- **Last reviewed:** 2026-09-25 · against `main` @ `93f07b2` (package 0.1.1, policy v3)
 - **Current state of the product** lives in [README.md](../README.md) and
   [COMPATIBILITY.md](COMPATIBILITY.md), not here. This file is intent, not state.
 
@@ -186,6 +186,63 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   byte-for-byte (the diff is additions plus the authorized header-line update
   only); every note's citation opened and checked against the cited file; D =
   NONE (`git diff --stat origin/main -- iaa/ scripts/iaa` empty).
+
+### IAA-BL-020 — Doctor: accurate Agent Teams detection
+- **Status:** `OPEN` · **Category:** maintenance / tooling (category-A
+  infrastructure; no semantic impact)
+- **Problem / motivation:** `iaa doctor`'s "Agent Teams experimental flag"
+  check greps only user `~/.claude/settings.json` for the variable *name*
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`: it reports "present" even when the
+  value is `"0"` (explicitly disabled), and it ignores the process
+  environment, project `.claude/settings.json` /
+  `.claude/settings.local.json`, and managed settings — sources that per the
+  official docs can enable the feature and outrank user settings.
+- **Evidence:** the pre-change block in `scripts/iaa` (`doctor_claude_plugins`,
+  "Agent Teams experimental flag"); official docs read 2026-09-25 —
+  https://code.claude.com/docs/en/agent-teams ("Setting the variable to `0`
+  in your user `settings.json` overrides a shell export. … project settings,
+  local settings, and a `--settings` payload apply after user settings, so an
+  `env` entry that sets the variable to `1` in any of them wins"; "Managed
+  settings … apply after every other source") and
+  https://code.claude.com/docs/en/settings (settings precedence:
+  managed > `--settings` > project local > shared project > user;
+  "Environment variables aren't a level in this stack … An `env` block inside
+  a settings file is an ordinary key and follows the levels above").
+- **Why it matters:** the doctor is İAA's read-only detection surface for an
+  UNVERIFIED coexistence (IAA-BL-009); a check that cannot tell enabled from
+  explicitly-disabled gives false assurance in exactly the environment where
+  İAA's topology assumptions change (named spawns become teammates).
+- **Dependencies / blockers:** none. (Characterization itself is IAA-BL-009;
+  this item is detection only — current-facing wording must stay detection,
+  not tested behavior.)
+- **Acceptance criteria:** effective state resolved read-only from the
+  process environment, user settings `env`, project + local settings
+  (reported as project-scoped with the path named), and managed settings at
+  the documented platform paths, honoring the documented precedence;
+  effectively enabled → a warning-level line (never a failure); explicitly
+  disabled or absent → info; if the state cannot be determined with
+  confidence → `indeterminate` with the sources found (no guessing); doctor
+  mutates nothing; fixture tests cover absent / user-`"1"` / user-`"0"` /
+  shell-env-`"1"`-only / shell-env-`"1"`+user-`"0"` / project-`"1"` /
+  malformed settings JSON / managed-`"1"`; all pre-existing doctor tests
+  still pass; static CI green; D = NONE.
+- **Implementation (2026-09-25, branch `feat/bl-009-agent-teams-doctor`):**
+  `doctor_agent_teams` in `scripts/iaa` (projected byte-identically to
+  `packaging/claude/bin/iaa`) resolves the effective state read-only from the
+  process environment, user settings `env`, cwd-scoped project
+  `.claude/settings.json` + `.claude/settings.local.json` (paths named), and
+  managed settings at the documented platform paths including
+  `managed-settings.d/` merging (`IAA_CLAUDE_MANAGED_DIR` override for tests
+  and disposable environments), honoring the documented precedence
+  (settings `env` outranks a shell export; managed > local > project > user).
+  Enabled → `WARNING` (never a failure, never counted actionable);
+  explicitly disabled or absent → `INFO`; unreadable or unrecognized source →
+  `WARNING` `indeterminate` with the sources found (no guessing);
+  `--settings` payloads and MDM/console-managed policies are named as not
+  observable. Doctor tests T14–T23 cover the fixture matrix plus
+  project-over-user and local-over-project precedence (23/23 pass locally).
+  Detection-only wording added to INSTALLATION.md and COMPATIBILITY.md.
+  Stays `OPEN` until the PR `static` run is observed green.
 
 ## NEXT
 
@@ -440,17 +497,163 @@ Model-family breadth remains IAA-BL-007, independently open.
 - **Acceptance criteria:** research note with evidence; explicit adopt/reject.
 
 ### IAA-BL-009 — Agent Teams / peer-coordination characterization
-- **Status:** `RESEARCH` (deferred until upstream stabilizes) · **Category:** research / compatibility
+- **Status:** `OPEN` (scope: characterization only; no adoption intent; until
+  2026-09-25 this was `RESEARCH` "deferred until upstream stabilizes") · **Category:** research / compatibility
 - **Problem / motivation:** Claude Agent Teams (experimental, flag-gated, off
   locally) is untested against İAA; auto-formation would change topology
   assumptions and conflicts with root-to-child by design.
 - **Evidence:** COMPATIBILITY-MATRIX "UNVERIFIED"; comparison §9 (E10), §17
   (mesh topologies: DO NOT ADOPT as a default shape).
+- **Evidence (added 2026-09-25):** official Claude Code docs
+  (https://code.claude.com/docs/en/agent-teams, read 2026-09-25): with
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, an Agent tool call that passes
+  `name` launches a teammate instead of a subagent, unless the call is a fork
+  or passes `isolation`; Claude names ordinary subagents on its own, so teams
+  can form without the user asking and no confirmation is shown; teammates
+  are full sessions that load CLAUDE.md, MCP servers, and skills, message
+  each other directly, and can spawn their own (foreground) subagents;
+  teammates are not spawned in non-interactive (`-p`/SDK) sessions; setting
+  the variable to `"0"` in user settings.json overrides a shell export, while
+  project settings, local settings, `--settings`, and managed settings take
+  higher precedence. Implication for İAA: İAA-dispatched seats may silently
+  become peer teammates — conflicting with root-to-child delegation and
+  primary-owned integration — and each teammate may load the İAA shim.
+  Whether the spawn-depth cap applies to teammates' subagents is UNKNOWN.
+  The `iaa doctor` detection gap this exposes is recorded as IAA-BL-020.
 - **Why it matters:** to know what happens *if a user enables teams* beside
   İAA — characterization only; no adoption intent.
 - **Dependencies / blockers:** stable upstream feature + owner-enabled flag.
 - **Acceptance criteria:** one characterization run + note, or an explicit
   wont-research decision recorded.
+
+#### Pre-registered characterization design (2026-09-25; NOT executed — design
+#### only, awaits owner decisions)
+
+Modeled on the BL-004 pre-registered design. No run has started; nothing
+below has been executed. Owner decisions required before execution:
+(1) execution method, (2) fixture/form confirmation, (3) scheduling and cost
+authorization (budget below).
+
+- **Execution method.** Teammates only spawn in interactive sessions (docs,
+  2026-09-25), so a non-interactive harness cannot produce the phenomenon.
+  Options:
+  - **(a) owner-executed GUI/terminal checklist.** The owner starts each
+    interactive session personally against a prepared disposable HOME and
+    repo, following a pre-registered checklist (prompt text, flag state,
+    what to answer on permission prompts, when to stop). Highest fidelity:
+    a real interactive session with default permission behavior, no
+    automation artifacts. Cost: owner time; permission answers are
+    unscripted and must be recorded per arm.
+  - **(b) agent-driven interactive session via tmux** in a disposable HOME
+    and repo: a driver agent types the prompt into a real interactive
+    `claude` running under tmux (`IAA_HOME` pinned to the disposable HOME).
+    Repeatable in form, but tmux key-driving is timing-brittle, permission
+    prompts stall automation, and pre-seeding allowlists or running bypass
+    mode changes the permission environment (teammates inherit the lead's
+    permission mode per docs) — a fidelity deviation that must be recorded;
+    docs also note tmux limitations on some operating systems.
+  - **(c) hybrid — owner-executed runs, analyzer-verified observations
+    (recommended).** Option (a)'s run window (owner starts the interactive
+    session in a scripted-prepared disposable environment) with all
+    observations extracted afterwards from transcripts and the disposable
+    filesystem by analyzer tooling — never from the owner's or the model's
+    self-report. Rationale: the interactive window must exist either way;
+    keeping it human-executed removes (b)'s automation and
+    permission-environment deviations while keeping every observation
+    transcript-/filesystem-verified. If the owner declines manual execution,
+    (b) is the documented fallback with its deviations recorded.
+  The owner chooses.
+- **Fixture.** A small disposable repo containing two disjoint modules
+  (each own sources + own test file; no shared files) and two corresponding
+  small, self-contained changes — a task on which İAA plausibly authorizes
+  2 independent write lanes. No embedded workflow directive anywhere in the
+  fixture (BL-004 lesson): the only orchestration signals are the user
+  prompt and İAA itself. Current user instruction: the two-lane task text
+  plus the delegation-flavored sentence "Use subagents where appropriate."
+  Environment (recorded per arm): İAA **skills-dir form** (manage.sh install
+  into the disposable HOME — the historically tested form; owner may swap in
+  the plugin form); Superpowers state recorded (version, enabled/disabled —
+  expected 6.4.1 enabled, matching the tested baseline); spawn-depth setting
+  recorded (actual `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` value in the
+  disposable settings.json after install); Claude Code version pinned; the
+  flag set per arm via the disposable HOME's user `settings.json` `env`
+  (documented channel, self-documenting on disk).
+- **Arms.** Flag ON ×2 samples; flag OFF ×1 control. Only the flag value
+  differs between arms: same fixture commit, same prompt, same model.
+- **Observations** (each transcript- or filesystem-verified, never model
+  self-report):
+  - whether Agent calls carried `name` (Agent tool-input fields in the lead
+    and any teammate transcripts);
+  - whether teammates formed (`~/.claude/teams/<team>/config.json` members,
+    `~/.claude/tasks/<team>/`, per-agent inbox files);
+  - whether teammates loaded the İAA shim or skill (teammate transcripts:
+    managed-block/skill presence in context);
+  - whether teammates spawned subagents, and at what depth (Agent calls
+    inside teammate transcripts, compared against the recorded spawn-depth
+    value — this is the UNKNOWN in the 2026-09-25 evidence);
+  - inter-agent messages (inbox JSON contents: counts, senders, recipients);
+  - total spawns (Agent calls counted across all transcripts);
+  - final validation location (which session ran the final test suite);
+  - cost per arm (usage/cost records from the transcripts).
+- **Expected outcome.** None pre-asserted — this is characterization.
+  Pre-registered instead: the observations that would justify the candidate
+  adapter sentence "In İAA mode, do not pass `name` on Agent calls unless
+  the user requested a team" (would be a category-B change to
+  [platform-adapters.md](../iaa/references/platform-adapters.md); owner
+  decision; NOT part of this task). The sentence is justified only if ALL
+  hold: (1) at least one ON sample shows İAA governing (shim/skill loaded
+  in the lead) AND (2) at least one Agent call made under İAA's delegation
+  (delegation-flavored prompt, no user team request) carried `name` and
+  launched as a teammate (team config/mailbox evidence) AND (3) the OFF
+  control shows the same prompt producing ordinary subagents with no team
+  artifacts (isolating the flag as the differentiator). NOT justified
+  (record as no-adoption with evidence) if İAA-governed Agent calls never
+  carry `name`, no team forms under İAA dispatch in the ON arms, or the
+  ON/OFF difference is absent. Mixed ON samples are recorded as mixed; no
+  aggregation beyond what the samples show. Secondary (recorded, not
+  gating): whether teammate formation changed total spawns, validation
+  location, or shim loading — this feeds the characterization note either
+  way.
+- **Budget.** Stop and report if cumulative cost exceeds USD 20 (all arms
+  plus analysis).
+- **Evidence location.** `post-release/bl-009-agent-teams/`. Raw transcripts
+  stay machine-local per
+  [HISTORICAL-EVIDENCE-DISPOSITION.md](HISTORICAL-EVIDENCE-DISPOSITION.md);
+  commit analyzer outputs, sha256 of raw transcripts, fixtures, and the
+  report.
+- **Model.** Record the model in use at run time (expected: the GLM-5.3
+  profile — the single-model baseline). Model-family breadth (IAA-BL-007)
+  is explicitly out of scope, deferred by the owner.
+
+### IAA-BL-021 — Visible delegation-decision line (policy v4 candidate)
+- **Status:** `RESEARCH` (candidate; **not adopted; no core change**) · **Category:** research / policy
+- **Idea:** before any dispatch, and when choosing zero agents on a
+  delegation request, the primary states one short line naming the chosen
+  topology and the material benefit justifying each seat.
+- **Problem / motivation:** the delegation decision's reasoning is invisible
+  at the point of use; a user who asked for subagents cannot distinguish a
+  reasoned zero-agent or N-seat outcome from an unexamined one.
+- **Evidence:** owner rationale (2026-09-25), recorded as a paraphrase: users
+  should see a reasoned explanation rather than being asked to accept the
+  delegation outcome blindly. No behavioral evidence yet.
+- **Risks:** post-hoc rationalization (the stated reason may not be what
+  drove the decision); verbosity; possible drift in spawn behavior.
+- **Why it matters:** would make the material-benefit and per-seat
+  justification reasoning externally visible at the moment it decides — but
+  only if the stated line tracks the real decision, which is exactly what an
+  experiment must establish before any adoption.
+- **Governance:** adoption is a semantic change and requires a
+  policy-revision bump ([POLICY-LINEAGE.md](POLICY-LINEAGE.md)) plus
+  justification against the 18 frozen invariants
+  ([gate-2/00 §1](../release-hardening/gate-2/00-semantic-freeze.md)).
+- **Draft success metrics (for a future experiment):** justification line
+  present in N/N delegated and zero-agent runs; no increase in spawn counts
+  versus control; zero-agent fallback rate on trivial tasks unchanged; the
+  line is checkable by tests/tools/analyze_run.py.
+- **Dependencies / blockers:** none to design; adoption blocked by design on
+  experiment evidence + owner decision.
+- **Acceptance criteria (research phase):** experiment design plus results
+  plus a recorded owner decision.
 
 ## MAINTENANCE (standing)
 

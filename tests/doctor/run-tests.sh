@@ -191,5 +191,113 @@ ls "$H13/.claude/CLAUDE.md".iaa-backup-* >/dev/null 2>&1 || bad "no backup creat
 IAA_HOME="$H13" "$IAA" doctor > "$WORK/t13b.out" 2>&1 || bad "doctor should be clean after migration"
 ok "legacy migration: markers replaced, links swapped, state adopted, backup kept"
 
+# ---------------------------------------------------------------- T14..T23 agent-teams state
+# Effective Agent Teams detection (IAA-BL-020): doctor must resolve the
+# effective CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS state read-only across
+# environment, user/project/local settings, and managed settings, honoring
+# documented precedence, and must never fail merely because it is enabled.
+at_settings() { # $1 file, $2 value — minimal settings env fixture
+  mkdir -p -- "$(dirname -- "$1")"
+  printf '{"env":{"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS":"%s"}}\n' "$2" > "$1"
+}
+
+say 'T14: agent-teams absent everywhere → info, exit 0'
+H14=$(fresh_home 14)
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  IAA_HOME="$H14" "$IAA" doctor > "$WORK/t14.out" 2>&1 ) || bad "doctor non-zero with flag absent"
+grep -qE 'INFO +framework:agent-teams' "$WORK/t14.out" || bad "expected info line for absent flag"
+grep -q 'Agent Teams flag not set' "$WORK/t14.out" || bad "absent wording missing"
+grep -q 'WARNING framework:agent-teams' "$WORK/t14.out" && bad "absent flag must not warn"
+ok "absent flag → info only"
+
+say 'T15: user settings "1" → warning (not a failure), source named'
+H15=$(fresh_home 15)
+at_settings "$H15/.claude/settings.json" 1
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  IAA_HOME="$H15" "$IAA" doctor > "$WORK/t15.out" 2>&1 ) || bad "doctor must not fail when feature enabled"
+grep -q 'WARNING framework:agent-teams' "$WORK/t15.out" || bad "enabled flag must warn"
+grep -q 'Agent Teams enabled (source: user settings' "$WORK/t15.out" || bad "enabled wording/source missing"
+grep -qF "$H15/.claude/settings.json" "$WORK/t15.out" || bad "user settings path not named"
+grep -q 'summary: 0 actionable' "$WORK/t15.out" || bad "warning must not count as an actionable problem"
+ok "user settings 1 → warning, exit 0"
+
+say 'T16: user settings "0" → info, explicitly disabled'
+H16=$(fresh_home 16)
+at_settings "$H16/.claude/settings.json" 0
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  IAA_HOME="$H16" "$IAA" doctor > "$WORK/t16.out" 2>&1 ) || bad "doctor non-zero on explicit disable"
+grep -q 'Agent Teams explicitly disabled (source: user settings' "$WORK/t16.out" || bad "disabled wording missing"
+grep -q 'WARNING framework:agent-teams' "$WORK/t16.out" && bad "explicit disable must not warn"
+ok "user settings 0 → info (explicitly disabled)"
+
+say 'T17: shell env "1" only → warning, source environment'
+H17=$(fresh_home 17)
+( CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 IAA_HOME="$H17" "$IAA" doctor > "$WORK/t17.out" 2>&1 ) \
+  || bad "doctor must not fail when feature enabled via env"
+grep -q 'WARNING framework:agent-teams' "$WORK/t17.out" || bad "env-enabled flag must warn"
+grep -q 'Agent Teams enabled (source: environment)' "$WORK/t17.out" || bad "environment source missing"
+ok "shell env 1 → warning (source: environment)"
+
+say 'T18: shell env "1" + user settings "0" → disabled (settings env overrides shell export)'
+H18=$(fresh_home 18)
+at_settings "$H18/.claude/settings.json" 0
+( CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 IAA_HOME="$H18" "$IAA" doctor > "$WORK/t18.out" 2>&1 ) \
+  || bad "doctor non-zero on settings-disabled override"
+grep -q 'Agent Teams explicitly disabled' "$WORK/t18.out" || bad "settings must override shell export"
+grep -q 'overridden' "$WORK/t18.out" || bad "override note missing"
+grep -q 'WARNING framework:agent-teams' "$WORK/t18.out" && bad "disabled outcome must not warn"
+ok "user settings 0 beats shell env 1"
+
+say 'T19: project settings "1" → warning, project-scoped with path'
+H19=$(fresh_home 19)
+at_settings "$H19/proj/.claude/settings.json" 1
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  cd "$H19/proj" && IAA_HOME="$H19" "$IAA" doctor > "$WORK/t19.out" 2>&1 ) \
+  || bad "doctor must not fail on project-scoped enablement"
+grep -q 'Agent Teams enabled (source: project settings' "$WORK/t19.out" || bad "project source missing"
+grep -qF "$H19/proj/.claude/settings.json" "$WORK/t19.out" || bad "project settings path not named"
+ok "project settings 1 → warning with path"
+
+say 'T20: malformed settings JSON → indeterminate warning, no crash'
+H20=$(fresh_home 20)
+mkdir -p "$H20/.claude"
+printf '{"env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"\n' > "$H20/.claude/settings.json"
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  IAA_HOME="$H20" "$IAA" doctor > "$WORK/t20.out" 2>&1 ) || bad "doctor must not crash or fail on malformed JSON"
+grep -q 'Agent Teams state indeterminate' "$WORK/t20.out" || bad "indeterminate wording missing"
+grep -q 'WARNING framework:agent-teams' "$WORK/t20.out" || bad "unreadable source must yield indeterminate warning"
+ok "malformed JSON → indeterminate warning, exit 0"
+
+say 'T21: managed settings "1" → warning, managed path named'
+H21=$(fresh_home 21)
+at_settings "$H21/managed/managed-settings.json" 1
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  IAA_CLAUDE_MANAGED_DIR="$H21/managed" IAA_HOME="$H21" "$IAA" doctor > "$WORK/t21.out" 2>&1 ) \
+  || bad "doctor must not fail on managed enablement"
+grep -q 'Agent Teams enabled (source: managed settings' "$WORK/t21.out" || bad "managed source missing"
+grep -qF "$H21/managed" "$WORK/t21.out" || bad "managed path not named"
+ok "managed settings 1 → warning with path"
+
+say 'T22: project "0" outranks user "1" (settings precedence)'
+H22=$(fresh_home 22)
+at_settings "$H22/.claude/settings.json" 1
+at_settings "$H22/proj/.claude/settings.json" 0
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  cd "$H22/proj" && IAA_HOME="$H22" "$IAA" doctor > "$WORK/t22.out" 2>&1 ) \
+  || bad "doctor non-zero on project-level disable"
+grep -q 'Agent Teams explicitly disabled (source: project settings' "$WORK/t22.out" || bad "project must outrank user"
+ok "project 0 beats user 1"
+
+say 'T23: local project settings outranks shared project settings'
+H23=$(fresh_home 23)
+at_settings "$H23/proj/.claude/settings.json" 0
+at_settings "$H23/proj/.claude/settings.local.json" 1
+( unset CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+  cd "$H23/proj" && IAA_HOME="$H23" "$IAA" doctor > "$WORK/t23.out" 2>&1 ) \
+  || bad "doctor must not fail on local enablement"
+grep -q 'Agent Teams enabled (source: local project settings' "$WORK/t23.out" || bad "local must outrank shared project"
+grep -qF "$H23/proj/.claude/settings.local.json" "$WORK/t23.out" || bad "local settings path not named"
+ok "local 1 beats shared project 0"
+
 printf '\nALL %s DOCTOR TESTS PASSED\n' "$PASS"
 rm -rf -- "$WORK"
