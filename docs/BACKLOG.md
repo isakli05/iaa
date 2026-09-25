@@ -226,6 +226,23 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   shell-env-`"1"`-only / shell-env-`"1"`+user-`"0"` / project-`"1"` /
   malformed settings JSON / managed-`"1"`; all pre-existing doctor tests
   still pass; static CI green; D = NONE.
+- **Implementation (2026-09-25, branch `feat/bl-009-agent-teams-doctor`):**
+  `doctor_agent_teams` in `scripts/iaa` (projected byte-identically to
+  `packaging/claude/bin/iaa`) resolves the effective state read-only from the
+  process environment, user settings `env`, cwd-scoped project
+  `.claude/settings.json` + `.claude/settings.local.json` (paths named), and
+  managed settings at the documented platform paths including
+  `managed-settings.d/` merging (`IAA_CLAUDE_MANAGED_DIR` override for tests
+  and disposable environments), honoring the documented precedence
+  (settings `env` outranks a shell export; managed > local > project > user).
+  Enabled → `WARNING` (never a failure, never counted actionable);
+  explicitly disabled or absent → `INFO`; unreadable or unrecognized source →
+  `WARNING` `indeterminate` with the sources found (no guessing);
+  `--settings` payloads and MDM/console-managed policies are named as not
+  observable. Doctor tests T14–T23 cover the fixture matrix plus
+  project-over-user and local-over-project precedence (23/23 pass locally).
+  Detection-only wording added to INSTALLATION.md and COMPATIBILITY.md.
+  Stays `OPEN` until the PR `static` run is observed green.
 
 ## NEXT
 

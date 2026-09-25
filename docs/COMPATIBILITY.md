@@ -37,7 +37,7 @@ reasoning" — never "installation succeeds".
 | Codex native MultiAgentV2 (`spawn_agent`, `fork_turns` none/all/"N") | **TESTED** | 2026-08 campaigns + E9 numeric probe 2026-09-23 |
 | GSD / gsd-core | **UNVERIFIED** | not installed here; hook-grade guards untested against İAA dispatches; no compatibility claimed either way |
 | BMAD | **UNVERIFIED** | absent; no evidence |
-| Claude Agent Teams | **UNVERIFIED** | experimental, flag-gated, off locally |
+| Claude Agent Teams | **UNVERIFIED** | experimental, flag-gated, off locally; `iaa doctor` detects the effective flag state read-only across observable settings sources (detection, not tested behavior — IAA-BL-009/BL-020) |
 | warp codex plugin (`orchestration`) | **UNVERIFIED** | detected by `iaa doctor`; Oz/cloud-focused; not exercised together |
 | Other/unknown orchestration plugins | **UNVERIFIED** | by design: no compatibility claimed for unknowns; doctor reports what it detects; İAA's degradation rule is prose-level (sole-authority + yield) |
 | Non-GLM model families | **UNVERIFIED** | all behavioral evidence is single-model (KNOWN-LIMITATIONS #7) |

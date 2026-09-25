@@ -96,6 +96,14 @@ Healthy = exit 0. LEGACY former-MAO state, duplicates, stale links, malformed
 markers, and hash drift are all reported with exact fix commands
 ([LEGACY-MIGRATION.md](LEGACY-MIGRATION.md)).
 
+The doctor also reports whether Claude Code's experimental Agent Teams feature
+(`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) appears effectively enabled across
+the sources it can read read-only (process environment, user/project/local
+settings, managed settings files), honoring the documented precedence —
+detection only, not tested behavior: coexistence with İAA is untested
+([COMPATIBILITY.md](COMPATIBILITY.md)). An enabled flag is a warning, never a
+failure.
+
 ## What İAA never does at install time
 
 - never edits anything outside the marker-delimited blocks / its own links /
