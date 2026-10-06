@@ -244,6 +244,44 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   Detection-only wording added to INSTALLATION.md and COMPATIBILITY.md.
   Stays `OPEN` until the PR `static` run is observed green.
 
+### IAA-BL-022 — model-evals scheduled runs fail weekly (no hosted eval environment)
+- **Status:** `OPEN` · **Category:** maintenance / CI (category-A
+  infrastructure; no semantic impact)
+- **Problem / motivation:** the `model-evals` workflow carries a weekly
+  `schedule` trigger, but no hosted model-eval environment is configured on
+  GitHub (no `CLAUDE_EVAL_CREDENTIALS` secret), so every scheduled run fails
+  at the credential gate — recurring red noise with no eval behind it.
+- **Evidence:** scheduled run
+  [36412937270](https://github.com/isakli05/iaa/actions/runs/36412937270)
+  (2026-09-28) and scheduled run
+  [37303842355](https://github.com/isakli05/iaa/actions/runs/37303842355)
+  (2026-10-05), both at `main` @ `c4a426b`, both `event=schedule`, both
+  failing at "Require eval credentials" with the Gate-2 suite and result
+  upload **skipped** — no actual model eval ever started. The repository was
+  designed while Actions/publication assumptions differed (the weekly
+  cadence predates the decision not to configure hosted credentials); dated
+  Gate-2 evidence (`release-hardening/gate-2/09-ci-regression.md`,
+  `FINAL-GATE-2-REPORT.md` Q15) records that earlier design and is not
+  rewritten.
+- **Why it matters:** a weekly guaranteed-red run is noise that hides real
+  failures and misrepresents the hosted eval capability (local GLM-5.3 /
+  provider-profile evidence remains historical, machine-local evidence —
+  GitHub-hosted runs do not reproduce it).
+- **Owner decision (2026-10-07):** remove the weekly scheduled trigger;
+  keep manual `workflow_dispatch` (with the case-glob input). Do not
+  configure hosted model credentials/provider now. Do not let missing
+  credentials appear as a successful model eval — the credential gate stays
+  for manual dispatch, so an explicitly started but unconfigured eval may
+  fail loudly (acceptable: the owner initiated it).
+- **Explicit non-decision:** a hosted model-eval environment (secrets,
+  provider config, CLI install) is NOT being designed or configured in this
+  task; that remains a future question.
+- **Dependencies / blockers:** none.
+- **Acceptance criteria:** `model-evals.yml` on `main` has no `schedule:`
+  trigger and still has `workflow_dispatch` with the `cases` input; the
+  credential gate is unchanged; dated Gate-2 evidence unchanged; static CI
+  green; `git diff` over `iaa/` and `scripts/iaa` empty (D = NONE).
+
 ## NEXT
 
 ### IAA-BL-002 — ZCode feedback #699 confirming comment: post or drop
