@@ -45,7 +45,7 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
 ## ACTIVE
 
 ### IAA-BL-001 — Monitor and respond to zai-org/zcode-plugins PR #42
-- **Status:** `WAITING (external: zai-org/zcode-plugins maintainer review of PR #42 — opened 2026-09-23, still open with no comments as of 2026-09-24)` · **Category:** upstream / distribution
+- **Status:** `WAITING (external: zai-org/zcode-plugins maintainer review of PR #42 — opened 2026-09-23; no formal review yet as of 2026-10-07; internal validation passed on both PR heads)` · **Category:** upstream / distribution
 - **Problem / motivation:** the İAA ZCode plugin is submitted to the upstream
   marketplace; maintainer feedback may require changes, and upstream `main` may
   move before merge.
@@ -62,6 +62,35 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   `build_dist.py` / `git diff --check`, push. On merge or rejection: record the
   disposition here and close.
 - **Links:** https://github.com/zai-org/zcode-plugins/pull/42
+- **Upstream-refresh record (2026-10-07):** upstream `main` moved to
+  `c94279c9` (external-PR validation moved to an internal intake that
+  comments results on the PR; the old approval-required GitHub workflows
+  `validate.yml`/`pr-title.yml` were deleted — only `publish.yml` remains).
+  `feat/iaa-plugin` (fork `isakli05/zcode-plugins`) was rebased onto it:
+  head `e925831` → `738c4b0`, exactly one upstream commit swept in, clean
+  rebase. Contribution verified unchanged relative to the new base: the 13
+  intended files only, plugin tree byte-identical to İAA's validated
+  `packaging/zcode/` projection, `iaa` marketplace entry still last
+  (27 entries), version 0.1.1. Local upstream checks from the rebased
+  checkout: `scripts/validate.py` OK (27 plugins), `scripts/build_dist.py`
+  rebuilt `plugins/iaa/0.1.1/plugin.zip` to sha256
+  `621bdd1ffd24f40c736019e8b4d0961bc3dbda26b553ae72a425ea625e061e2c`
+  (exact published-pin match), `tests/test_tree_safety.py` 10/10 (the test
+  modified by `c94279c9`), working tree clean (`dist/` gitignored).
+  `git diff --check` reports two "new blank line at EOF" warnings in
+  `references/delegation-contract.md` / `references/platform-adapters.md` —
+  pre-existing in the original commit (authentic source-file trailing
+  newlines, present since the 2026-09-23 contribution), unchanged by the
+  rebase and left as-is to keep the PR bytes identical to the published
+  artifact. Pushed with `--force-with-lease` after verifying the remote
+  branch unmoved. New internal validation comment (panda920,
+  2026-10-06T22:25:46Z): `external-sync-validated
+  sha=738c4b0d190289c884a3a29e7a22d540a581ce20` — ✅ passed; the same
+  mechanism passed the old head `e925831` on 2026-09-24. The old
+  approval-waiting workflow checks no longer appear on the new head (the
+  workflows no longer exist upstream). Remaining gate: maintainer review
+  (requested: jacksonliuyn, panda920). No upstream action taken beyond the
+  rebase/push — no comments, pings, or merge attempts.
 
 ### IAA-BL-016 — Static CI red on main: plugin.zip sha not reproducible on GitHub runners
 - **Status:** `CLOSED` (2026-09-24) — phase A implemented and verified; **B**
