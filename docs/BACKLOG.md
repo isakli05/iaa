@@ -245,7 +245,8 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   Stays `OPEN` until the PR `static` run is observed green.
 
 ### IAA-BL-022 — model-evals scheduled runs fail weekly (no hosted eval environment)
-- **Status:** `OPEN` · **Category:** maintenance / CI (category-A
+- **Status:** `CLOSED` (2026-10-07) — schedule trigger removed, manual-only
+  dispatch live on `main` · **Category:** maintenance / CI (category-A
   infrastructure; no semantic impact)
 - **Problem / motivation:** the `model-evals` workflow carries a weekly
   `schedule` trigger, but no hosted model-eval environment is configured on
@@ -281,6 +282,16 @@ replace this file (relationship model: [GOVERNANCE.md](GOVERNANCE.md) §7).
   trigger and still has `workflow_dispatch` with the `cases` input; the
   credential gate is unchanged; dated Gate-2 evidence unchanged; static CI
   green; `git diff` over `iaa/` and `scripts/iaa` empty (D = NONE).
+- **Closure evidence (2026-10-07):** PR
+  [isakli05/iaa#6](https://github.com/isakli05/iaa/pull/6) merged as
+  `ef8cdac` (merge commit; PR `static` run 37538504875 `success`, GitGuardian
+  pass; main-push `static` run 37538603717 `success` at `ef8cdac`). Live
+  `main` `model-evals.yml` verified: triggers = `workflow_dispatch` only, no
+  `schedule`/`cron`, `cases` input and credential gate intact; merge diff
+  touches only `.github/workflows/model-evals.yml` + this file;
+  `c4a426b..ef8cdac` over `iaa/`/`scripts/iaa` empty (D = NONE); no
+  tag/release/version change (tags remain `v0.1.0-rc.1`/`v0.1.0`/`v0.1.1`,
+  VERSION 0.1.1); dated Gate-2 evidence unchanged.
 
 ## NEXT
 
