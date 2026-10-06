@@ -1,7 +1,11 @@
 name: model-evals
 
-# Layer B — real-model plugin evals. NEVER on push: cost-controlled cadence
-# (manual dispatch, release gates, or the weekly schedule).
+# Layer B — real-model plugin evals. NEVER on push, never scheduled — manual
+# dispatch only (IAA-BL-022). Hosted model evals are cost-controlled
+# and require an explicitly configured compatible auth/provider/CLI
+# environment (the CLAUDE_EVAL_CREDENTIALS secret); an explicitly started
+# but unconfigured run fails loudly below rather than reporting a misleading
+# green result.
 on:
   workflow_dispatch:
     inputs:
@@ -9,8 +13,6 @@ on:
         description: "case name glob (default: all)"
         required: false
         default: ""
-  schedule:
-    - cron: "23 4 * * 1" # weekly, Mondays ~04:23 UTC (off the :00 mark)
 
 permissions:
   contents: read
